@@ -12,4 +12,24 @@ const mongoConnect = async () => {
   await mongoose.connect("mongodb://0.0.0.0:27017/LIBRARY-SBSSU");
 };
 
-module.exports = { mongoConnect };
+const startTransaction = async () => {
+  const session = await mongoose.startSession();
+  session.startTransaction({});
+  return session;
+};
+
+const commitTransaction = async (session) => {
+  await session.commitTransaction();
+  session.endSession();
+};
+
+const abortTransaction = async (session) => {
+  await session.abortTransaction();
+  session.endSession();
+};
+module.exports = {
+  mongoConnect,
+  startTransaction,
+  commitTransaction,
+  abortTransaction,
+};

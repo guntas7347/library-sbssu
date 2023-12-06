@@ -9,20 +9,26 @@ import TableRow from "@mui/material/TableRow";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { useState } from "react";
 
-const CustomTableSelect = ({ rows, columns, onSelect }) => {
+const CustomTableSelect = ({
+  tableName,
+  rows,
+  columns,
+  onSelect,
+  indexToSelect,
+}) => {
   const [isChecked, setIsChecked] = useState(false);
 
-  const [selectedValue, setSelectedValue] = useState(null);
+  const [selectedValue, setSelectedValue] = useState([null]);
 
   const handleRowClick = (row) => {
     setIsChecked(!isChecked);
-    setSelectedValue(row[0]);
+    setSelectedValue(row[indexToSelect]);
   };
 
   if (!isChecked) {
-    onSelect(null);
+    onSelect(tableName, "");
   } else {
-    onSelect(selectedValue);
+    onSelect(tableName, selectedValue);
   }
 
   return (
@@ -40,8 +46,8 @@ const CustomTableSelect = ({ rows, columns, onSelect }) => {
           <TableBody>
             {rows.map((row, index) => {
               return (
-                <TableRow key={index} hover onClick={() => handleRowClick(row)}>
-                  <Checkbox checked={isChecked} />
+                <TableRow key={index} hover>
+                  <Checkbox onClick={() => handleRowClick(row)} />
                   {row.map((element, index) => {
                     return <TableCell key={index}>{element}</TableCell>;
                   })}

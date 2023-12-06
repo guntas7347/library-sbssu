@@ -3,15 +3,15 @@ import ADMIN_NavigationBar from "../components/navbar/navbar.component";
 import ADMIN_Homepage from "../pages/homepage/homepage.page.admin";
 import ManageBooksRoute from "./manage-books.route.admin";
 import ManageStudentsRoute from "./manage-students.route";
-import IssueBookPage from "../pages/issue-book/issue-book.page.admin";
+import IssueBooksRoute from "./issue-books.route.admin";
 
-const ADMIN_AdminRoutes = () => {
+const AdminRoutes = () => {
   return (
     <div>
       <ADMIN_NavigationBar />
       <Routes>
         <Route index element={<ADMIN_Homepage />} />
-        <Route path="/issue-book" element={<IssueBookPage />} />
+        <Route path="/issue-books/*" element={<IssueBooksRoute />} />
         <Route path="/manage-books/*" element={<ManageBooksRoute />} />
         <Route path="/manage-students/*" element={<ManageStudentsRoute />} />
       </Routes>
@@ -19,4 +19,4 @@ const ADMIN_AdminRoutes = () => {
   );
 };
 
-export default ADMIN_AdminRoutes;
+export default AdminRoutes;

@@ -12,7 +12,7 @@ const ManageStudentsPage = () => {
       <br />
       <br />
       <Button as={Link} to={`${previousPath}/add-student/add-student-card`}>
-        Add Student Card
+        Add Library Card
       </Button>
       <br />
       <br />

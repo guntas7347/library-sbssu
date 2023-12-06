@@ -9,7 +9,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { useNavigate } from "react-router-dom";
 
-const CustomTable = ({ rows, columns, path }) => {
+const CustomTable = ({ rows, columns, handleRowClick, indexToSelect = 0 }) => {
   const navigate = useNavigate();
 
   const [page, setPage] = useState(0);
@@ -41,7 +41,7 @@ const CustomTable = ({ rows, columns, path }) => {
                 <TableRow
                   key={index}
                   hover
-                  onClick={() => navigate(`${path}/${row[0]}`)}
+                  onClick={() => handleRowClick(row[indexToSelect])}
                 >
                   {row.map((element, index) => {
                     return <TableCell key={index}>{element}</TableCell>;

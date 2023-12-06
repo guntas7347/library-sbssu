@@ -8,11 +8,20 @@ import {
   fetchBookByISBN,
 } from "../../../../hooks/http-requests.hooks.admin";
 import { sortObjectUsingKeys } from "../../../../../../utils/functions";
+import AlertDialog from "../../../../../../components/feedback/dialog/alert-dialog.component";
+import SnackbarFeedback from "../../../../../../components/feedback/snackbar/snackbar.component";
 
 const AddBookAccountPage = () => {
   const [showBookTable, setShowBookTable] = useState(false);
 
   const [showAccountNumberField, setShowAccountNumberField] = useState(false);
+
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
+  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   const [rowData, setRowData] = useState([]);
 
@@ -29,7 +38,8 @@ const AddBookAccountPage = () => {
     setShowBookTable(true);
   };
 
-  const handleSelect = (selectedValue) => {
+  const handleSelect = (_, selectedValue) => {
+    console.log(selectedValue);
     if (selectedValue !== null) {
       setShowAccountNumberField(selectedValue);
     } else {
@@ -37,8 +47,14 @@ const AddBookAccountPage = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    console.log(await createBookAccount(formFields));
+  const handleCreateBookAccount = async () => {
+    await createBookAccount(formFields)
+      .then((res) => {
+        setSnackbarFeedback({ open: true, severity: "success", message: res });
+      })
+      .catch((err) =>
+        setSnackbarFeedback({ open: true, severity: "error", message: err })
+      );
   };
 
   const rowsArray = (array) => {
@@ -60,6 +76,7 @@ const AddBookAccountPage = () => {
               label="Book's ISBN"
               name="isbn"
               type="text"
+              disabled={showBookTable}
               onChange={handleChange}
             />
           </Grid>
@@ -74,6 +91,7 @@ const AddBookAccountPage = () => {
             columns={["ISBN", "Title", "Author", "Genre", "Price"]}
             rows={rowData}
             onSelect={handleSelect}
+            indexToSelect={0}
           />
         ) : (
           ""
@@ -82,35 +100,61 @@ const AddBookAccountPage = () => {
 
         {showAccountNumberField ? (
           <div>
-            <Grid container spacing={2}>
-              <Grid item>
-                <InputField
-                  label="ISBN"
-                  type="number"
-                  name="isbn"
-                  value={isbn}
-                  disabled
-                  InputLabelProps={{ shrink: true }}
-                />
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setShowAlertDialog(true);
+              }}
+            >
+              <Grid container spacing={2}>
+                <Grid item>
+                  <InputField
+                    label="ISBN"
+                    type="number"
+                    name="isbn"
+                    value={isbn}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                <Grid item>
+                  <InputField
+                    label="Account Number"
+                    type="number"
+                    name="accountNumber"
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item>
+                  <Button type="submit" variant="contained">
+                    Submit
+                  </Button>
+                </Grid>
               </Grid>
-              <Grid item>
-                <InputField
-                  label="Account Number"
-                  type="number"
-                  name="accountNumber"
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item>
-                <Button onClick={handleSubmit} variant="contained">
-                  Submit
-                </Button>
-              </Grid>
-            </Grid>
+            </form>
           </div>
         ) : (
           ""
         )}
+      </div>
+      <div>
+        <AlertDialog
+          title="Confirm?"
+          content="This action can not be undone"
+          open={showAlertDialog}
+          handleClick={(e, f) => {
+            if (e) handleCreateBookAccount();
+            setShowAlertDialog(false);
+          }}
+        />
+        <SnackbarFeedback
+          open={showSnackbarFeedback.open}
+          message={showSnackbarFeedback.message}
+          severity={showSnackbarFeedback.severity}
+          handleClose={() =>
+            setSnackbarFeedback({ open: false, severity: "", message: "" })
+          }
+        />
       </div>
     </div>
   );

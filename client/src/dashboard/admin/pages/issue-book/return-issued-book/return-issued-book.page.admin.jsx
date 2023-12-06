@@ -1,0 +1,223 @@
+import { Button, Grid } from "@mui/material";
+import InputField from "../../../../../components/forms/input-field/input-field.component";
+import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
+import {
+  fetchIssuedBook,
+  issueBookFine,
+  returnIssuedBook,
+} from "../../../hooks/http-requests.hooks.admin";
+import SpanningTable from "../../../../../components/table/spanning-table.component";
+import { useState } from "react";
+import { formatDate } from "../../../../../utils/functions";
+import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
+import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+
+const ReturnIssuedBookPage = () => {
+  const [showSubmitConfirmationAlertDialog, setShowAlertDialog] =
+    useState(false);
+  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
+
+  const [showFineAlertDialog, setShowFineAlertDialog] = useState({
+    open: false,
+    fineAmount: 0,
+  });
+
+  const { formFields, handleChange, resetFormFields } = useForm({
+    accountNumber: "",
+  });
+
+  const defaultIssuedBookDoc = {
+    title: null,
+    ISBN: "",
+    author: "",
+    accountNumber: "",
+    libraryCard: "",
+    issueDate: "",
+    name: "",
+    program: "",
+    rollNumber: "",
+  };
+
+  const [issuedBookDoc, setIssuedBookDoc] = useState(defaultIssuedBookDoc);
+
+  const {
+    title,
+    ISBN,
+    author,
+    accountNumber,
+    libraryCard,
+    issueDate,
+    name,
+    program,
+    rollNumber,
+    _id,
+  } = issuedBookDoc;
+
+  const handleFetch = async () => {
+    await fetchIssuedBook({ accountNumber: +formFields.accountNumber })
+      .then((res) => {
+        setIssuedBookDoc(res);
+      })
+      .catch((err) =>
+        setSnackbarFeedback({ open: true, severity: "error", message: err })
+      );
+  };
+
+  const returnDate = formatDate();
+
+  const handleReturnBook = async () => {
+    await returnIssuedBook({ _id })
+      .then((res) => {
+        setSnackbarFeedback({
+          open: true,
+          severity: "success",
+          message: res,
+        });
+      })
+      .catch((err) => {
+        setSnackbarFeedback({
+          open: true,
+          severity: "error",
+          message: err,
+        });
+      });
+  };
+
+  const handleCheckFine = async () => {
+    await issueBookFine({ _id })
+      .then(async (fine) => {
+        if (fine != null) {
+          setShowFineAlertDialog({ open: true, fineAmount: fine });
+        } else {
+          handleReturnBook();
+        }
+      })
+      .catch((err) =>
+        setSnackbarFeedback({ open: true, severity: "error", message: err })
+      );
+  };
+
+  const handleFineDialoge = async () => {
+    await returnIssuedBook({ _id })
+      .then((res) => {
+        setSnackbarFeedback({ open: true, severity: "success", message: res });
+      })
+      .catch((err) => {
+        setSnackbarFeedback({ open: true, severity: "error", message: err });
+      });
+  };
+
+  return (
+    <div className="text-center m-5">
+      <h1>Return book?</h1>
+
+      <div className="my-5">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setShowAlertDialog(true);
+          }}
+        >
+          <Grid container spacing={2}>
+            <Grid item>
+              <InputField
+                label="Account Number"
+                name="accountNumber"
+                type="number"
+                onChange={handleChange}
+                value={formFields.accountNumber}
+              />
+            </Grid>
+            <Grid item>
+              <Button variant="contained" onClick={handleFetch}>
+                Fetch
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+        <Button onClick={() => resetFormFields()}>clear</Button>
+      </div>
+      <div>
+        <div className="mb-3">
+          <SpanningTable
+            rows={[
+              ["Account Number", accountNumber],
+              ["Library Card Number", libraryCard],
+              ["Issue Date", issueDate],
+              ["Book title", title],
+              ["Book Author", author],
+              ["ISBN", ISBN],
+              ["Student Name", name],
+              ["Roll Number", rollNumber],
+              ["Program", program],
+            ]}
+          />
+        </div>
+        <div className="">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setShowAlertDialog(true);
+            }}
+          >
+            <Grid container spacing={2}>
+              <Grid item>
+                <InputField
+                  label="Return Date"
+                  name="returnDate"
+                  value={returnDate}
+                  disabled
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid item>
+                <Button variant="contained" type="submit">
+                  Return
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </div>
+      </div>
+      <div>
+        <AlertDialog
+          title="Confirm?"
+          content="This action can not be undone"
+          open={showSubmitConfirmationAlertDialog}
+          handleClick={(e, f) => {
+            if (e) handleCheckFine();
+            setShowAlertDialog(false);
+          }}
+        />
+        <AlertDialog
+          title="Pay Fine"
+          content={`The issuer is subject to fine of ${showFineAlertDialog.fineAmount} for late submit`}
+          open={showFineAlertDialog.open}
+          agreeMessage="Paid"
+          disagreeMessage="Pending"
+          handleClick={(e, f) => {
+            if (e) handleFineDialoge();
+            setShowFineAlertDialog({
+              open: false,
+              fineAmount: 0,
+            });
+          }}
+        />
+        <SnackbarFeedback
+          open={showSnackbarFeedback.open}
+          message={showSnackbarFeedback.message}
+          severity={showSnackbarFeedback.severity}
+          handleClose={() =>
+            setSnackbarFeedback({ open: false, severity: "", message: "" })
+          }
+        />
+      </div>
+    </div>
+  );
+};
+
+export default ReturnIssuedBookPage;

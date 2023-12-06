@@ -6,8 +6,18 @@ import {
   fetchBookDetailsByIsbnApi,
 } from "../../../hooks/http-requests.hooks.admin";
 import useLengthTrigger from "../../../../../components/forms/hooks/useLengthTrigger/uselengthTrigger.hook.component";
+import { useState } from "react";
+import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
+import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
 
 const AddBookPage = () => {
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
+  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
+
   const { formFields, handleChange, setFormFields } = useForm({
     title: "",
     author: "",
@@ -25,22 +35,28 @@ const AddBookPage = () => {
   const { title, author, publisher, publicationYear } = formFields;
 
   const handleAutoFetch = async () => {
-    const { title, publish_date, publishers, author } =
-      await fetchBookDetailsByIsbnApi(formFields.ISBN);
+    const { title, publish_date, publishers } = await fetchBookDetailsByIsbnApi(
+      formFields.ISBN
+    );
 
     setFormFields({
       ...formFields,
-      title: title,
+      title,
       publisher: publishers[0],
       publicationYear: new Date(publish_date).getFullYear(),
-      author: author,
     });
   };
 
   useLengthTrigger(formFields.ISBN, 13, handleAutoFetch);
 
-  const handleClick = async () => {
-    console.log(await addNewBook(formFields));
+  const handleAddNewBook = async () => {
+    await addNewBook(formFields)
+      .then((res) => {
+        setSnackbarFeedback({ open: true, severity: "success", message: res });
+      })
+      .catch((err) =>
+        setSnackbarFeedback({ open: true, severity: "error", message: err })
+      );
   };
 
   return (
@@ -48,81 +64,107 @@ const AddBookPage = () => {
       <br />
       <br />
       <div className="m-5">
-        <Grid container spacing={2}>
-          <Grid item>
-            <InputField
-              label="Title"
-              type="text"
-              name="title"
-              value={title}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item>
-            <InputField
-              label="Author"
-              type="text"
-              name="author"
-              value={author}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item>
-            <InputField
-              label="ISBN"
-              type="number"
-              name="ISBN"
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item>
-            <InputField
-              label="Genre"
-              type="text"
-              name="genre"
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item>
-            <InputField
-              label="Publication Year"
-              type="number"
-              name="publicationYear"
-              value={publicationYear}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item>
-            <InputField
-              label="Publisher"
-              type="text"
-              name="publisher"
-              value={publisher}
-              onChange={handleChange}
-            />
-          </Grid>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            setShowAlertDialog(true);
+          }}
+        >
+          <Grid container spacing={2}>
+            <Grid item>
+              <InputField
+                label="Title"
+                type="text"
+                name="title"
+                value={title}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item>
+              <InputField
+                label="Author"
+                type="text"
+                name="author"
+                value={author}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item>
+              <InputField
+                label="ISBN"
+                type="number"
+                name="ISBN"
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item>
+              <InputField
+                label="Genre"
+                type="text"
+                name="genre"
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item>
+              <InputField
+                label="Publication Year"
+                type="number"
+                name="publicationYear"
+                value={publicationYear}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item>
+              <InputField
+                label="Publisher"
+                type="text"
+                name="publisher"
+                value={publisher}
+                onChange={handleChange}
+              />
+            </Grid>
 
-          <Grid item>
-            <InputField
-              label="Description"
-              type="text"
-              name="description"
-              onChange={handleChange}
-            />
+            <Grid item>
+              <InputField
+                label="Description"
+                type="text"
+                name="description"
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item>
+              <InputField
+                label="Price"
+                type="number"
+                name="price"
+                onChange={handleChange}
+              />
+            </Grid>
           </Grid>
-          <Grid item>
-            <InputField
-              label="Price"
-              type="number"
-              name="price"
-              onChange={handleChange}
-            />
-          </Grid>
-        </Grid>
-        <br />
-        <Button onClick={handleClick} variant="contained">
-          Submit
-        </Button>
+          <br />
+          <Button type="submit" variant="contained">
+            Submit
+          </Button>
+        </form>
+      </div>
+      <div>
+        <AlertDialog
+          title="Confirm?"
+          content="This action can not be undone"
+          open={showAlertDialog}
+          handleClick={(e) => {
+            if (e) handleAddNewBook();
+            setShowAlertDialog(false);
+          }}
+        />
+        <SnackbarFeedback
+          open={showSnackbarFeedback.open}
+          message={showSnackbarFeedback.message}
+          severity={showSnackbarFeedback.severity}
+          handleClose={() =>
+            setSnackbarFeedback({ open: false, severity: "", message: "" })
+          }
+        />
       </div>
     </div>
   );

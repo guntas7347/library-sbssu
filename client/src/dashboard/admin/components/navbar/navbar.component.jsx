@@ -15,14 +15,17 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import { signOut } from "../../../http-requests";
 
 const ADMIN_NavigationBar = () => {
   const navigate = useNavigate();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const handleSignOut = () => {
-    console.log("Signout triggered...");
+  const handleSignOut = async () => {
+    await signOut()
+      .then(() => navigate("/"))
+      .catch(() => alert("Sign Out Failed"));
   };
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
@@ -74,7 +77,7 @@ const ADMIN_NavigationBar = () => {
               <ListItem
                 button
                 component={Link}
-                to="/dashboard/admin/issue-book"
+                to="/dashboard/admin/issue-books"
               >
                 <ListItemText primary="Issue Book" />
               </ListItem>
