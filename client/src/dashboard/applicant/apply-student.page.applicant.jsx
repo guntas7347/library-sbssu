@@ -24,8 +24,9 @@ const ApplyStudentPage = () => {
     rollNumber: "",
     name: "",
     fathersName: "",
-    gender: "male",
+
     dob: "",
+
     program: "BTECH",
     specialization: "",
     batch: "",
@@ -40,6 +41,7 @@ const ApplyStudentPage = () => {
     fathersName,
     gender,
     dob,
+    caste,
     program,
     specialization,
   } = formFields;
@@ -112,7 +114,6 @@ const ApplyStudentPage = () => {
                   { name: "Female", value: "female" },
                   { name: "Other", value: "other" },
                 ]}
-                value={gender}
                 onChange={handleChange}
               />
             </Grid>
@@ -123,6 +124,18 @@ const ApplyStudentPage = () => {
                 name="dob"
                 onChange={handleChange}
                 InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item>
+              <InputSelect
+                name="caste"
+                fields={[
+                  { name: "General", value: "general" },
+                  { name: "SC", value: "sc" },
+                  { name: "ST", value: "st" },
+                  { name: "OBC", value: "obc" },
+                ]}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item>

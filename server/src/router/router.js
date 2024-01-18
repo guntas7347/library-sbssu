@@ -16,15 +16,14 @@ router.use("/admin/settings", settingsRouter);
 
 const verifyJwtMiddleware = (req, res, next) => {
   try {
-    const jwt = verifyJwt(req.cookies.jwt);
+    const jwt = verifyJwt(req.cookies.session);
     if (jwt === null) {
-      res.cookie("jwt", null, { expires: new Date(0) });
+      res.cookie("session", null, { expires: new Date(0) });
       return res
         .status(401)
         .json({ status: "Authenticaltion Failed", payload: null });
     } else {
       req.user = jwt;
-
       next();
     }
   } catch (error) {
@@ -55,11 +54,11 @@ const verifyAdmin = async (req, res, next) => {
 };
 
 router.post("/auth/ping", async (req, res) => {
+  // console.log("\x1b[32m Pinged \x1b[0m");
   try {
-    const userAuth = await getAuthRoleById(req.user.id);
-
+    const userAuth = await getAuthRoleById(req.user.uid, req.body.role);
     if (userAuth === null) {
-      res.cookie("jwt", null, { expires: new Date(0) });
+      res.cookie("session", null, { expires: new Date(0) });
       return res
         .status(401)
         .json({ status: "Authenticaltion Failed", payload: null });

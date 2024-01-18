@@ -17,7 +17,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { signOut } from "../../../http-requests";
 
-const ADMIN_NavigationBar = () => {
+const NavigationBar = () => {
   const navigate = useNavigate();
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -107,4 +107,4 @@ const ADMIN_NavigationBar = () => {
   );
 };
 
-export default ADMIN_NavigationBar;
+export default NavigationBar;

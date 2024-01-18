@@ -25,3 +25,4 @@ const checkPassword = async (password, hash) => {
 };
 
 module.exports = { createPasswordHash, checkPassword };
+//   userName: { type: String, required: true },

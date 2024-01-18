@@ -1,60 +1,68 @@
 const express = require("express");
 const {
-  createUser,
-  findUser,
-  changePassword,
-} = require("../../../models/auth/auth.controllers");
-const { checkPassword } = require("../../../models/auth/functions");
-const { createJWT } = require("../passport/jwt");
-const { transporter } = require("../../../services/nodemailer");
-const Mailgen = require("mailgen");
+  createApplicantAuth,
+  getApplicantAuthOtpById,
+  getApplicantAuthIdByEmail,
+  markApplicantAuthAsVerified,
+} = require("../../../../models/auth/auth_applicant.controllers");
+const {
+  generateOtpEmailTemplate,
+} = require("../../../../services/email-templates");
+const { transporter } = require("../../../../services/nodemailer");
 
 const emailSignOnRouter = express.Router();
 
-const mailGenerator = new Mailgen({
-  theme: "default",
-  product: {
-    name: "Library SBSSU",
-    link: "https://sbssu.ac.in/",
-    logo: "https://sbssu.ac.in/images/Tricolor.png",
-  },
-});
-
 emailSignOnRouter.post("/create-user/send-otp", async (req, res) => {
   try {
-    const user = await findUser(req.body.email);
+    // const user = await findUser(req.body.email);
 
-    if (user !== null) {
-      return res
-        .status(400)
-        .json({ status: "Email already exists", payload: null });
-    }
+    // if (user !== null) {
+    //   return res
+    //     .status(400)
+    //     .json({ status: "Email already exists", payload: null });
+    // }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    var emailBody = mailGenerator.generate({
-      body: {
-        name: req.body.displayName,
-        intro: [
-          "Welcome to Shaheed Bhagat Singh State University's Centeral Library! We're very excited to have you on board.",
-          `One Time Password for your account verification is ${otp}`,
-        ],
-        outro:
-          "Need help, or have questions? Contact Library in working hours, we'd love to help.",
-      },
-    });
 
     transporter.sendMail({
       from: "sandhugameswithjoy@gmail.com",
       to: req.body.email,
       subject: "Account Verification",
-      html: emailBody,
+      html: generateOtpEmailTemplate(req.body.displayName, otp),
     });
 
-    await createUser(req.body);
-    return res
-      .status(200)
-      .json({ status: "Account created, Please Login", payload: null });
+    await createApplicantAuth(req.body, otp);
+    const { _id } = await getApplicantAuthIdByEmail(req.body.email);
+
+    console.log(`One Time Password: ${otp}`);
+
+    return res.status(200).json({
+      status: "Please enter OTP that you recieved via your email",
+      payload: _id,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ status: "Operation Failed", payload: null });
+  }
+});
+
+emailSignOnRouter.post("/create-user/verify-otp", async (req, res) => {
+  try {
+    const applicantDoc = await getApplicantAuthOtpById(req.body._id);
+
+    if (applicantDoc._doc.otp !== req.body.otp) {
+      return res.status(400).json({
+        status: "Invalid OTP",
+        payload: null,
+      });
+    }
+
+    await markApplicantAuthAsVerified(req.body._id);
+
+    return res.status(200).json({
+      status: "Account Created Successfully",
+      payload: null,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: "Operation Failed", payload: null });

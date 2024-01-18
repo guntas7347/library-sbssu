@@ -38,3 +38,8 @@ const DashboardRoutes = () => {
 };
 
 export default DashboardRoutes;
+{
+  /* <ProtectedRoute role="ADMIN">
+              <AdminRoutes />
+            </ProtectedRoute> */
+}

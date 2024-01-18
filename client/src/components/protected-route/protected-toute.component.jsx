@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { getAuthRole, signOut } from "../../dashboard/http-requests";
+import { signOut, verifyAuthRole } from "../../dashboard/http-requests";
 
 const ProtectedRoute = ({ redirectPath = "/", children, role }) => {
   const [jwt, setJwt] = useState(false);
@@ -8,7 +8,7 @@ const ProtectedRoute = ({ redirectPath = "/", children, role }) => {
 
   useEffect(() => {
     const asyncFunc = async () => {
-      await getAuthRole()
+      await verifyAuthRole({ role })
         .then((resRole) => {
           if (resRole === role) {
             setIsLoading(false);

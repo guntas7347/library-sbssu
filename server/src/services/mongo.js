@@ -8,6 +8,14 @@ mongoose.connection.on("error", (error) => {
   console.log(error);
 });
 
+// mongoose.set("debug", (collectionName, method, query, doc) => {
+//   console.log(
+//     `${new Date()} ${collectionName}.${method}`,
+//     JSON.stringify(query),
+//     doc
+//   );
+// });
+
 const mongoConnect = async () => {
   await mongoose.connect("mongodb://0.0.0.0:27017/LIBRARY-SBSSU");
 };

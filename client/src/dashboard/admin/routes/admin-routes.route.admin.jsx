@@ -1,16 +1,18 @@
 import { Route, Routes } from "react-router-dom";
-import ADMIN_NavigationBar from "../components/navbar/navbar.component";
-import ADMIN_Homepage from "../pages/homepage/homepage.page.admin";
+import NavigationBar from "../components/navbar/navbar.component";
+import Homepage from "../pages/homepage/homepage.page.admin";
 import ManageBooksRoute from "./manage-books.route.admin";
 import ManageStudentsRoute from "./manage-students.route";
 import IssueBooksRoute from "./issue-books.route.admin";
+import ProfileRoute from "./profile.router";
 
 const AdminRoutes = () => {
   return (
     <div>
-      <ADMIN_NavigationBar />
+      <NavigationBar />
       <Routes>
-        <Route index element={<ADMIN_Homepage />} />
+        <Route index element={<Homepage />} />
+        <Route path="/profile/*" element={<ProfileRoute />} />
         <Route path="/issue-books/*" element={<IssueBooksRoute />} />
         <Route path="/manage-books/*" element={<ManageBooksRoute />} />
         <Route path="/manage-students/*" element={<ManageStudentsRoute />} />

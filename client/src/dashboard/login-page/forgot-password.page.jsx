@@ -10,22 +10,13 @@ import {
 import InputField from "../../components/forms/input-field/input-field.component";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
-import {
-  adminLoginWithCredentials,
-  loginWithCredentials,
-} from "../http-requests";
+import { forgotPassword, signUpWithCredentials } from "../http-requests";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
 import SnackbarFeedback from "../../components/feedback/snackbar/snackbar.component";
-import SnackbarFeedbackCustom from "../../components/feedback/snackbar/snackbar-full.component";
+import { useState } from "react";
 
-const LoginPage = () => {
+const ForgotPassword = () => {
   const navigate = useNavigate();
-
-  const { formFields, handleChange } = useForm({
-    email: "",
-    password: "",
-  });
 
   const [showSnackbarFeedback, setSnackbarFeedback] = useState({
     open: false,
@@ -33,35 +24,20 @@ const LoginPage = () => {
     severity: "",
   });
 
+  const { formFields, handleChange } = useForm({
+    email: "",
+    password: "",
+  });
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(formFields);
-    await adminLoginWithCredentials(formFields)
-      .then(() => {
-        navigate("/dashboard/admin");
+    await forgotPassword(formFields)
+      .then((res) => {
+        setSnackbarFeedback({ open: true, severity: "success", message: res });
       })
       .catch((err) =>
         setSnackbarFeedback({ open: true, severity: "error", message: err })
       );
-  };
-
-  const redirectOnRole = (role) => {
-    switch (role) {
-      case "ADMIN":
-        navigate("/dashboard/admin");
-        break;
-
-      case "STUDENT":
-        navigate("/dashboard/student");
-        break;
-
-      case "APPLICANT":
-        navigate("/dashboard/applicant");
-        break;
-
-      default:
-        break;
-    }
   };
 
   return (
@@ -80,7 +56,7 @@ const LoginPage = () => {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Reset your password
           </Typography>
           <Box
             component="form"
@@ -115,26 +91,30 @@ const LoginPage = () => {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Continue
             </Button>
             <Grid container>
-              <Grid item xs>
-                <Link to={"/forgot-password"}>Forgot password?</Link>
-              </Grid>
               <Grid item>
-                <Link to={"/sign-up"}>{"Don't have an account? Sign Up"}</Link>
+                <Link to={"/"}>{"Already have an account? Login In"}</Link>
               </Grid>
             </Grid>
           </Box>
         </Box>
         {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
       </Container>
-      <SnackbarFeedbackCustom
-        showSnackbarFeedback={showSnackbarFeedback}
-        setSnackbarFeedback={setSnackbarFeedback}
-      />
+      <div>
+        <SnackbarFeedback
+          open={showSnackbarFeedback.open}
+          message={showSnackbarFeedback.message}
+          severity={showSnackbarFeedback.severity}
+          handleClose={() => {
+            setSnackbarFeedback({ open: false, severity: "", message: "" });
+            // navigate("/");
+          }}
+        />
+      </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default ForgotPassword;
