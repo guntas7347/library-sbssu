@@ -1,43 +1,56 @@
 const mongoose = require("mongoose");
 
 const BooksSchema = new mongoose.Schema({
+  isbn: {
+    type: Number,
+    required: false,
+  },
   title: {
     type: String,
-    required: true,
+    required: false,
   },
   author: {
     type: String,
     required: true,
   },
-  ISBN: {
-    type: Number,
-    required: true,
-  },
-  genre: {
-    type: String,
-    required: true,
-  },
-  publicationYear: {
-    type: Number,
-    required: true,
-  },
-  publisher: {
-    type: String,
-    required: true,
-  },
 
-  description: {
+  placeAndPublishers: {
     type: String,
     required: false,
   },
-  price: {
+  publicationYear: {
     type: Number,
-    required: true,
+    required: false,
   },
-  bookAccounts: [
+  pages: {
+    type: String,
+    required: false,
+  },
+
+  volume: {
+    type: String,
+    required: false,
+  },
+  source: {
+    type: String,
+    required: false,
+  },
+  cost: {
+    type: String,
+    required: false,
+  },
+  callNumber: {
+    type: String,
+    required: false,
+  },
+  createdAt: {
+    type: Date,
+    default: new Date(),
+  },
+  accessionNumbers: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "BookAccount",
+      ref: "BookAccession",
     },
   ],
 });

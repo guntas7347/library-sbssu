@@ -1,20 +1,21 @@
 import { useState } from "react";
-import { useForm } from "../../../../../../components/forms/use-form-hook/use-form.hook.component";
-import InputField from "../../../../../../components/forms/input-field/input-field.component";
+import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
+import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { Button, Grid } from "@mui/material";
-import CustomTableSelect from "../../../../../../components/table/custom-table-select.component";
+import CustomTableSelect from "../../../../../components/table/custom-table-select.component";
 import {
-  createBookAccount,
+  createBookAccession,
   fetchBookByISBN,
-} from "../../../../hooks/http-requests.hooks.admin";
-import { sortObjectUsingKeys } from "../../../../../../utils/functions";
-import AlertDialog from "../../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../../components/feedback/snackbar/snackbar.component";
+} from "../../../hooks/http-requests.hooks.admin";
+import { sortObjectUsingKeys } from "../../../../../utils/functions";
+import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
+import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
 
-const AddBookAccountPage = () => {
+const AddBookAccessionPage = () => {
   const [showBookTable, setShowBookTable] = useState(false);
 
-  const [showAccountNumberField, setShowAccountNumberField] = useState(false);
+  const [showAccessionNumberField, setShowAccessionNumberField] =
+    useState(false);
 
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [showSnackbarFeedback, setSnackbarFeedback] = useState({
@@ -27,7 +28,7 @@ const AddBookAccountPage = () => {
 
   const { formFields, handleChange } = useForm({
     isbn: "",
-    accountNumber: "",
+    accessionNumber: "",
   });
   const { isbn } = formFields;
 
@@ -39,16 +40,15 @@ const AddBookAccountPage = () => {
   };
 
   const handleSelect = (_, selectedValue) => {
-    console.log(selectedValue);
     if (selectedValue !== null) {
-      setShowAccountNumberField(selectedValue);
+      setShowAccessionNumberField(selectedValue);
     } else {
-      setShowAccountNumberField(false);
+      setShowAccessionNumberField(false);
     }
   };
 
-  const handleCreateBookAccount = async () => {
-    await createBookAccount(formFields)
+  const handleCreateBookAccession = async () => {
+    await createBookAccession(formFields)
       .then((res) => {
         setSnackbarFeedback({ open: true, severity: "success", message: res });
       })
@@ -60,7 +60,13 @@ const AddBookAccountPage = () => {
   const rowsArray = (array) => {
     return array.map((obj) => {
       return Object.values(
-        sortObjectUsingKeys(obj, ["ISBN", "title", "author", "genre", "price"])
+        sortObjectUsingKeys(obj, [
+          "isbn",
+          "title",
+          "author",
+          "publicationYear",
+          "cost",
+        ])
       );
     });
   };
@@ -88,7 +94,7 @@ const AddBookAccountPage = () => {
         </Grid>
         {showBookTable ? (
           <CustomTableSelect
-            columns={["ISBN", "Title", "Author", "Genre", "Price"]}
+            columns={["ISBN", "Title", "Author", "Publication Year", "Price"]}
             rows={rowData}
             onSelect={handleSelect}
             indexToSelect={0}
@@ -98,7 +104,7 @@ const AddBookAccountPage = () => {
         )}
         <br />
 
-        {showAccountNumberField ? (
+        {showAccessionNumberField ? (
           <div>
             <form
               onSubmit={(e) => {
@@ -119,9 +125,9 @@ const AddBookAccountPage = () => {
                 </Grid>
                 <Grid item>
                   <InputField
-                    label="Account Number"
+                    label="Accession Number"
                     type="number"
-                    name="accountNumber"
+                    name="accessionNumber"
                     onChange={handleChange}
                   />
                 </Grid>
@@ -143,7 +149,7 @@ const AddBookAccountPage = () => {
           content="This action can not be undone"
           open={showAlertDialog}
           handleClick={(e, f) => {
-            if (e) handleCreateBookAccount();
+            if (e) handleCreateBookAccession();
             setShowAlertDialog(false);
           }}
         />
@@ -160,4 +166,4 @@ const AddBookAccountPage = () => {
   );
 };
 
-export default AddBookAccountPage;
+export default AddBookAccessionPage;

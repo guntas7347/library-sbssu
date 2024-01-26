@@ -47,6 +47,24 @@ export const formatDate = (date = new Date()) => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
+const options = {
+  timeZone: "Asia/Kolkata", // IST time zone
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+};
+export const formatTime = (dateString) =>
+  new Date(dateString).toLocaleString("en-US", options);
+
+export const rowsArray = (array, keysArray) => {
+  return array.map((obj) => {
+    return Object.values(sortObjectUsingKeys(obj, keysArray));
+  });
+};
+
 // export const handleErrors = (statusCode, status, payload) => {
 //   switch (statusCode) {
 //     case 200:

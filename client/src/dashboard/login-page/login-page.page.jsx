@@ -5,6 +5,7 @@ import {
   Container,
   CssBaseline,
   Grid,
+  Switch,
   Typography,
 } from "@mui/material";
 import InputField from "../../components/forms/input-field/input-field.component";
@@ -12,15 +13,20 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
 import {
   adminLoginWithCredentials,
+  applicantLoginWithCredentials,
   loginWithCredentials,
+  studentLoginWithCredentials,
 } from "../http-requests";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import SnackbarFeedback from "../../components/feedback/snackbar/snackbar.component";
 import SnackbarFeedbackCustom from "../../components/feedback/snackbar/snackbar-full.component";
+import InputSelect from "../../components/forms/input-select/input-select.component";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+
+  const [loginType, setLoginType] = useState("ADMIN");
 
   const { formFields, handleChange } = useForm({
     email: "",
@@ -35,28 +41,41 @@ const LoginPage = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(formFields);
-    await adminLoginWithCredentials(formFields)
-      .then(() => {
-        navigate("/dashboard/admin");
-      })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
-  };
 
-  const redirectOnRole = (role) => {
-    switch (role) {
+    switch (loginType) {
       case "ADMIN":
-        navigate("/dashboard/admin");
+        await adminLoginWithCredentials(formFields)
+          .then((res) => {
+            console.log(res);
+            if (res === "ADMIN") {
+              navigate("/dashboard/admin");
+            } else {
+              navigate("/dashboard/staff");
+            }
+          })
+          .catch((err) =>
+            setSnackbarFeedback({ open: true, severity: "error", message: err })
+          );
         break;
 
       case "STUDENT":
-        navigate("/dashboard/student");
+        await studentLoginWithCredentials(formFields)
+          .then(() => {
+            navigate("/dashboard/student");
+          })
+          .catch((err) =>
+            setSnackbarFeedback({ open: true, severity: "error", message: err })
+          );
         break;
 
       case "APPLICANT":
-        navigate("/dashboard/applicant");
+        await applicantLoginWithCredentials(formFields)
+          .then(() => {
+            navigate("/dashboard/applicant");
+          })
+          .catch((err) =>
+            setSnackbarFeedback({ open: true, severity: "error", message: err })
+          );
         break;
 
       default:
@@ -123,6 +142,18 @@ const LoginPage = () => {
               </Grid>
               <Grid item>
                 <Link to={"/sign-up"}>{"Don't have an account? Sign Up"}</Link>
+              </Grid>
+              <Grid item>
+                <InputSelect
+                  name="Login Type"
+                  fields={[
+                    { name: "Student", value: "STUDENT" },
+                    { name: "Admin", value: "ADMIN" },
+                    { name: "Applicant", value: "APPLICANT" },
+                  ]}
+                  value={loginType}
+                  onChange={(e) => setLoginType(e.target.value)}
+                />
               </Grid>
             </Grid>
           </Box>

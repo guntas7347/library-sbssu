@@ -12,6 +12,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
 import {
   compleateSignUpWithCredentials,
+  createAdminAuth,
   initalizeSignUpWithCredentials,
 } from "../http-requests";
 import { Link, useNavigate } from "react-router-dom";
@@ -150,7 +151,7 @@ const SignUpPage = () => {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Create Account
+                Create Accession
               </Button>
             ) : (
               <Button

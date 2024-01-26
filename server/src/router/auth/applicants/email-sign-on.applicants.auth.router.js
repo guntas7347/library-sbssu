@@ -4,11 +4,13 @@ const {
   getApplicantAuthOtpById,
   getApplicantAuthIdByEmail,
   markApplicantAuthAsVerified,
-} = require("../../../../models/auth/auth_applicant.controllers");
+} = require("../../../models/auth/applicant/auth_applicant.controllers");
 const {
   generateOtpEmailTemplate,
-} = require("../../../../services/email-templates");
-const { transporter } = require("../../../../services/nodemailer");
+} = require("../../../services/email-templates");
+const { transporter } = require("../../../services/nodemailer");
+const { checkPassword } = require("../../../models/auth/functions");
+const { createJWT } = require("../passport/jwt");
 
 const emailSignOnRouter = express.Router();
 
@@ -24,12 +26,12 @@ emailSignOnRouter.post("/create-user/send-otp", async (req, res) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    transporter.sendMail({
-      from: "sandhugameswithjoy@gmail.com",
-      to: req.body.email,
-      subject: "Account Verification",
-      html: generateOtpEmailTemplate(req.body.displayName, otp),
-    });
+    // transporter.sendMail({
+    //   from: "sandhugameswithjoy@gmail.com",
+    //   to: req.body.email,
+    //   subject: "Accession Verification",
+    //   html: generateOtpEmailTemplate(req.body.displayName, otp),
+    // });
 
     await createApplicantAuth(req.body, otp);
     const { _id } = await getApplicantAuthIdByEmail(req.body.email);
@@ -71,7 +73,7 @@ emailSignOnRouter.post("/create-user/verify-otp", async (req, res) => {
 
 emailSignOnRouter.post("/login", async (req, res) => {
   try {
-    const user = await findUser(req.body.email);
+    const user = await getApplicantAuthIdByEmail(req.body.email);
 
     if (user === null) {
       return res
@@ -89,17 +91,21 @@ emailSignOnRouter.post("/login", async (req, res) => {
         .status(400)
         .json({ status: "Invalid Password", payload: null });
     }
-    const jwtCredentials = { id: user.id, role: user.role };
+
+    const jwtCredentials = { uid: user.id, role: "APPLICANT" };
     const jwt = createJWT(jwtCredentials);
     const cookieOptions = {
       httpOnly: true,
       expires: new Date(Date.now() + 60 * 60 * 1000),
     };
 
-    res.cookie("jwt", jwt, cookieOptions);
+    res.cookie("session", jwt, cookieOptions);
+
+    console.log("Applicant Login verified, sending jwt...");
+
     return res
       .status(200)
-      .json({ status: "Operation Successful", payload: user.role });
+      .json({ status: "Operation Successful", payload: null });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: "Operation Failed", payload: null });

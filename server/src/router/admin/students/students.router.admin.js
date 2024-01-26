@@ -4,6 +4,7 @@ const {
   fetchAllStudents,
   fetchStudentByRollNumber,
   addLibraryCardToStudent,
+  fetchStudentById,
 } = require("../../../models/students/students.controllers");
 const {
   createLibraryCard,
@@ -17,19 +18,25 @@ const {
   updateApplicationStatus,
 } = require("../../../models/applications/applications.controllers");
 const { updateAuthRole } = require("../../../models/auth/auth.controllers");
+const {
+  getApplicantAuthIdById,
+  deleteApplicantAuth,
+} = require("../../../models/auth/applicant/auth_applicant.controllers");
+const {
+  createStudentAuth,
+} = require("../../../models/auth/student/auth_student.controllers");
+
+const mongoose = require("mongoose");
+const crs = require("../../../utils/custom-response-codes");
 
 const studentsRoute = express.Router();
 
-studentsRoute.post("/create-student", async (req, res) => {
+studentsRoute.post("/create-new-student", async (req, res) => {
   try {
     const rollNumber = await fetchStudentByRollNumber(req.body.rollNumber);
 
     if (rollNumber != null) {
-      return res.status(400).json({
-        success: false,
-        status: "Roll Number already exists",
-        payload: null,
-      });
+      return res.status(409).json(crs.CONFL409CNS());
     }
 
     const formatedData = formatObjectValues(req.body, [
@@ -41,21 +48,21 @@ studentsRoute.post("/create-student", async (req, res) => {
 
     await createNewStudent(formatedData);
 
-    return res.status(200).json({
-      success: true,
-      status: "Student created successfully",
-      payload: null,
-    });
+    return res.status(201).json(crs.STU201CNS());
   } catch (error) {
-    console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, status: error, payload: null });
+    if (error.name === "ValidationError") {
+      return res.status(422).json(crs.MONGO422CNS());
+    }
+
+    return res.status(500).json(crs.SERR500CNS());
   }
 });
 
 studentsRoute.post("/fetch-all-students", async (req, res) => {
-  const StudentsCol = await fetchAllStudents(req.body);
+  const StudentsCol = await fetchAllStudents(
+    req.body,
+    "rollNumber name batch program"
+  );
   return res.status(200).json({
     success: true,
     payload: StudentsCol,
@@ -65,10 +72,33 @@ studentsRoute.post("/fetch-all-students", async (req, res) => {
 
 studentsRoute.post("/fetch-student-by-roll-number", async (req, res) => {
   try {
+    console.log("hello ");
     const studentDoc = await fetchStudentByRollNumber(
       req.body.rollNumber,
       true
     );
+
+    if (studentDoc != null) {
+      return res.status(200).json({
+        success: true,
+        payload: studentDoc,
+        status: "Successful",
+      });
+    }
+    return res
+      .status(400)
+      .json({ success: false, payload: null, status: "Invalid Roll Number" });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(404)
+      .json({ success: false, payload: null, status: error });
+  }
+});
+
+studentsRoute.post("/fetch-student-by-id", async (req, res) => {
+  try {
+    const studentDoc = await fetchStudentById(req.body._id, true);
 
     if (studentDoc != null) {
       return res.status(200).json({
@@ -156,11 +186,11 @@ studentsRoute.post("/fetch-all-applications", async (req, res) => {
 
 studentsRoute.post("/fetch-one-application", async (req, res) => {
   try {
-    const ApplicantionDoc = await fetchOneApplication(
+    const applicantionDoc = await fetchOneApplication(
       req.body.applicationNumber
     );
 
-    if (ApplicantionDoc === null) {
+    if (applicantionDoc === null) {
       return res.status(400).json({
         payload: null,
         status: "Invalid Application Number",
@@ -168,7 +198,7 @@ studentsRoute.post("/fetch-one-application", async (req, res) => {
     }
 
     return res.status(200).json({
-      payload: ApplicantionDoc,
+      payload: applicantionDoc,
       status: "Operation Successful",
     });
   } catch (error) {
@@ -181,13 +211,15 @@ studentsRoute.post("/fetch-one-application", async (req, res) => {
 });
 
 studentsRoute.post("/process-application", async (req, res) => {
+  const session = await mongoose.startSession();
+
   try {
-    const ApplicantionDoc = await fetchOneApplication(
+    const applicantionDoc = await fetchOneApplication(
       req.body.applicationNumber
     );
-    const applicantId = ApplicantionDoc._doc._id;
+    const applicantId = applicantionDoc._doc._id;
 
-    if (ApplicantionDoc._doc.status !== "PENDING") {
+    if (applicantionDoc._doc.status !== "PENDING") {
       return res.status(400).json({
         payload: null,
         status: "Application decision has already been made",
@@ -202,9 +234,18 @@ studentsRoute.post("/process-application", async (req, res) => {
       });
     }
 
-    const { _id } = await createNewStudent(ApplicantionDoc._doc);
-    await updateApplicationStatus(applicantId, "APPROVED");
-    await updateAuthRole(applicantId, "STUDENT");
+    await session.withTransaction(async () => {
+      await updateApplicationStatus(applicantId, "APPROVED", session);
+      const applicantAuthDoc = await getApplicantAuthIdById(applicantId);
+      await createNewStudent(applicantionDoc._doc, session);
+      await deleteApplicantAuth(applicantId, session);
+      await createStudentAuth(
+        { ...applicantAuthDoc._doc, role: "STUDENT" },
+        session
+      );
+    });
+
+    await session.commitTransaction();
 
     return res.status(200).json({
       payload: null,
@@ -212,10 +253,17 @@ studentsRoute.post("/process-application", async (req, res) => {
     });
   } catch (error) {
     console.log(error);
+
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
+
     return res.status(500).json({
       payload: null,
       status: "Operation Failed",
     });
+  } finally {
+    await session.endSession();
   }
 });
 

@@ -2,7 +2,7 @@ import { Button, Grid } from "@mui/material";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import {
-  fetchIssuedBook,
+  fetchIssuedBookByAccessionNumber,
   issueBookFine,
   returnIssuedBook,
 } from "../../../hooks/http-requests.hooks.admin";
@@ -27,14 +27,14 @@ const ReturnIssuedBookPage = () => {
   });
 
   const { formFields, handleChange, resetFormFields } = useForm({
-    accountNumber: "",
+    accessionNumber: "",
   });
 
   const defaultIssuedBookDoc = {
     title: null,
     ISBN: "",
     author: "",
-    accountNumber: "",
+    accessionNumber: "",
     libraryCard: "",
     issueDate: "",
     name: "",
@@ -48,7 +48,7 @@ const ReturnIssuedBookPage = () => {
     title,
     ISBN,
     author,
-    accountNumber,
+    accessionNumber,
     libraryCard,
     issueDate,
     name,
@@ -58,7 +58,9 @@ const ReturnIssuedBookPage = () => {
   } = issuedBookDoc;
 
   const handleFetch = async () => {
-    await fetchIssuedBook({ accountNumber: +formFields.accountNumber })
+    await fetchIssuedBookByAccessionNumber({
+      accessionNumber: +formFields.accessionNumber,
+    })
       .then((res) => {
         setIssuedBookDoc(res);
       })
@@ -125,11 +127,11 @@ const ReturnIssuedBookPage = () => {
           <Grid container spacing={2}>
             <Grid item>
               <InputField
-                label="Account Number"
-                name="accountNumber"
+                label="Accession Number"
+                name="accessionNumber"
                 type="number"
                 onChange={handleChange}
-                value={formFields.accountNumber}
+                value={formFields.accessionNumber}
               />
             </Grid>
             <Grid item>
@@ -139,13 +141,12 @@ const ReturnIssuedBookPage = () => {
             </Grid>
           </Grid>
         </form>
-        <Button onClick={() => resetFormFields()}>clear</Button>
       </div>
       <div>
         <div className="mb-3">
           <SpanningTable
             rows={[
-              ["Account Number", accountNumber],
+              ["Accession Number", accessionNumber],
               ["Library Card Number", libraryCard],
               ["Issue Date", issueDate],
               ["Book title", title],

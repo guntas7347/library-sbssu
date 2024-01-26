@@ -26,7 +26,8 @@ const IssueHistory = () => {
     return array.map((obj) => {
       return Object.values(
         sortObjectUsingKeys(obj, [
-          "accountNumber",
+          "_id",
+          "accessionNumber",
           "bookTitle",
           "cardNumber",
           "issueDate",
@@ -70,7 +71,7 @@ const IssueHistory = () => {
                     name: "Get full histroy",
                     value: "fetchAllReturnedBooks",
                   },
-                  { name: "Account Number", value: "accountNumber" },
+                  { name: "Accession Number", value: "accessionNumber" },
                   { name: "Fine", value: "fine" },
                   {
                     name: "Date Range",
@@ -118,7 +119,7 @@ const IssueHistory = () => {
         <div className="p-5">
           <CustomTable
             columns={[
-              "Account Number",
+              "Accession Number",
               "Book Title",
               "Card Number",
               "Issue Date",

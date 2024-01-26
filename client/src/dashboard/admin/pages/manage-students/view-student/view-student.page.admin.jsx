@@ -1,10 +1,10 @@
 import { useParams } from "react-router-dom";
-import { fetchStudentByRollNumber } from "../../../hooks/http-requests.hooks.admin";
+import { fetchStudentById } from "../../../hooks/http-requests.hooks.admin";
 import { useEffect, useState } from "react";
 import SpanningTable from "../../../../../components/table/spanning-table.component";
 
 const ViewStudentPage = () => {
-  const { rollNumber } = useParams();
+  const { _id } = useParams();
 
   const [studentDoc, setStudentDoc] = useState({
     rollNumber: null,
@@ -17,13 +17,11 @@ const ViewStudentPage = () => {
     batch: "",
     email: "",
     phoneNumber: null,
-    libraryCards: [
-      { cardNumber: "", status: "" },
-      { cardNumber: "", status: "" },
-    ],
+    libraryCards: [],
   });
 
   const {
+    rollNumber,
     name,
     fathersName,
     gender,
@@ -37,10 +35,37 @@ const ViewStudentPage = () => {
   } = studentDoc;
 
   useEffect(() => {
-    const asyncFunc = async () =>
-      setStudentDoc(await fetchStudentByRollNumber({ rollNumber }));
+    const asyncFunc = async () => {
+      const studentDoc = await fetchStudentById(_id);
+
+      const libraryCardsArray = studentDoc.libraryCards.map((libraryCard) => {
+        return libraryCard.cardNumber;
+      });
+      const libraryCardsString = mergeArrayElementsToString(libraryCardsArray);
+      setStudentDoc({ ...studentDoc, libraryCards: libraryCardsString });
+    };
     asyncFunc();
   }, []);
+
+  const mergeArrayElementsToString = (array = []) => {
+    let string = "";
+    let isFirst = true;
+
+    if (array.length === 0) {
+      return "None";
+    }
+
+    array.forEach((element) => {
+      if (isFirst) {
+        string += element;
+        isFirst = false;
+      } else {
+        string += ", " + element;
+      }
+    });
+
+    return string;
+  };
 
   return (
     <div className="text-center m-5">
@@ -52,14 +77,22 @@ const ViewStudentPage = () => {
             ["Name", name],
             ["Fathers Name", fathersName],
             ["Gender", gender],
-            ["Date Of Birth", dob],
-            ["Program", program],
-            ["Specialization", specialization],
-            ["Batch", batch],
+            ["Date Of Birth", new Date(dob).toDateString()],
+            [
+              "Program | Specialization | Batch",
+              program +
+                " " +
+                "|" +
+                " " +
+                specialization +
+                " " +
+                "|" +
+                " " +
+                batch,
+            ],
             ["Email", email],
             ["Phone Number", phoneNumber],
-            ["Library Card", libraryCards[0].cardNumber],
-            ["Library Card", libraryCards[1].cardNumber],
+            ["Library Cards", libraryCards],
           ]}
         />
       </div>

@@ -5,7 +5,9 @@ const InputField = (props) => {
     <TextField
       id="outlined-basic"
       variant="outlined"
+      required
       {...props}
+
       // value={props.value}
     />
   );

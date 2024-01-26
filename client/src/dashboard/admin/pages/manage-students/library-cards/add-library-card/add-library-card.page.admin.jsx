@@ -13,7 +13,7 @@ import SnackbarFeedback from "../../../../../../components/feedback/snackbar/sna
 
 const AddLibraryCardPage = () => {
   const [showStudentTable, setShowStudentTable] = useState(false);
-  const [showCardNumberField, setShowAccountNumberField] = useState(false);
+  const [showCardNumberField, setShowAccessionNumberField] = useState(false);
 
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [showSnackbarFeedback, setSnackbarFeedback] = useState({
@@ -32,7 +32,7 @@ const AddLibraryCardPage = () => {
   const { rollNumber } = formFields;
 
   const handleFetchStudent = async () => {
-    await fetchStudentByRollNumber(formFields)
+    await fetchStudentByRollNumber(rollNumber)
       .then(async (res) => {
         setRowData(rowsArray([res]));
         setShowStudentTable(true);
@@ -44,9 +44,9 @@ const AddLibraryCardPage = () => {
 
   const handleSelect = (_, selectedValue) => {
     if (selectedValue !== null) {
-      setShowAccountNumberField(selectedValue);
+      setShowAccessionNumberField(selectedValue);
     } else {
-      setShowAccountNumberField(false);
+      setShowAccessionNumberField(false);
     }
   };
 
@@ -54,7 +54,7 @@ const AddLibraryCardPage = () => {
     await createLibraryCard(formFields)
       .then((res) => {
         setSnackbarFeedback({ open: true, severity: "success", message: res });
-        setShowAccountNumberField(false);
+        setShowAccessionNumberField(false);
         setShowStudentTable(false);
       })
       .catch((err) =>
@@ -109,7 +109,7 @@ const AddLibraryCardPage = () => {
               <Grid item>
                 <InputField
                   label="Roll Number"
-                  type="text"
+                  type="number"
                   name="rollNumber"
                   value={rollNumber}
                   disabled

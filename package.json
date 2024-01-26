@@ -1,0 +1,14 @@
+{
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "scripts": {
+    "start": "concurrently --kill-others \"npm run mongo\" \"npm run server\" \"npm run client\"",
+    "server": "cd server && npm run watch",
+    "client": "cd client && start npm start",
+    "mongo": "concurrently \"npm run mongoRS1\" \"npm run mongoRS2\" \"npm run mongoRS3\" ",
+    "mongoRS1": "start mongod --replSet rs0 --port 27017 --bind_ip 127.0.0.1 --dbpath \"D:\\Programming\\MongoDB Database\\Library-SBSSU\\db-replica\\rs1\"",
+    "mongoRS2": "start mongod --replSet rs0 --port 27018 --bind_ip 127.0.0.1 --dbpath \"D:\\Programming\\MongoDB Database\\Library-SBSSU\\db-replica\\rs2\"",
+    "mongoRS3": "start mongod --replSet rs0 --port 27019 --bind_ip 127.0.0.1 --dbpath \"D:\\Programming\\MongoDB Database\\Library-SBSSU\\db-replica\\rs3\""
+  }
+}

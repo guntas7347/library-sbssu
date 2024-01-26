@@ -95,7 +95,7 @@ const ForgotPassword = () => {
             </Button>
             <Grid container>
               <Grid item>
-                <Link to={"/"}>{"Already have an account? Login In"}</Link>
+                <Link to={"/"}>{"Already have an accession? Login In"}</Link>
               </Grid>
             </Grid>
           </Box>

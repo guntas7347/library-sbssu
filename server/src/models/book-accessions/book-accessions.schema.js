@@ -1,23 +1,23 @@
 const mongoose = require("mongoose");
 
-const BookAccountsSchema = new mongoose.Schema({
+const BookAccessionsSchema = new mongoose.Schema({
   bookId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Book",
     required: true,
   },
-  accountNumber: {
+  accessionNumber: {
     type: Number,
     required: true,
   },
   status: {
     type: String,
-    required: true,
+    default: "available",
   },
 });
 
 module.exports = mongoose.model(
-  "BookAccount",
-  BookAccountsSchema,
-  "BookAccounts"
+  "BookAccession",
+  BookAccessionsSchema,
+  "BookAccessions"
 );

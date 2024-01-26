@@ -42,10 +42,6 @@ settingsRouter.get("/get-academic-programs", async (req, res) => {
       value: "BARCH",
       name: "Bachelor of Architecture",
     },
-    {
-      value: "MBBS",
-      name: "Bachelor of Medical and Surgery",
-    },
   ];
 
   return res.status(200).json({ success: true, data: bachelorPrograms });

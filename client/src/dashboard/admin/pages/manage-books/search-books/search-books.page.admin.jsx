@@ -6,9 +6,19 @@ import { useState } from "react";
 import { sortObjectUsingKeys } from "../../../../../utils/functions";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
+import { signOut } from "../../../../http-requests";
+import useSignOut from "../../../hooks/useSignOut.hooks";
+import { useNavigate } from "react-router-dom";
 
 const SearchBooksPage = () => {
+  const navigate = useNavigate();
+
   const [rowData, setRowData] = useState([]);
+
+  const { handleSignOut } = useSignOut();
+
+  const [pagenation_count, setPagenation_count] = useState(0);
+  const [pagenation_page, setPagenation_page] = useState(0);
 
   const { formFields, handleChange } = useForm({
     sortSelect: "fetchAllBooks",
@@ -16,19 +26,39 @@ const SearchBooksPage = () => {
   });
 
   const handleFetch = async () => {
-    await fetchAllBooks(formFields).then((res) => setRowData(rowsArray(res)));
+    await fetchAllBooks(formFields)
+      .then((res) => {
+        setPagenation_count(res.totalBooks);
+        setRowData(rowsArray(res.books));
+      })
+      .catch((err) => {
+        if (err.statusCode === 401) {
+          alert("Unauthorised");
+          handleSignOut();
+        }
+      });
   };
 
   const rowsArray = (array) => {
     return array.map((obj) => {
       return Object.values(
-        sortObjectUsingKeys(obj, ["ISBN", "title", "author", "genre"])
+        sortObjectUsingKeys(
+          { ...obj, accessionNumber: obj.accessionNumbers[0] },
+          [
+            "_id",
+            "accessionNumber",
+            "title",
+            "author",
+            "placeAndPublishers",
+            "publicationYear",
+          ]
+        )
       );
     });
   };
 
   const handleRowClick = (e) => {
-    console.log(e);
+    navigate(`/dashboard/admin/manage-books/view-book/${e}`);
   };
 
   return (
@@ -42,7 +72,7 @@ const SearchBooksPage = () => {
                 fields={[
                   { name: "Search All Books", value: "fetchAllBooks" },
                   { name: "ISBN", value: "ISBN" },
-                  { name: "Account Number", value: "accountNumber" },
+                  { name: "Accession Number", value: "accessionNumber" },
                 ]}
                 value={formFields.sortSelect}
                 onChange={handleChange}
@@ -61,9 +91,20 @@ const SearchBooksPage = () => {
         </div>
         <div className="p-5">
           <CustomTable
-            columns={["ISBN", "Title", "Author", "Genre"]}
+            columns={[
+              "Accession Number",
+              "Title",
+              "Author",
+              "Place And Publishers",
+              "Publication Year",
+            ]}
             rows={rowData}
             handleRowClick={handleRowClick}
+            pagenation_handlePageChange={(e, newPage) =>
+              setPagenation_page(newPage)
+            }
+            pagenation_page={pagenation_page}
+            pagenation_count={pagenation_count}
           />
         </div>
       </div>

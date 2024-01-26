@@ -26,7 +26,7 @@ emailSignOn.post("/login", async (req, res) => {
         .status(400)
         .json({ status: "Invalid Password", payload: null });
     }
-    const jwt = createJWT({ uid: adminDoc._doc._id, role: "ADMIN" });
+    const jwt = createJWT({ uid: adminDoc._doc._id, role: adminDoc._doc.role });
     const cookieOptions = {
       httpOnly: true,
       sameSite: "Strict",
@@ -34,7 +34,9 @@ emailSignOn.post("/login", async (req, res) => {
     };
     res.cookie("session", jwt, cookieOptions);
 
-    return res.status(200).json({ status: "LOGIN_SUCCESSFUL", payload: null });
+    return res
+      .status(200)
+      .json({ status: "LOGIN_SUCCESSFUL", payload: adminDoc._doc.role });
   } catch (error) {
     return res
       .status(500)
@@ -43,7 +45,7 @@ emailSignOn.post("/login", async (req, res) => {
 });
 
 emailSignOn.post("/signup", async (req, res) => {
-  const adminDoc = await createAdminAccount(req.body);
+  await createAdminAccount(req.body);
   return res.status(200).json({ status: "Done", payload: null });
 });
 

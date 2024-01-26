@@ -11,7 +11,7 @@ const applicantRouter = express.Router();
 
 applicantRouter.post("/create-new-application", async (req, res) => {
   try {
-    await createApplication({ ...req.body, _id: req.user.id });
+    await createApplication({ ...req.body, _id: req.user.uid });
 
     return res
       .status(200)
@@ -24,7 +24,7 @@ applicantRouter.post("/create-new-application", async (req, res) => {
 
 applicantRouter.post("/get-application", async (req, res) => {
   try {
-    const applicationDoc = await findApplicationById(req.user.id);
+    const applicationDoc = await findApplicationById(req.user.uid);
 
     if (applicationDoc === null) {
       return res

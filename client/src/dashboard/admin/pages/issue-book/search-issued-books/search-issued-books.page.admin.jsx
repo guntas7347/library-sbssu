@@ -6,9 +6,19 @@ import CustomTable from "../../../../../components/table/custom-table.component"
 import { sortObjectUsingKeys } from "../../../../../utils/functions";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
+import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import { useNavigate } from "react-router-dom";
 
 const SearchIssuedBooks = () => {
+  const navigate = useNavigate();
+
   const [rowData, setRowData] = useState([]);
+
+  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   const { formFields, handleChange, setFormFields } = useForm({
     sortSelect: "fetchAllIssuedBooks",
@@ -18,16 +28,24 @@ const SearchIssuedBooks = () => {
   const [showDateRangeInputField, setShowDateRangeInputField] = useState(false);
 
   const handleFetch = async () => {
-    await fetchAllIssuedBooks(formFields).then((res) =>
-      setRowData(rowsArray(res))
-    );
+    await fetchAllIssuedBooks(formFields).then((res) => {
+      setRowData(rowsArray(res));
+      if (res.length === 0) {
+        setSnackbarFeedback({
+          open: true,
+          severity: "error",
+          message: "No data Found",
+        });
+      }
+    });
   };
 
   const rowsArray = (array) => {
     return array.map((obj) => {
       return Object.values(
         sortObjectUsingKeys(obj, [
-          "accountNumber",
+          "_id",
+          "accessionNumber",
           "bookTitle",
           "cardNumber",
           "issueDate",
@@ -38,7 +56,7 @@ const SearchIssuedBooks = () => {
     });
   };
   const handleRowClick = (e) => {
-    console.log(e);
+    navigate(`/dashboard/admin/issue-books/search-issued-books/view-book/${e}`);
   };
 
   const handleInputSelectChange = (event) => {
@@ -68,7 +86,7 @@ const SearchIssuedBooks = () => {
                     name: "Search All Issued Books",
                     value: "fetchAllIssuedBooks",
                   },
-                  { name: "Account Number", value: "accountNumber" },
+                  { name: "Accession Number", value: "accessionNumber" },
                   { name: "Library Card Number", value: "cardNumber" },
 
                   { name: "Current Month", value: "currentMonth" },
@@ -118,7 +136,7 @@ const SearchIssuedBooks = () => {
         <div className="p-5">
           <CustomTable
             columns={[
-              "Account Number",
+              "Accession Number",
               "Book Title",
               "Card Number",
               "Issue Date",
@@ -129,6 +147,16 @@ const SearchIssuedBooks = () => {
             handleRowClick={handleRowClick}
           />
         </div>
+      </div>
+      <div>
+        <SnackbarFeedback
+          open={showSnackbarFeedback.open}
+          message={showSnackbarFeedback.message}
+          severity={showSnackbarFeedback.severity}
+          handleClose={() =>
+            setSnackbarFeedback({ open: false, severity: "", message: "" })
+          }
+        />
       </div>
     </div>
   );

@@ -16,8 +16,20 @@ mongoose.connection.on("error", (error) => {
 //   );
 // });
 
+// mongod --replSet rs0 --port 27017 --dbpath "D:\Programming\MongoDB Database\Library-SBSSU\db-replica\rs1"
+// mongod --replSet rs0 --port 27018 --dbpath "D:\Programming\MongoDB Database\Library-SBSSU\db-replica\rs2"
+// mongod --replSet rs0 --port 27019 --dbpath "D:\Programming\MongoDB Database\Library-SBSSU\db-replica\rs3"
+
+const mongoURI =
+  "mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019/LIBRARY_SBSSU?replicaSet=rs0";
+
 const mongoConnect = async () => {
-  await mongoose.connect("mongodb://0.0.0.0:27017/LIBRARY-SBSSU");
+  try {
+    await mongoose.connect(mongoURI);
+  } catch (error) {
+    console.log("Error connecting to MONGODB:-");
+    console.log(error);
+  }
 };
 
 const startTransaction = async () => {

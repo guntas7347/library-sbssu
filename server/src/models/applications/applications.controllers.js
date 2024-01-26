@@ -67,8 +67,10 @@ const fetchOneApplication = async (applicationNumber) => {
   return await query.exec();
 };
 
-const updateApplicationStatus = async (id, status) => {
-  return await applicationsMongo.findByIdAndUpdate(id, { status });
+const updateApplicationStatus = async (id, status, session) => {
+  return await applicationsMongo
+    .findByIdAndUpdate(id, { status })
+    .session(session);
 };
 
 module.exports = {

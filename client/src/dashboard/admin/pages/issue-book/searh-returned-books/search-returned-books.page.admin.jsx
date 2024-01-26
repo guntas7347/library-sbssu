@@ -6,9 +6,19 @@ import CustomTable from "../../../../../components/table/custom-table.component"
 import { sortObjectUsingKeys } from "../../../../../utils/functions";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
+import { useNavigate } from "react-router-dom";
+import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
 
 const SearchReturnedBooks = () => {
+  const navigate = useNavigate();
+
   const [rowData, setRowData] = useState([]);
+
+  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   const [showDateRangeInputField, setShowDateRangeInputField] = useState(false);
 
@@ -19,14 +29,24 @@ const SearchReturnedBooks = () => {
 
   const handleFetch = async () => {
     await fetchAllReturnedBooks(formFields)
-      .then((res) => setRowData(rowsArray(res)))
+      .then((res) => {
+        setRowData(rowsArray(res));
+        if (res.length === 0) {
+          setSnackbarFeedback({
+            open: true,
+            severity: "error",
+            message: "No data Found",
+          });
+        }
+      })
       .catch((err) => console.error(err));
   };
   const rowsArray = (array) => {
     return array.map((obj) => {
       return Object.values(
         sortObjectUsingKeys(obj, [
-          "accountNumber",
+          "_id",
+          "accessionNumber",
           "bookTitle",
           "cardNumber",
           "issueDate",
@@ -39,7 +59,9 @@ const SearchReturnedBooks = () => {
     });
   };
   const handleRowClick = (e) => {
-    console.log(e);
+    navigate(
+      `/dashboard/admin/issue-books/search-returned-books/view-book/${e}`
+    );
   };
 
   const handleInputSelectChange = (event) => {
@@ -70,7 +92,7 @@ const SearchReturnedBooks = () => {
                     name: "Search All Returned Books",
                     value: "fetchAllReturnedBooks",
                   },
-                  { name: "Account Number", value: "accountNumber" },
+                  { name: "Accession Number", value: "accessionNumber" },
                   { name: "Fine", value: "fine" },
                   { name: "Current Month", value: "currentMonth" },
                   {
@@ -119,7 +141,7 @@ const SearchReturnedBooks = () => {
         <div className="p-5">
           <CustomTable
             columns={[
-              "Account Number",
+              "Accession Number",
               "Book Title",
               "Card Number",
               "Issue Date",
@@ -132,6 +154,16 @@ const SearchReturnedBooks = () => {
             handleRowClick={handleRowClick}
           />
         </div>
+      </div>
+      <div>
+        <SnackbarFeedback
+          open={showSnackbarFeedback.open}
+          message={showSnackbarFeedback.message}
+          severity={showSnackbarFeedback.severity}
+          handleClose={() =>
+            setSnackbarFeedback({ open: false, severity: "", message: "" })
+          }
+        />
       </div>
     </div>
   );

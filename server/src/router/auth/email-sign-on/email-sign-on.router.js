@@ -37,7 +37,7 @@ emailSignOnRouter.post("/create-user/send-otp", async (req, res) => {
         name: req.body.displayName,
         intro: [
           "Welcome to Shaheed Bhagat Singh State University's Centeral Library! We're very excited to have you on board.",
-          `One Time Password for your account verification is ${otp}`,
+          `One Time Password for your accession verification is ${otp}`,
         ],
         outro:
           "Need help, or have questions? Contact Library in working hours, we'd love to help.",
@@ -47,14 +47,14 @@ emailSignOnRouter.post("/create-user/send-otp", async (req, res) => {
     transporter.sendMail({
       from: "sandhugameswithjoy@gmail.com",
       to: req.body.email,
-      subject: "Account Verification",
+      subject: "Accession Verification",
       html: emailBody,
     });
 
     await createUser(req.body);
     return res
       .status(200)
-      .json({ status: "Account created, Please Login", payload: null });
+      .json({ status: "Accession created, Please Login", payload: null });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ status: "Operation Failed", payload: null });

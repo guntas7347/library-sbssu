@@ -7,9 +7,9 @@ const issueHistoryRouter = express.Router();
 
 issueHistoryRouter.post("/fetch-issued-history", async (req, res) => {
   try {
-    const returnedBooksCol = await fetchIssueHistory(req.user.id, req.body);
+    const returnedBooksCol = await fetchIssueHistory(req.user.uid, req.body);
     const data = returnedBooksCol.map(
-      ({ bookAccountId, libraryCardId, issueDate, returnDate, fine }) => {
+      ({ bookAccessionId, libraryCardId, issueDate, returnDate, fine }) => {
         if (!returnDate) {
           returnDate = "Currently Issued";
         } else {
@@ -23,12 +23,12 @@ issueHistoryRouter.post("/fetch-issued-history", async (req, res) => {
           cardNumber: libraryCardId.cardNumber,
           studentName: libraryCardId.studentId.name,
           rollNumber: libraryCardId.studentId.rollNumber,
-          accountNumber: bookAccountId.accountNumber,
-          bookTitle: bookAccountId.bookId.title,
+          accessionNumber: bookAccessionId.accessionNumber,
+          bookTitle: bookAccessionId.bookId.title,
         };
       }
     );
-
+    console.log(returnedBooksCol);
     return res
       .status(200)
       .json({ success: true, payload: data, status: "Operation Successful" });

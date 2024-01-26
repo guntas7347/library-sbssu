@@ -11,8 +11,8 @@ const ManageBooksPage = () => {
       </Button>
       <br />
       <br />
-      <Button as={Link} to={`${previousPath}/add-book/add-book-account`}>
-        Add new Book Account
+      <Button as={Link} to={`${previousPath}/add-book-accession`}>
+        Add Book Accession
       </Button>
       <br />
       <br />

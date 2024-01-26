@@ -1,13 +1,13 @@
 const { createCurrentMonthDateRange } = require("../../utils/functions");
 const {
-  getBookAccountIdFromBookAccountNumber,
-} = require("../book-accounts/book-accounts.controllers");
+  getBookAccessionIdFromBookAccessionNumber,
+} = require("../book-accessions/book-accessions.controllers");
 const { fetchStudentById } = require("../students/students.controllers");
 const returnedBooksMongo = require("./returned-books.schema");
 const issueBookMongo = require("../issue-book/issue-book.schema");
 
-const returnBook = async (returningBookDetails) => {
-  return await returnedBooksMongo.create(returningBookDetails);
+const returnBook = async (returningBookDetails, session) => {
+  return await returnedBooksMongo.create([returningBookDetails], { session });
 };
 
 const fetchAllReturnedBooks = async (filter) => {
@@ -23,18 +23,18 @@ const fetchAllReturnedBooks = async (filter) => {
       query.where({ returnDate: sortValue });
       break;
 
-    case "accountNumber":
-      const accountNumber = await getBookAccountIdFromBookAccountNumber(
+    case "accessionNumber":
+      const accessionNumber = await getBookAccessionIdFromBookAccessionNumber(
         sortValue
       );
 
-      if (accountNumber != null) {
+      if (accessionNumber != null) {
         query.where({
-          bookAccountId: accountNumber._id,
+          bookAccessionId: accessionNumber._id,
         });
       } else {
         query.where({
-          bookAccountId: null,
+          bookAccessionId: null,
         });
       }
 
@@ -58,7 +58,7 @@ const fetchAllReturnedBooks = async (filter) => {
 
   const results = await query
     .populate({
-      path: "bookAccountId",
+      path: "bookAccessionId",
       populate: { path: "bookId", select: "title  -_id" },
     })
     .populate({
@@ -99,24 +99,24 @@ const fetchIssueHistory = async (student_Id, filter) => {
       query2.where({ fine: { $ne: 0 } });
       break;
 
-    case "accountNumber":
-      const accountNumber = await getBookAccountIdFromBookAccountNumber(
+    case "accessionNumber":
+      const accessionNumber = await getBookAccessionIdFromBookAccessionNumber(
         sortValue
       );
 
-      if (accountNumber != null) {
+      if (accessionNumber != null) {
         query1.where({
-          bookAccountId: accountNumber._id,
+          bookAccessionId: accessionNumber._id,
         });
         query2.where({
-          bookAccountId: accountNumber._id,
+          bookAccessionId: accessionNumber._id,
         });
       } else {
         query1.where({
-          bookAccountId: null,
+          bookAccessionId: null,
         });
         query2.where({
-          bookAccountId: null,
+          bookAccessionId: null,
         });
       }
 
@@ -134,7 +134,7 @@ const fetchIssueHistory = async (student_Id, filter) => {
 
   query1
     .populate({
-      path: "bookAccountId",
+      path: "bookAccessionId",
       populate: { path: "bookId", select: "title  -_id" },
     })
     .populate({
@@ -143,7 +143,7 @@ const fetchIssueHistory = async (student_Id, filter) => {
     });
   query2
     .populate({
-      path: "bookAccountId",
+      path: "bookAccessionId",
       populate: { path: "bookId", select: "title  -_id" },
     })
     .populate({
@@ -154,4 +154,27 @@ const fetchIssueHistory = async (student_Id, filter) => {
   return [...(await query1.exec()), ...(await query2.exec())];
 };
 
-module.exports = { returnBook, fetchAllReturnedBooks, fetchIssueHistory };
+const fetchReturnedBookById = async (_id) => {
+  const query = returnedBooksMongo.findById(_id);
+
+  query
+    .populate({
+      path: "bookAccessionId",
+      populate: { path: "bookId", select: "title author -_id" },
+    })
+    .populate({
+      path: "libraryCardId",
+      populate: { path: "studentId", select: "rollNumber name -_id" },
+    })
+    .populate({ path: "issuedBy", select: "idNumber fullName -_id" })
+    .populate({ path: "returnedBy", select: "idNumber fullName -_id" });
+
+  return await query.exec();
+};
+
+module.exports = {
+  returnBook,
+  fetchAllReturnedBooks,
+  fetchIssueHistory,
+  fetchReturnedBookById,
+};

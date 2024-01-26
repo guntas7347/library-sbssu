@@ -9,18 +9,84 @@ const mailGenerator = new Mailgen({
   },
 });
 
-const generateOtpEmailTemplate = (name, otp) => {
-  return mailGenerator.generate({
-    body: {
-      name: name,
-      intro: [
-        "Welcome to Shaheed Bhagat Singh State University's Centeral Library! We're very excited to have you on board.",
-        `One Time Password for your account verification is ${otp}`,
-      ],
-      outro:
-        "Need help, or have questions? Contact Library in working hours, we'd love to help.",
-    },
-  });
+const generateEmailTemplate = {
+  otp: (name, otp) => {
+    return mailGenerator.generate({
+      body: {
+        name: name,
+        intro: [
+          "Welcome to Shaheed Bhagat Singh State University's Centeral Library! We're very excited to have you on board.",
+          `One Time Password for your account verification is ${otp}`,
+        ],
+        outro:
+          "Need help, or have questions? Contact Library in working hours, we'd love to help.",
+      },
+    });
+  },
+  issueBookConfirmation: ({
+    name,
+    accessionNumber,
+    title,
+    author,
+    dueDate,
+    issueDate,
+    cardNumber,
+  }) => {
+    return mailGenerator.generate({
+      body: {
+        name: name,
+        intro:
+          "This is a confirmation email to inform you that you have borrowed a book from Central Library.",
+        table: {
+          data: [
+            {
+              "Accession Number": accessionNumber,
+              Book: title,
+              Author: author,
+              "Library Card Number": cardNumber,
+              "Issue Date": issueDate,
+              "Due Date": dueDate,
+            },
+          ],
+        },
+        outro:
+          "Please ensure to return the book by the due date to avoid any late fees. If you have any questions, feel free to contact us.",
+      },
+    });
+  },
+  returnBookConfirmation: ({
+    name,
+    accessionNumber,
+    title,
+    author,
+    returnDate,
+    issueDate,
+    fine,
+    cardNumber,
+  }) => {
+    return mailGenerator.generate({
+      body: {
+        name: name,
+        intro:
+          "This is a confirmation email to inform you that you have successfully returned a book to Library.",
+        table: {
+          data: [
+            {
+              "Accession Number": accessionNumber,
+              Book: title,
+              Author: author,
+              "Library Card Number": cardNumber,
+              "Issue Date": issueDate,
+              "Return Date": returnDate,
+              Fine: fine,
+            },
+          ],
+        },
+        outro:
+          "Thank you for returning the book. If you have any further inquiries, feel free to contact us.",
+      },
+    });
+  },
 };
 
-module.exports = { generateOtpEmailTemplate };
+module.exports = { generateEmailTemplate };

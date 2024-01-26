@@ -40,6 +40,81 @@ export const adminLoginWithCredentials = (userCredentials) => {
         const { payload, status } = await res.json();
 
         if (statusCode === 200) {
+          resolve(payload);
+        } else {
+          console.error(payload);
+          reject(status);
+        }
+      })
+      .catch((error) => reject(error));
+  });
+};
+
+export const studentLoginWithCredentials = (userCredentials) => {
+  return new Promise((resolve, reject) => {
+    fetch(`${API_URL}/api/auth/students/email-sign-on/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(userCredentials),
+    })
+      .then(async (res) => {
+        const statusCode = res.status;
+        const { payload, status } = await res.json();
+
+        if (statusCode === 200) {
+          resolve(status);
+        } else {
+          console.error(payload);
+          reject(status);
+        }
+      })
+      .catch((error) => reject(error));
+  });
+};
+
+export const applicantLoginWithCredentials = (userCredentials) => {
+  return new Promise((resolve, reject) => {
+    fetch(`${API_URL}/api/auth/applicants/email-sign-on/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(userCredentials),
+    })
+      .then(async (res) => {
+        const statusCode = res.status;
+        const { payload, status } = await res.json();
+
+        if (statusCode === 200) {
+          resolve(status);
+        } else {
+          console.error(payload);
+          reject(status);
+        }
+      })
+      .catch((error) => reject(error));
+  });
+};
+
+export const createAdminAuth = (userCredentials) => {
+  return new Promise((resolve, reject) => {
+    fetch(`${API_URL}/api/auth/admin/email-sign-on/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(userCredentials),
+    })
+      .then(async (res) => {
+        const statusCode = res.status;
+        const { payload, status } = await res.json();
+
+        if (statusCode === 200) {
           resolve(status);
         } else {
           console.error(payload);
@@ -185,7 +260,7 @@ export const verifyAuthRole = (role) => {
         "Content-Type": "application/json",
       },
       credentials: "include",
-      body: JSON.stringify(role),
+      body: JSON.stringify({ role }),
     })
       .then(async (res) => {
         const statusCode = res.status;

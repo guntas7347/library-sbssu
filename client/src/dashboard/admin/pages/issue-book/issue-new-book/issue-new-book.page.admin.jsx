@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  fetchBookByAccountNumber,
+  fetchBookByAccessionNumber,
   fetchStudentByRollNumber,
   issueNewBook,
 } from "../../../hooks/http-requests.hooks.admin";
@@ -9,7 +9,7 @@ import { Button, Grid } from "@mui/material";
 import CustomTableSelect from "../../../../../components/table/custom-table-select.component";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import TransitionsModal from "../../../../../components/modals/modal.component";
-import { sortObjectUsingKeys } from "../../../../../utils/functions";
+import { rowsArray, sortObjectUsingKeys } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
 import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
 
@@ -20,7 +20,7 @@ const IssueNewBookPage = () => {
   const [studentRowData, setStudentRowData] = useState([]);
 
   const [selectedCardNumber, setSelectedCardNumber] = useState(null);
-  const [selectedAccountNumber, setSelectedAccountNumber] = useState(null);
+  const [selectedAccessionNumber, setSelectedAccessionNumber] = useState(null);
 
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [showSnackbarFeedback, setSnackbarFeedback] = useState({
@@ -29,18 +29,20 @@ const IssueNewBookPage = () => {
     severity: "",
   });
 
-  const { formFields, handleChange } = useForm({});
+  const { formFields, handleChange } = useForm({
+    issueDate: new Date(),
+  });
 
   const handleFetchBook = async () => {
     setShowBookTable(true);
-    await fetchBookByAccountNumber({
-      accountNumber: formFields.accountNumber,
+    await fetchBookByAccessionNumber({
+      accessionNumber: formFields.accessionNumber,
     })
       .then((res) => {
         setBookRowData(
           rowsArray(
             [res],
-            ["ISBN", "title", "author", "accountNumber", "status"]
+            ["isbn", "title", "author", "accessionNumber", "status"]
           )
         );
       })
@@ -51,7 +53,7 @@ const IssueNewBookPage = () => {
 
   const handleFetchStuent = () => {
     setShowStudentTable(true);
-    fetchStudentByRollNumber({ rollNumber: formFields.rollNumber })
+    fetchStudentByRollNumber(formFields.rollNumber)
       .then((res) => {
         setStudentRowData(
           rowsArray(addLibraryCardsValueToObject(res), [
@@ -81,36 +83,39 @@ const IssueNewBookPage = () => {
     return array;
   };
 
-  const handleSelect = (tableName, selectedValue) => {
+  const handleSelect = (tableName, selectedValue, isChecked) => {
     if (tableName === "studentsTable") {
-      setSelectedCardNumber(selectedValue);
+      if (isChecked) {
+        setSelectedCardNumber(selectedValue);
+      } else {
+        setSelectedCardNumber("");
+      }
     }
     if (tableName === "booksTable") {
-      setSelectedAccountNumber(selectedValue);
+      if (isChecked) {
+        setSelectedAccessionNumber(selectedValue);
+      } else {
+        setSelectedAccessionNumber("");
+      }
     }
   };
 
-  const [modal, setModal] = useState(false);
-
   const handleIssueNewBook = async () => {
     const issueBookDetails = {
-      accountNumber: selectedAccountNumber,
+      accessionNumber: selectedAccessionNumber,
       cardNumber: selectedCardNumber,
       issueDate: formFields.issueDate,
     };
+
     await issueNewBook(issueBookDetails)
       .then((res) => {
         setSnackbarFeedback({ open: true, severity: "success", message: res });
+        handleFetchBook();
+        handleFetchStuent();
       })
       .catch((err) =>
         setSnackbarFeedback({ open: true, severity: "error", message: err })
       );
-  };
-
-  const rowsArray = (array, keysArray) => {
-    return array.map((obj) => {
-      return Object.values(sortObjectUsingKeys(obj, keysArray));
-    });
   };
 
   return (
@@ -123,8 +128,8 @@ const IssueNewBookPage = () => {
           <Grid container spacing={4}>
             <Grid item>
               <InputField
-                label="Book's Account Number"
-                name="accountNumber"
+                label="Book's Accession Number"
+                name="accessionNumber"
                 type="text"
                 onChange={handleChange}
               />
@@ -141,7 +146,7 @@ const IssueNewBookPage = () => {
                 "ISBN",
                 "Title",
                 "Author",
-                "Account Number",
+                "Accession Number",
                 "Avalability",
               ]}
               rows={bookRowData}
@@ -211,8 +216,8 @@ const IssueNewBookPage = () => {
                 <Grid item>
                   <InputField
                     disabled
-                    label="Account Number"
-                    value={selectedAccountNumber}
+                    label="Accession Number"
+                    value={selectedAccessionNumber}
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
@@ -234,16 +239,6 @@ const IssueNewBookPage = () => {
             </div>
           </form>
         </div>
-
-        {modal ? (
-          <TransitionsModal
-            title="Book Issued Successfully"
-            body="Book issuance has been successfully processed. The necessary records have been updated, and the book is now marked as issued. If you have any questions or need further assistance, please feel free to contact the library administration. Thank you.
-"
-          />
-        ) : (
-          ""
-        )}
       </div>
       <div>
         <AlertDialog

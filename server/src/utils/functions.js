@@ -1,3 +1,6 @@
+const fs = require("fs");
+// const { books1 } = require("../../books1");
+
 const checkDateGap = (initialDate, finalDate) => {
   const iy = initialDate.getFullYear();
   const im = initialDate.getMonth();
@@ -30,6 +33,10 @@ const formatString = (inputString) => {
   }
 };
 
+const createDateGap = (initialDate = new Date(), gap = 0) => {
+  return new Date(new Date(initialDate).getTime() + 1000 * 60 * 60 * 24 * gap);
+};
+
 const formatObjectValues = (object = {}, keysToIgnore = []) => {
   const newObject = {};
   const objectKeysArray = Object.keys(object);
@@ -56,12 +63,14 @@ const formatObjectValues = (object = {}, keysToIgnore = []) => {
 
   return newObject;
 };
+
 const formatDate = (date = new Date()) => {
   const yyyy = date.getFullYear();
   const mm = date.getMonth() + 1;
   const dd = date.getDate();
   return `${yyyy}-${mm}-${dd}`;
 };
+
 const createCurrentMonthDateRange = (date = new Date()) => {
   const yyyy = date.getFullYear();
   const mm = date.getMonth();
@@ -70,8 +79,39 @@ const createCurrentMonthDateRange = (date = new Date()) => {
   return { startingDate, endingDate };
 };
 
+const mergeAccessionNumbers = async () => {
+  var title = "";
+  let AccessionNumber = [];
+  let isNew = true;
+  let result = [];
+  let prevBook = {};
+  books1.forEach((book) => {
+    if (title === book.title) {
+      AccessionNumber.push(book.accessionNumber);
+      prevBook = book;
+    } else {
+      if (isNew) {
+        prevBook = book;
+        AccessionNumber.push(book.accessionNumber);
+        title = book.title;
+        isNew = false;
+      } else {
+        result.push({ ...prevBook, accessionNumber: AccessionNumber });
+        AccessionNumber = [];
+        AccessionNumber.push(book.accessionNumber);
+        prevBook = book;
+        isNew = true;
+      }
+    }
+  });
+  // fs.writeFileSync("books1-sorted.json", JSON.stringify(result, null, 2));
+};
+
+// mergeAccessionNumbers();
+
 module.exports = {
   checkDateGap,
+  createDateGap,
   formatString,
   formatObjectValues,
   createCurrentMonthDateRange,

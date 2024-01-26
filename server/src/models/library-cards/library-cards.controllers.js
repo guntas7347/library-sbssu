@@ -8,16 +8,26 @@ const fetchLibraryCardsByStudentId = async (studentId) => {
   return await libraryCards.find({ studentId: studentId });
 };
 
-const fetchLibraryCardByCardNumber = async (cardNumber) => {
-  return await libraryCards.findOne({ cardNumber });
+const fetchLibraryCardByCardNumber = async (
+  cardNumber,
+  populate = false,
+  select
+) => {
+  const query = libraryCards.findOne({ cardNumber });
+
+  if (populate) {
+    query.populate({ path: "studentId", select });
+  }
+
+  return await query.exec();
 };
 
 const fetchLibraryCardById = async (id) => {
   return await libraryCards.findById(id);
 };
 
-const updateLibraryCardStatus = async (_id, status) => {
-  return await libraryCards.findByIdAndUpdate(_id, { status });
+const updateLibraryCardStatus = async (_id, status, session) => {
+  return await libraryCards.findByIdAndUpdate(_id, { status }, { session });
 };
 
 const fetchLibraryCardIdByCardNumber = async (cardNumber) => {

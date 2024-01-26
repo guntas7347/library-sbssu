@@ -9,24 +9,12 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 export default function SnackbarFeedback({
-  severity,
-  message,
-  open,
-  handleClose,
+  severity = "info",
+  message = "",
+  open = false,
   autoHideDuration = 6000,
+  handleClose,
 }) {
-  // const handleClick = () => {
-  //   setOpen(true);
-  // };
-
-  // const handleClose = (event, reason) => {
-  //   if (reason === "clickaway") {
-  //     return;
-  //   }
-
-  //   setOpen(false);
-  // };
-
   return (
     <Stack spacing={2} sx={{ width: "100%" }}>
       <Snackbar

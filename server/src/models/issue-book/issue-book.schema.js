@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const issuedBooksSchema = new mongoose.Schema({
-  bookAccountId: {
+  bookAccessionId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "BookAccount",
+    ref: "BookAccession",
     required: true,
   },
   libraryCardId: {
@@ -13,6 +13,11 @@ const issuedBooksSchema = new mongoose.Schema({
   },
   issueDate: {
     type: Date,
+    required: true,
+  },
+  issuedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Staff",
     required: true,
   },
 });

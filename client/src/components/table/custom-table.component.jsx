@@ -9,18 +9,27 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { useNavigate } from "react-router-dom";
 
-const CustomTable = ({ rows, columns, handleRowClick, indexToSelect = 0 }) => {
+const CustomTable = ({
+  rows,
+  columns,
+  handleRowClick,
+  indexToSelect = 0,
+  pagenation_handleChangeRowsPerPage,
+  pagenation_handlePageChange,
+  pagenation_page,
+  pagenation_count,
+}) => {
   const navigate = useNavigate();
 
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
+    setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
@@ -36,24 +45,29 @@ const CustomTable = ({ rows, columns, handleRowClick, indexToSelect = 0 }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, index) => {
-              return (
-                <TableRow
-                  key={index}
-                  hover
-                  onClick={() => handleRowClick(row[indexToSelect])}
-                >
-                  {row.map((element, index) => {
-                    return <TableCell key={index}>{element}</TableCell>;
-                  })}
-                </TableRow>
-              );
-            })}
+            {rows
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row, index) => {
+                return (
+                  <TableRow
+                    key={index}
+                    hover
+                    onClick={() => handleRowClick(row[indexToSelect])}
+                  >
+                    {row.map((element, index) => {
+                      if (index === 0) {
+                        return;
+                      }
+                      return <TableCell key={index}>{element}</TableCell>;
+                    })}
+                  </TableRow>
+                );
+              })}
           </TableBody>
         </Table>
       </TableContainer>
       <TablePagination
-        rowsPerPageOptions={[10, 25, 100]}
+        rowsPerPageOptions={[5, 10, 25]}
         component="div"
         count={rows.length}
         rowsPerPage={rowsPerPage}

@@ -26,6 +26,18 @@ const getAuthRoleById = async (id, role) => {
       return await Auth_Admin.findById(id).select("role -_id");
       break;
 
+    case "STAFF":
+      return await Auth_Admin.findById(id).select("role -_id");
+      break;
+
+    case "STUDENT":
+      return await Auth_Student.findById(id).select("role -_id");
+      break;
+
+    case "APPLICANT":
+      return await Auth_Applicant.findById(id).select("role -_id");
+      break;
+
     default:
       return await AuthMongo.findById(id).select("role -_id");
       break;

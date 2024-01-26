@@ -1,7 +1,5 @@
 const express = require("express");
-const {
-  emailSignOnRouter,
-} = require("./email-sign-on/email-sign-on.applicants.auth.router");
+const { emailSignOnRouter } = require("./email-sign-on.applicants.auth.router");
 
 const applicantsAuthRouter = express.Router();
 

@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   AppBar,
@@ -22,6 +22,22 @@ const NavigationBar = () => {
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  const navRef = useRef(null);
+
+  const handleClickOutside = (event) => {
+    if (navRef.current && !navRef.current.contains(event.target)) {
+      setIsDrawerOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleSignOut = async () => {
     await signOut()
       .then(() => navigate("/"))
@@ -31,9 +47,19 @@ const NavigationBar = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
+  const ListButton = ({ name, path }) => {
+    return (
+      <ListItem>
+        <ListItem button component={Link} to={path}>
+          <ListItemText primary={name} />
+        </ListItem>
+      </ListItem>
+    );
+  };
+
   return (
     <Fragment>
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex" }} ref={navRef}>
         <AppBar position="relative">
           <Toolbar>
             <IconButton onClick={toggleDrawer}>
@@ -60,46 +86,26 @@ const NavigationBar = () => {
           <IconButton onClick={toggleDrawer}>
             <ChevronLeftIcon />
           </IconButton>
-
           <Divider />
           <List>
-            <ListItem>
-              <ListItem button component={Link} to="/dashboard/admin">
-                <ListItemText primary="Home" />
-              </ListItem>
-            </ListItem>
-            <ListItem>
-              <ListItem button component={Link} to="/dashboard/admin/profile">
-                <ListItemText primary="Profile" />
-              </ListItem>
-            </ListItem>
-            <ListItem>
-              <ListItem
-                button
-                component={Link}
-                to="/dashboard/admin/issue-books"
-              >
-                <ListItemText primary="Issue Book" />
-              </ListItem>
-            </ListItem>
-            <ListItem>
-              <ListItem
-                button
-                component={Link}
-                to="/dashboard/admin/manage-books"
-              >
-                <ListItemText primary="Manage Books" />
-              </ListItem>
-            </ListItem>
-            <ListItem>
-              <ListItem
-                button
-                component={Link}
-                to="/dashboard/admin/manage-students"
-              >
-                <ListItemText primary="Manage Students" />
-              </ListItem>
-            </ListItem>
+            <ListButton name="Home" path="/dashboard/admin" />
+            <ListButton name="Profile" path="/dashboard/admin/profile" />
+            <ListButton
+              name="Issue / Return Books"
+              path="/dashboard/admin/issue-books"
+            />
+            <ListButton
+              name="Manage Books"
+              path="/dashboard/admin/manage-books"
+            />
+            <ListButton
+              name="Manage Students"
+              path="/dashboard/admin/manage-students"
+            />
+            <ListButton
+              name="Manage Staff"
+              path="/dashboard/admin/manage-staff"
+            />
           </List>
         </Drawer>
       </Box>

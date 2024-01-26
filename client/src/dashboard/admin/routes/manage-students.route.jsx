@@ -17,10 +17,7 @@ const ManageStudentsRoute = () => {
         element={<AddLibraryCardPage />}
       />
       <Route path="/search-students/" element={<SearchStudentsPage />} />
-      <Route
-        path="/search-students/:rollNumber"
-        element={<ViewStudentPage />}
-      />
+      <Route path="/search-students/:_id" element={<ViewStudentPage />} />
       <Route path="/approve-students/" element={<ApproveStudentPage />} />
       <Route
         path="/approve-students/:applicationNumber"

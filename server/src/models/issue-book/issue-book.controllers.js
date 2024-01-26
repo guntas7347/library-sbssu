@@ -1,35 +1,52 @@
 const { createCurrentMonthDateRange } = require("../../utils/functions");
 const {
-  getBookAccountIdFromBookAccountNumber,
-} = require("../book-accounts/book-accounts.controllers");
+  getBookAccessionIdFromBookAccessionNumber,
+} = require("../book-accessions/book-accessions.controllers");
 const {
   fetchLibraryCardIdByCardNumber,
 } = require("../library-cards/library-cards.controllers");
 const issueBookMongo = require("./issue-book.schema");
 
-const issueNewBook = async (issueBookDetails) => {
-  return await issueBookMongo.create(issueBookDetails);
+const issueNewBook = async (issueBookDetails, session) => {
+  return await issueBookMongo.create([issueBookDetails], { session });
 };
 
-const fetchIssuedBookByBookAccountId = async (bookAccountId) => {
+const fetchIssuedBookByBookAccessionId = async (bookAccessionId) => {
   return await issueBookMongo
-    .findOne({ bookAccountId })
+    .findOne({ bookAccessionId })
     .populate({
-      path: "bookAccountId",
+      path: "bookAccessionId",
       populate: { path: "bookId", select: "title author ISBN -_id" },
     })
     .populate({
       path: "libraryCardId",
       populate: { path: "studentId", select: "rollNumber name program -_id" },
+    })
+    .populate({
+      path: "issuedBy",
     });
 };
 
-const fetchIssuedBookDocById = async (_id) => {
-  return await issueBookMongo.findById(_id);
+const fetchIssuedBookDocById = async (_id, populate = true) => {
+  const query = issueBookMongo.findById(_id);
+  if (populate) {
+    query
+      .populate({
+        path: "bookAccessionId",
+        populate: { path: "bookId", select: "title author -_id" },
+      })
+      .populate({
+        path: "libraryCardId",
+        populate: { path: "studentId", select: "rollNumber name -_id" },
+      })
+      .populate({ path: "issuedBy", select: "idNumber fullName -_id" });
+  }
+
+  return await query.exec();
 };
 
-const deleteIssuedBookDoc = async (_id) => {
-  return await issueBookMongo.findByIdAndDelete(_id);
+const deleteIssuedBookDoc = async (_id, session) => {
+  return await issueBookMongo.findByIdAndDelete(_id, { session });
 };
 
 const fetchAllIssuedBooks = async (filter) => {
@@ -42,18 +59,18 @@ const fetchAllIssuedBooks = async (filter) => {
       query.where({ issueDate: sortValue });
       break;
 
-    case "accountNumber":
-      const accountNumber = await getBookAccountIdFromBookAccountNumber(
+    case "accessionNumber":
+      const accessionNumber = await getBookAccessionIdFromBookAccessionNumber(
         sortValue
       );
 
-      if (accountNumber != null) {
+      if (accessionNumber != null) {
         query.where({
-          bookAccountId: accountNumber._id,
+          bookAccessionId: accessionNumber._id,
         });
       } else {
         query.where({
-          bookAccountId: null,
+          bookAccessionId: null,
         });
       }
 
@@ -87,7 +104,7 @@ const fetchAllIssuedBooks = async (filter) => {
 
   return await query
     .populate({
-      path: "bookAccountId",
+      path: "bookAccessionId",
       populate: { path: "bookId", select: "title  -_id" },
     })
     .populate({
@@ -98,7 +115,7 @@ const fetchAllIssuedBooks = async (filter) => {
 
 module.exports = {
   issueNewBook,
-  fetchIssuedBookByBookAccountId,
+  fetchIssuedBookByBookAccessionId,
   fetchIssuedBookDocById,
   deleteIssuedBookDoc,
   fetchAllIssuedBooks,

@@ -6,8 +6,11 @@ import InputField from "../../../../../components/forms/input-field/input-field.
 import { sortObjectUsingKeys } from "../../../../../utils/functions";
 import { useState } from "react";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
+import { useNavigate } from "react-router-dom";
 
 const SearchStudentsPage = () => {
+  const navigate = useNavigate();
+
   const [rowData, setRowData] = useState([]);
 
   const { formFields, handleChange } = useForm({
@@ -26,13 +29,19 @@ const SearchStudentsPage = () => {
   const rowsArray = (array) => {
     return array.map((obj) => {
       return Object.values(
-        sortObjectUsingKeys(obj, ["rollNumber", "name", "program", "batch"])
+        sortObjectUsingKeys(obj, [
+          "_id",
+          "rollNumber",
+          "name",
+          "program",
+          "batch",
+        ])
       );
     });
   };
 
   const handleRowClick = (e) => {
-    console.log(e);
+    navigate(`/dashboard/admin/manage-students/search-students/${e}`);
   };
 
   return (

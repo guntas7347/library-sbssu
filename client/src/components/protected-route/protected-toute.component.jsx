@@ -3,20 +3,20 @@ import { Navigate } from "react-router-dom";
 import { signOut, verifyAuthRole } from "../../dashboard/http-requests";
 
 const ProtectedRoute = ({ redirectPath = "/", children, role }) => {
-  const [jwt, setJwt] = useState(false);
+  const [session, setSession] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const asyncFunc = async () => {
-      await verifyAuthRole({ role })
+      await verifyAuthRole(role)
         .then((resRole) => {
           if (resRole === role) {
             setIsLoading(false);
-            setJwt(true);
+            setSession(true);
           } else {
             signOut();
             setIsLoading(false);
-            setJwt(false);
+            setSession(false);
           }
         })
         .catch(() => setIsLoading(false));
@@ -28,7 +28,7 @@ const ProtectedRoute = ({ redirectPath = "/", children, role }) => {
     return <div>Loading...</div>;
   }
 
-  return jwt ? children : <Navigate to={redirectPath} />;
+  return session ? children : <Navigate to={redirectPath} />;
 };
 
 export default ProtectedRoute;

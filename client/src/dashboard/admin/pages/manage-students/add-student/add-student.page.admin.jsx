@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, Button, Grid, Snackbar } from "@mui/material";
+import { Button, FormControl, Grid } from "@mui/material";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import {
@@ -7,7 +7,6 @@ import {
   fetchSettingsAcademicPrograms,
 } from "../../../hooks/http-requests.hooks.admin";
 import InputSelect from "../../../../../components/forms/input-select/input-select.component";
-import TransitionsModal from "../../../../../components/modals/modal.component";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
 import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
 
@@ -18,20 +17,22 @@ const AddStudentPage = () => {
 
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
+    severity: "info",
     message: "",
-    severity: "",
+    open: false,
   });
 
   const defaultFormFields = {
     rollNumber: "",
-    name: "",
+    fullName: "",
     fathersName: "",
     gender: "male",
     dob: "",
     program: "BTECH",
-    specialization: "",
-    batch: "",
+    specialization: "CSE",
+    batch: new Date().getFullYear(),
+    email: "",
+    phoneNumber: "",
   };
 
   const { formFields, handleChange, resetFormFields } =
@@ -39,19 +40,22 @@ const AddStudentPage = () => {
 
   const {
     rollNumber,
-    name,
+    fullName,
     fathersName,
     gender,
     dob,
     program,
     specialization,
+    batch,
+    email,
+    phoneNumber,
   } = formFields;
 
   const handleSubmit = async () => {
     await createStudent(formFields)
       .then((res) => {
         setSnackbarFeedback({ open: true, severity: "success", message: res });
-        // resetFormFields();
+        resetFormFields();
       })
       .catch((err) =>
         setSnackbarFeedback({ open: true, severity: "error", message: err })
@@ -67,11 +71,122 @@ const AddStudentPage = () => {
     asyncFunc();
   }, []);
 
+  const generateBatchYears = () => {
+    const array = [];
+    for (
+      let i = new Date().getFullYear();
+      i >= new Date().getFullYear() - 6;
+      i--
+    ) {
+      array.push({ name: i.toString(), value: i });
+    }
+
+    return array;
+  };
+
+  const generateSpecialization = (program) => {
+    switch (program) {
+      case "BTECH": {
+        const bTechBranches = [
+          { name: "Computer Science and Engineering", value: "CSE" },
+          { name: "Electrical Engineering", value: "EE" },
+          { name: "Mechanical Engineering", value: "ME" },
+          { name: "Civil Engineering", value: "CE" },
+          { name: "Electronics and Communication Engineering", value: "ECE" },
+          { name: "Information Technology", value: "IT" },
+          { name: "Chemical Engineering", value: "ChemE" },
+        ];
+        return bTechBranches;
+      }
+
+      case "BCA": {
+        const bcaBranches = [
+          {
+            value: "CS",
+            name: "Computer Science",
+          },
+          {
+            value: "IT",
+            name: "Information Technology",
+          },
+          {
+            value: "SE",
+            name: "Software Engineering",
+          },
+          {
+            value: "DBMS",
+            name: "Database Management System",
+          },
+          {
+            value: "NW",
+            name: "Networking",
+          },
+        ];
+        return bcaBranches;
+      }
+
+      case "BSC": {
+        const bscBranches = [
+          {
+            value: "Math",
+            name: "Mathematics",
+          },
+          {
+            value: "Physics",
+            name: "Physics",
+          },
+          {
+            value: "Chem",
+            name: "Chemistry",
+          },
+          {
+            value: "Bio",
+            name: "Biology",
+          },
+          {
+            value: "CompSci",
+            name: "Computer Science",
+          },
+        ];
+
+        return bscBranches;
+      }
+
+      case "BBA": {
+        const bbaBranches = [
+          {
+            value: "Mkt",
+            name: "Marketing",
+          },
+          {
+            value: "Fin",
+            name: "Finance",
+          },
+          {
+            value: "HR",
+            name: "Human Resources",
+          },
+          {
+            value: "Ops",
+            name: "Operations",
+          },
+          {
+            value: "Mgmt",
+            name: "Management",
+          },
+        ];
+        return bbaBranches;
+      }
+
+      default:
+        return [{}];
+    }
+  };
+
   return (
     <div>
-      <br />
-      <br />
-      <div className="m-5">
+      <h2 className="text-center my-4">Add Student</h2>
+      <div className="mx-3 mx-md-4 mx-lg-5">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -79,34 +194,59 @@ const AddStudentPage = () => {
           }}
         >
           <Grid container spacing={2}>
-            <Grid item>
+            <Grid item xs={12} sm={6} md={6}>
               <InputField
+                fullWidth
                 label="Roll Number"
                 type="number"
                 name="rollNumber"
-                InputProps={{ inputProps: {} }}
+                value={rollNumber}
                 onChange={handleChange}
-                required
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={6} md={6}>
+              <InputSelect
+                label="Batch"
+                name="batch"
+                fields={generateBatchYears()}
+                value={batch}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6}>
               <InputField
+                fullWidth
                 label="Name"
                 type="text"
-                name="name"
+                name="fullName"
+                value={fullName}
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={6} md={6}>
               <InputField
+                fullWidth
                 label="Father's Name"
                 type="text"
                 name="fathersName"
+                value={fathersName}
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={6} md={6}>
+              <InputField
+                fullWidth
+                label="Date of Birth"
+                type="date"
+                name="dob"
+                value={dob}
+                onChange={handleChange}
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6} md={6}>
               <InputSelect
+                label="Gender"
                 name="gender"
                 fields={[
                   { name: "Male", value: "male" },
@@ -117,60 +257,58 @@ const AddStudentPage = () => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
-              <InputField
-                label="Date of Birth"
-                type="date"
-                name="dob"
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={6} md={6}>
               <InputSelect
+                label="Program"
                 name="program"
                 fields={academicPrograms}
                 value={program}
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
-              <InputField
+            <Grid item xs={12} sm={6} md={6}>
+              <InputSelect
                 label="Specialization"
-                type="text"
                 name="specialization"
+                fields={generateSpecialization(program)}
+                value={specialization}
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={6} md={6}>
               <InputField
-                label="Batch"
-                type="number"
-                name="batch"
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <InputField
+                fullWidth
                 label="Email"
-                type="text"
+                type="email"
                 name="email"
+                value={email}
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={6} md={6}>
               <InputField
+                fullWidth
                 label="Phone Number"
                 type="number"
                 name="phoneNumber"
+                value={phoneNumber}
                 onChange={handleChange}
+                onInput={(e) => {
+                  e.target.value = Math.max(0, parseInt(e.target.value))
+                    .toString()
+                    .slice(0, 10);
+                }}
               />
             </Grid>
           </Grid>
           <br />
-          <Button type="submit" variant="contained">
-            Submit
-          </Button>
+          <Grid container justifyContent="center">
+            <Grid item xs={12} sm={6} md={3}>
+              <Button fullWidth type="submit" variant="contained">
+                Submit
+              </Button>
+            </Grid>
+          </Grid>
         </form>
       </div>
       <div>
@@ -187,9 +325,7 @@ const AddStudentPage = () => {
           open={showSnackbarFeedback.open}
           message={showSnackbarFeedback.message}
           severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
-          }
+          handleClose={() => setSnackbarFeedback({ open: false })}
         />
       </div>
     </div>

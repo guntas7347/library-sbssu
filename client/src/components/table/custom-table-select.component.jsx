@@ -18,26 +18,31 @@ const CustomTableSelect = ({
 }) => {
   const [isChecked, setIsChecked] = useState(false);
 
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+
   const [selectedValue, setSelectedValue] = useState([null]);
 
-  const handleRowClick = (row) => {
-    setIsChecked(!isChecked);
+  const handleRowClick = (index, row) => {
+    if (selectedRowIndex === index) {
+      setSelectedRowIndex(null);
+    } else {
+      setSelectedRowIndex(index);
+    }
+
     setSelectedValue(row[indexToSelect]);
   };
 
-  if (!isChecked) {
-    onSelect(tableName, "");
-  } else {
-    onSelect(tableName, selectedValue);
-  }
+  onSelect(tableName, selectedValue, isChecked);
 
   return (
-    <Paper sx={{ width: "100%", overflow: "hidden" }}>
+    <Paper className="mb-5" sx={{ width: "100%", overflow: "hidden" }}>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-              <CheckBoxIcon className="mt-3" />
+              <TableCell>
+                <CheckBoxIcon className="mt-3" />
+              </TableCell>
               {columns.map((column, index) => (
                 <TableCell key={index}>{column}</TableCell>
               ))}
@@ -47,7 +52,15 @@ const CustomTableSelect = ({
             {rows.map((row, index) => {
               return (
                 <TableRow key={index} hover>
-                  <Checkbox onClick={() => handleRowClick(row)} />
+                  <TableCell>
+                    <Checkbox
+                      checked={selectedRowIndex === index}
+                      onChange={(e) => {
+                        handleRowClick(index, row);
+                        setIsChecked(e.target.checked);
+                      }}
+                    />
+                  </TableCell>
                   {row.map((element, index) => {
                     return <TableCell key={index}>{element}</TableCell>;
                   })}

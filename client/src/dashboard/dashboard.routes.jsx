@@ -3,6 +3,7 @@ import AdminRoutes from "./admin/routes/admin-routes.route.admin";
 import UserRoutes from "./student/routes/student-routes.user";
 import ApplicantHomePage from "./applicant/applicant.page";
 import ProtectedRoute from "../components/protected-route/protected-toute.component";
+import StaffRoutes from "./staff/routes/staff-routes.route.staff";
 
 const DashboardRoutes = () => {
   return (
@@ -13,6 +14,14 @@ const DashboardRoutes = () => {
           element={
             <ProtectedRoute role="ADMIN">
               <AdminRoutes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/*"
+          element={
+            <ProtectedRoute role="STAFF">
+              <StaffRoutes />
             </ProtectedRoute>
           }
         />

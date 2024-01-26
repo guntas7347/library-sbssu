@@ -5,21 +5,17 @@ const cookieParser = require("cookie-parser");
 const rfs = require("rotating-file-stream");
 
 const { router } = require("./router/router");
+// const { books1Sorted } = require("../books1-sorted");
+const {
+  addNewBook,
+  fetchAllBooks,
+  addBookAccessionToBook,
+} = require("./models/books/books.controllers");
+const {
+  addBookAccession,
+} = require("./models/book-accessions/book-accessions.controllers");
 
 const app = express();
-
-///
-// const readXlsxFile = require("read-excel-file/node");
-// const schema = {
-//   "Roll No.": { prop: "rollNumber" },
-//   "MST-1 Roll No.": { prop: "mst1RollNo" },
-//   Name: { prop: "name" },
-// };
-
-// readXlsxFile("./src/list.xlsx", { schema }).then(({ rows, errors }) => {
-//   console.log(rows);
-// });
-///
 
 const stream = rfs.createStream("morgan.log", {
   size: "10M", // rotate every 10 MegaBytes written

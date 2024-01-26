@@ -24,10 +24,10 @@ const ApplyStudentPage = () => {
     rollNumber: "",
     name: "",
     fathersName: "",
-
+    gender: "male",
     dob: "",
-
     program: "BTECH",
+    caste: "general",
     specialization: "",
     batch: "",
   };
@@ -47,6 +47,7 @@ const ApplyStudentPage = () => {
   } = formFields;
 
   const handleSubmit = async () => {
+    console.log(formFields);
     await createApplication(formFields)
       .then((res) => {
         setSnackbarFeedback({ open: true, severity: "success", message: res });

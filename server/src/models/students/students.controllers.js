@@ -1,11 +1,14 @@
 const { formatString } = require("../../utils/functions");
 const studentsCol = require("./students.schema");
 
-const createNewStudent = async (StudentDetails) => {
-  return await studentsCol.create({ ...StudentDetails, createdAt: new Date() });
+const createNewStudent = async (StudentDetails, session) => {
+  return await studentsCol.create(
+    [{ ...StudentDetails, createdAt: new Date() }],
+    { session }
+  );
 };
 
-const fetchAllStudents = async (filter) => {
+const fetchAllStudents = async (filter, select) => {
   const { sortSelect, sortValue } = filter;
   // const sortValue = formatString(filter.sortValue);
 
@@ -27,12 +30,12 @@ const fetchAllStudents = async (filter) => {
     default:
       break;
   }
-
+  query.select(select);
   return await query.exec();
 };
 
 const fetchStudentByRollNumber = async (rollNumber, populate = false) => {
-  const query = studentsCol.findOne({ rollNumber: rollNumber });
+  const query = studentsCol.findOne({ rollNumber });
 
   if (populate) query.populate("libraryCards");
 
@@ -42,7 +45,8 @@ const fetchStudentByRollNumber = async (rollNumber, populate = false) => {
 const fetchStudentById = async (id, populate = false) => {
   const query = studentsCol.findById(id);
 
-  if (populate) query.populate("libraryCards");
+  if (populate)
+    query.populate({ path: "libraryCards", select: "cardNumber status -_id" });
 
   return await query.exec();
 };
