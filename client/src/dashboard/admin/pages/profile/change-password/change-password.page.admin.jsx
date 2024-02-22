@@ -32,17 +32,15 @@ const ChangePasswordPage = () => {
       });
     } else {
       await changePassword(formFields)
-        .then((res) => {
+        .then(({ message }) => {
           resetFormFields();
           setSnackbarFeedback({
             open: true,
             severity: "success",
-            message: res,
+            message,
           });
         })
-        .catch((err) =>
-          setSnackbarFeedback({ open: true, severity: "error", message: err })
-        );
+        .catch((err) => setSnackbarFeedback([1, 2, err]));
     }
   };
 
@@ -56,6 +54,7 @@ const ChangePasswordPage = () => {
               <InputField
                 label="Current Password"
                 name="currentPassword"
+                type="password"
                 onChange={handleChange}
                 value={currentPassword}
               />
@@ -64,6 +63,7 @@ const ChangePasswordPage = () => {
               <InputField
                 label="New Password"
                 name="newPassword"
+                type="password"
                 onChange={handleChange}
                 value={newPassword}
               />
@@ -72,6 +72,7 @@ const ChangePasswordPage = () => {
               <InputField
                 label="Confirm New Password"
                 name="confirmNewPassword"
+                type="password"
                 onChange={handleChange}
                 value={confirmNewPassword}
               />
@@ -86,8 +87,8 @@ const ChangePasswordPage = () => {
       </div>
       <div>
         <SnackbarFeedbackCustom
-          showSnackbarFeedback={showSnackbarFeedback}
-          setSnackbarFeedback={setSnackbarFeedback}
+          feedback={showSnackbarFeedback}
+          handleClose={setSnackbarFeedback}
         />
       </div>
     </div>

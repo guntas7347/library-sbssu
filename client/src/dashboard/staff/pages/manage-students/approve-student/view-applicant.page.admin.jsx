@@ -60,11 +60,9 @@ const ViewApplicantPage = () => {
     const decision = e.target.name;
     await processApplication({ applicationNumber, decision })
       .then((res) => {
-        setSnackbarFeedback({ open: true, severity: "success", message: res });
+        setSnackbarFeedback([1, 1, res]);
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   return (
@@ -117,7 +115,7 @@ const ViewApplicantPage = () => {
           message={showSnackbarFeedback.message}
           severity={showSnackbarFeedback.severity}
           handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
+            setSnackbarFeedback({ open: false, severity: "info", message: "" })
           }
         />
       </div>

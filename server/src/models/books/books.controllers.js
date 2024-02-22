@@ -4,7 +4,7 @@ const {
 
 const booksMongo = require("./books.schema");
 
-const addNewBook = async (bookDetails, session) => {
+const createBook = async (bookDetails, session) => {
   try {
     return await booksMongo.create([bookDetails], { session });
   } catch (error) {
@@ -12,24 +12,22 @@ const addNewBook = async (bookDetails, session) => {
   }
 };
 
-const fetchBookDetailsById = async (id) => {
+const getBookById = async (id, populate = false) => {
   const query = booksMongo.findById(id);
-  query.populate({ path: "accessionNumbers" });
+  if (populate) query.populate({ path: "accessionNumbers" });
   return await query.exec();
 };
 
-const fetchAllBooks = async (
+const findBooks = async (
   filter = { sortSelect: "", sortValue: "" },
-  select
+  select,
+  limit = 100,
+  populate = false,
+  select_accession
 ) => {
   const { sortSelect, sortValue } = filter;
-
-  const query = booksMongo.find().limit(100);
+  const query = booksMongo.find().limit(limit);
   switch (sortSelect) {
-    case "ISBN":
-      query.where({ ISBN: sortValue });
-      break;
-
     case "accessionNumber":
       const accessionNumber = await getBookIdFromAccessionNumber(sortValue);
       if (accessionNumber != null) {
@@ -43,19 +41,25 @@ const fetchAllBooks = async (
       }
       break;
 
-    case "title":
-      query.where({ title: sortValue });
+    case "isbn":
+      query.where({ isbn: sortValue });
       break;
 
-    case "_id":
-      query.where({ _id: sortValue });
+    case "title":
+      query.where({ title: sortValue });
       break;
 
     default:
       break;
   }
   query.select(select);
-  query.populate({ path: "accessionNumbers", select: "accessionNumber -_id" });
+
+  populate
+    ? query.populate({
+        path: "accessionNumbers",
+        select: select_accession,
+      })
+    : "";
 
   return await query.exec();
 };
@@ -64,31 +68,27 @@ const countTotalBooks = async () => {
   return await booksMongo.countDocuments();
 };
 
-const fetchBookByISBN = async (isbn, populate = false) => {
+const getBookByIsbn = async (isbn, select, populate = false) => {
   const query = booksMongo.findOne({ isbn });
-
-  if (populate) query.populate("bookAccessions");
+  query.select(select);
+  if (populate) query.populate({ path: "bookAccessions" });
 
   return await query.exec();
 };
 
-const fetchBookById = async (id) => {
-  return await booksMongo.findById(id);
-};
-
-const addBookAccessionToBook = async (bookId, bookAccessionId) => {
-  return await booksMongo.updateOne(
-    { _id: bookId },
-    { $push: { accessionNumbers: bookAccessionId } }
+const addBookAccessionToBook = async (bookId, bookAccessionId, session) => {
+  return await booksMongo.findByIdAndUpdate(
+    bookId,
+    { $push: { accessionNumbers: bookAccessionId } },
+    { session }
   );
 };
 
 module.exports = {
-  addNewBook,
-  fetchAllBooks,
+  createBook,
+  findBooks,
   countTotalBooks,
-  fetchBookByISBN,
-  fetchBookById,
+  getBookById,
+  getBookByIsbn,
   addBookAccessionToBook,
-  fetchBookDetailsById,
 };

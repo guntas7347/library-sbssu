@@ -12,12 +12,11 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
 import {
   compleateSignUpWithCredentials,
-  createAdminAuth,
   initalizeSignUpWithCredentials,
 } from "../http-requests";
 import { Link, useNavigate } from "react-router-dom";
-import SnackbarFeedback from "../../components/feedback/snackbar/snackbar.component";
 import { useState } from "react";
+import SnackbarFeedbackCustom from "../../components/feedback/snackbar/snackbar-full.component";
 
 const SignUpPage = () => {
   const navigate = useNavigate();
@@ -30,7 +29,7 @@ const SignUpPage = () => {
     severity: "",
   });
 
-  const { formFields, handleChange, setFormFields } = useForm({
+  const { formFields, handleChange, resetFormFields } = useForm({
     displayName: "",
     email: "",
     password: "",
@@ -38,10 +37,24 @@ const SignUpPage = () => {
     _id: "",
   });
 
+  const { displayName, email, password, otp } = formFields;
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (showOTPForm) {
+    if (!showOTPForm) {
+      await initalizeSignUpWithCredentials(formFields)
+        .then((res) => {
+          handleChange({ target: { name: "_id", value: res.payload } });
+          setSnackbarFeedback({
+            open: true,
+            severity: "success",
+            message: res.message,
+          });
+          setShowOTPForm(true);
+        })
+        .catch((err) => setSnackbarFeedback([1, 2, err]));
+    } else {
       await compleateSignUpWithCredentials({
         otp: +formFields.otp,
         _id: formFields._id,
@@ -50,27 +63,12 @@ const SignUpPage = () => {
           setSnackbarFeedback({
             open: true,
             severity: "success",
-            message: res,
+            message: res.message,
           });
+          setShowOTPForm(false);
+          resetFormFields();
         })
-        .catch((err) =>
-          setSnackbarFeedback({ open: true, severity: "error", message: err })
-        );
-    } else {
-      await initalizeSignUpWithCredentials(formFields)
-        .then((res) => {
-          const { status, payload } = res;
-          setFormFields({ ...formFields, _id: payload });
-          setSnackbarFeedback({
-            open: true,
-            severity: "success",
-            message: status,
-          });
-          setShowOTPForm(true);
-        })
-        .catch((err) =>
-          setSnackbarFeedback({ open: true, severity: "error", message: err })
-        );
+        .catch((err) => setSnackbarFeedback([1, 2, err]));
     }
   };
 
@@ -92,75 +90,70 @@ const SignUpPage = () => {
           <Typography component="h1" variant="h5">
             Create New Account
           </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
-          >
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <InputField
               margin="normal"
-              required
-              fullWidth
               label="Full Name"
               name="displayName"
               autoComplete="name"
+              value={displayName}
               autoFocus
               onChange={handleChange}
               disabled={showOTPForm}
             />
             <InputField
               margin="normal"
-              required
-              fullWidth
               label="Email Address"
               name="email"
+              type="email"
               autoComplete="email"
+              value={email}
               autoFocus
               onChange={handleChange}
               disabled={showOTPForm}
             />
             <InputField
               margin="normal"
-              required
-              fullWidth
               name="password"
               label="Password"
               type="password"
               autoComplete="current-password"
+              value={password}
               onChange={handleChange}
               disabled={showOTPForm}
             />
-            {showOTPForm ? (
+            {showOTPForm && (
               <InputField
                 margin="normal"
-                required
-                fullWidth
                 name="otp"
                 label="6 Digit One Time Password"
                 type="number"
+                value={otp}
                 onChange={handleChange}
+                onInput={(e) => {
+                  e.target.value = Math.max(0, parseInt(e.target.value))
+                    .toString()
+                    .slice(0, 6);
+                }}
               />
-            ) : (
-              ""
             )}
             {showOTPForm ? (
               <Button
-                type="submit"
                 fullWidth
+                type="submit"
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Create Accession
+                Create Account
               </Button>
             ) : (
               <Button
-                type="submit"
                 fullWidth
+                type="submit"
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Next
+                Send OTP
               </Button>
             )}
 
@@ -174,18 +167,9 @@ const SignUpPage = () => {
         {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
       </Container>
       <div>
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() => {
-            setSnackbarFeedback({ open: false, severity: "", message: "" });
-            if (
-              showSnackbarFeedback.message === "Account Created Successfully"
-            ) {
-              navigate("/");
-            }
-          }}
+        <SnackbarFeedbackCustom
+          feedback={showSnackbarFeedback}
+          handleClose={setSnackbarFeedback}
         />
       </div>
     </div>

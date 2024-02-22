@@ -7,11 +7,18 @@ import { sortObjectUsingKeys } from "../../../../../utils/functions";
 import { useState } from "react";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { useNavigate } from "react-router-dom";
+import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
 
 const SearchStaffPage = () => {
   const navigate = useNavigate();
 
   const [rowData, setRowData] = useState([]);
+
+  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
+    open: false,
+    message: "",
+    severity: "",
+  });
 
   const { formFields, handleChange } = useForm({
     sortSelect: "fetchAllStaff",
@@ -22,7 +29,7 @@ const SearchStaffPage = () => {
     await fetchAllStaff()
       .then((res) => setRowData(rowsArray(res)))
       .catch((err) => {
-        console.error(err);
+        setSnackbarFeedback([1, 2, err]);
       });
   };
 
@@ -62,6 +69,12 @@ const SearchStaffPage = () => {
             handleRowClick={handleRowClick}
           />
         </div>
+      </div>
+      <div>
+        <SnackbarFeedbackCustom
+          feedback={showSnackbarFeedback}
+          handleClose={setSnackbarFeedback}
+        />
       </div>
     </div>
   );

@@ -154,7 +154,7 @@ const SearchIssuedBooks = () => {
           message={showSnackbarFeedback.message}
           severity={showSnackbarFeedback.severity}
           handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
+            setSnackbarFeedback({ open: false, severity: "info", message: "" })
           }
         />
       </div>

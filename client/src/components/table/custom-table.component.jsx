@@ -7,20 +7,13 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import { useNavigate } from "react-router-dom";
 
 const CustomTable = ({
-  rows,
-  columns,
-  handleRowClick,
+  rows = [],
+  columns = [],
+  handleRowClick = () => {},
   indexToSelect = 0,
-  pagenation_handleChangeRowsPerPage,
-  pagenation_handlePageChange,
-  pagenation_page,
-  pagenation_count,
 }) => {
-  const navigate = useNavigate();
-
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -66,15 +59,19 @@ const CustomTable = ({
           </TableBody>
         </Table>
       </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={rows.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+      {rows.length > 5 ? (
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={rows.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      ) : (
+        ""
+      )}
     </Paper>
   );
 };

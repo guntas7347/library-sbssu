@@ -1,29 +1,31 @@
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
+import LinkButton from "../../../../components/forms/link-button/link-button.component";
 
 const ManageStudentsPage = () => {
   const previousPath = "/dashboard/admin/manage-students";
   return (
     <div className="text-center">
       <h1 className="my-4">Manage Students</h1>
-      <Button as={Link} to={`${previousPath}/add-student`}>
-        Add new Student
-      </Button>
+      <LinkButton to={`${previousPath}/add-student`} label="Add new Student" />
       <br />
       <br />
-      <Button as={Link} to={`${previousPath}/add-student/add-student-card`}>
-        Add Library Card
-      </Button>
+      <LinkButton
+        to={`${previousPath}/add-student/add-student-card`}
+        label="Add Library Card"
+      />
       <br />
       <br />
-      <Button as={Link} to={`${previousPath}/approve-students`}>
-        Approve Students
-      </Button>
+      <LinkButton
+        to={`${previousPath}/approve-students`}
+        label="Approve Students"
+      />
       <br />
       <br />
-      <Button as={Link} to={`${previousPath}/search-students`}>
-        Search Students
-      </Button>
+      <LinkButton
+        to={`${previousPath}/search-students`}
+        label="Search Students"
+      />
     </div>
   );
 };

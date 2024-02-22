@@ -7,8 +7,8 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 
 export default function AlertDialog({
-  title,
-  content,
+  title = "Confirm?",
+  content = "This action can not be undone",
   open,
   handleClick,
   agreeMessage = "Agree",

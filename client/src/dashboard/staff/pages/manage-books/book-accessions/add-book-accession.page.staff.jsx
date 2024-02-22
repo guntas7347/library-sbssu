@@ -50,11 +50,9 @@ const AddBookAccessionPage = () => {
   const handleCreateBookAccession = async () => {
     await createBookAccession(formFields)
       .then((res) => {
-        setSnackbarFeedback({ open: true, severity: "success", message: res });
+        setSnackbarFeedback([1, 1, res]);
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   const rowsArray = (array) => {
@@ -158,7 +156,7 @@ const AddBookAccessionPage = () => {
           message={showSnackbarFeedback.message}
           severity={showSnackbarFeedback.severity}
           handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
+            setSnackbarFeedback({ open: false, severity: "info", message: "" })
           }
         />
       </div>

@@ -7,7 +7,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const CustomTableSelect = ({
   tableName,
@@ -32,7 +32,9 @@ const CustomTableSelect = ({
     setSelectedValue(row[indexToSelect]);
   };
 
-  onSelect(tableName, selectedValue, isChecked);
+  useEffect(() => {
+    onSelect(tableName, selectedValue, isChecked);
+  }, [isChecked, selectedValue, selectedRowIndex]);
 
   return (
     <Paper className="mb-5" sx={{ width: "100%", overflow: "hidden" }}>

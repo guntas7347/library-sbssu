@@ -50,12 +50,10 @@ const AddStudentPage = () => {
   const handleSubmit = async () => {
     await createStudent(formFields)
       .then((res) => {
-        setSnackbarFeedback({ open: true, severity: "success", message: res });
+        setSnackbarFeedback([1, 1, res]);
         // resetFormFields();
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   useEffect(() => {
@@ -188,7 +186,7 @@ const AddStudentPage = () => {
           message={showSnackbarFeedback.message}
           severity={showSnackbarFeedback.severity}
           handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
+            setSnackbarFeedback({ open: false, severity: "info", message: "" })
           }
         />
       </div>

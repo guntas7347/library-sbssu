@@ -1,47 +1,34 @@
 const bookAccessionsSchema = require("./book-accessions.schema");
 
-const addBookAccession = async (bookAccessionDetails) => {
-  return await bookAccessionsSchema.create(bookAccessionDetails);
+const createBookAccession = async (bookAccessionDetails, session) => {
+  return await bookAccessionsSchema.create([bookAccessionDetails], { session });
 };
 
-const fetchBookAccessionByAccessionNumber = async (
+const getBookAccessionById = async (_id) => {
+  return await bookAccessionsSchema.findById(_id);
+};
+
+const getBookAccessionByAccessionNumber = async (
   accessionNumber,
   populate = false,
   select
 ) => {
-  const query = bookAccessionsSchema.findOne({
-    accessionNumber,
-  });
-
+  const query = bookAccessionsSchema.findOne({ accessionNumber });
   if (populate) query.populate({ path: "bookId", select });
-
   return await query.exec();
 };
 
-const getBookAccessionIdFromBookAccessionNumber = async (accessionNumber) => {
-  return await bookAccessionsSchema
-    .findOne({ accessionNumber: accessionNumber })
-    .select("_id");
-};
-
-const updateBookAccessionStatus = async (bookAccessionId, status, session) => {
+const updateBookAccession = async (bookAccessionId, update, session) => {
   return await bookAccessionsSchema.updateOne(
     { _id: bookAccessionId },
-    { status },
+    update,
     { session }
   );
 };
 
-const getBookIdFromAccessionNumber = async (accessionNumber) => {
-  return await bookAccessionsSchema
-    .findOne({ accessionNumber: accessionNumber })
-    .select("bookId -_id");
-};
-
 module.exports = {
-  addBookAccession,
-  fetchBookAccessionByAccessionNumber,
-  updateBookAccessionStatus,
-  getBookAccessionIdFromBookAccessionNumber,
-  getBookIdFromAccessionNumber,
+  createBookAccession,
+  getBookAccessionById,
+  getBookAccessionByAccessionNumber,
+  updateBookAccession,
 };

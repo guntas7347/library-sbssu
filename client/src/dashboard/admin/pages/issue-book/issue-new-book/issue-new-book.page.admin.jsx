@@ -5,13 +5,14 @@ import {
   issueNewBook,
 } from "../../../hooks/http-requests.hooks.admin";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
-import { Button, Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import CustomTableSelect from "../../../../../components/table/custom-table-select.component";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
-import TransitionsModal from "../../../../../components/modals/modal.component";
-import { rowsArray, sortObjectUsingKeys } from "../../../../../utils/functions";
+import { rowsArray } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
+import BackdropSpinner from "../../../../../components/feedback/backdrop/backdrop.component";
+import Button from "../../../../../components/buttons/button.component";
 
 const IssueNewBookPage = () => {
   const [showBookTable, setShowBookTable] = useState(false);
@@ -19,10 +20,11 @@ const IssueNewBookPage = () => {
   const [bookRowData, setBookRowData] = useState([]);
   const [studentRowData, setStudentRowData] = useState([]);
 
-  const [selectedCardNumber, setSelectedCardNumber] = useState(null);
-  const [selectedAccessionNumber, setSelectedAccessionNumber] = useState(null);
+  const [selectedCardNumber, setSelectedCardNumber] = useState("");
+  const [selectedAccessionNumber, setSelectedAccessionNumber] = useState("");
 
   const [showAlertDialog, setShowAlertDialog] = useState(false);
+  const [showBackdropSpinner, setShowBackdropSpinner] = useState(false);
   const [showSnackbarFeedback, setSnackbarFeedback] = useState({
     open: false,
     message: "",
@@ -30,44 +32,42 @@ const IssueNewBookPage = () => {
   });
 
   const { formFields, handleChange } = useForm({
+    rollNumber: "",
+    accessionNumber: "",
     issueDate: new Date(),
   });
 
+  const { rollNumber, accessionNumber, issueDate } = formFields;
+
   const handleFetchBook = async () => {
-    setShowBookTable(true);
-    await fetchBookByAccessionNumber({
-      accessionNumber: formFields.accessionNumber,
-    })
+    await fetchBookByAccessionNumber(accessionNumber)
       .then((res) => {
+        setShowBookTable(true);
         setBookRowData(
           rowsArray(
-            [res],
+            [{ ...res, ...res.bookId }],
             ["isbn", "title", "author", "accessionNumber", "status"]
           )
         );
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   const handleFetchStuent = () => {
-    setShowStudentTable(true);
     fetchStudentByRollNumber(formFields.rollNumber)
       .then((res) => {
+        setShowStudentTable(true);
         setStudentRowData(
           rowsArray(addLibraryCardsValueToObject(res), [
             "rollNumber",
-            "name",
+            "fullName",
             "program",
             "cardNumber",
             "cardStatus",
           ])
         );
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   const addLibraryCardsValueToObject = (obj) => {
@@ -88,34 +88,45 @@ const IssueNewBookPage = () => {
       if (isChecked) {
         setSelectedCardNumber(selectedValue);
       } else {
-        setSelectedCardNumber("");
+        if (selectedCardNumber !== "") setSelectedCardNumber("");
       }
     }
     if (tableName === "booksTable") {
       if (isChecked) {
         setSelectedAccessionNumber(selectedValue);
       } else {
-        setSelectedAccessionNumber("");
+        if (selectedAccessionNumber !== "") setSelectedAccessionNumber("");
       }
     }
   };
 
   const handleIssueNewBook = async () => {
+    setShowBackdropSpinner(true);
     const issueBookDetails = {
       accessionNumber: selectedAccessionNumber,
       cardNumber: selectedCardNumber,
       issueDate: formFields.issueDate,
     };
-
     await issueNewBook(issueBookDetails)
       .then((res) => {
-        setSnackbarFeedback({ open: true, severity: "success", message: res });
+        setSnackbarFeedback([1, 1, res]);
         handleFetchBook();
         handleFetchStuent();
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
+    setShowBackdropSpinner(false);
+  };
+
+  const yesterdayDate = () => {
+    return new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * -1)
+      .toISOString()
+      .split("T")[0];
+  };
+
+  const disableIssueButton = () => {
+    if (selectedCardNumber !== "" && selectedAccessionNumber !== "") {
+      return false;
+    } else return true;
   };
 
   return (
@@ -125,22 +136,27 @@ const IssueNewBookPage = () => {
       <br />
       <div>
         <div>
-          <Grid container spacing={4}>
-            <Grid item>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6} md={3}>
               <InputField
                 label="Book's Accession Number"
                 name="accessionNumber"
                 type="text"
+                value={accessionNumber}
+                disabled={showBookTable}
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
-              <Button variant="contained" onClick={handleFetchBook}>
-                Fetch Book
-              </Button>
+            <Grid item xs={12} sm={4} md={2}>
+              <Button
+                disabled={showBookTable}
+                onClick={handleFetchBook}
+                label="Fetch Book"
+              />
             </Grid>
           </Grid>
-          {showBookTable ? (
+
+          {showBookTable && (
             <CustomTableSelect
               columns={[
                 "ISBN",
@@ -154,29 +170,31 @@ const IssueNewBookPage = () => {
               indexToSelect={3}
               tableName="booksTable"
             />
-          ) : (
-            ""
           )}
         </div>
 
         <div>
           <br />
           <Grid container spacing={2}>
-            <Grid item>
+            <Grid item xs={12} sm={6} md={3}>
               <InputField
                 label="Student's Roll Number"
                 name="rollNumber"
                 type="text"
+                value={rollNumber}
+                disabled={showStudentTable}
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
-              <Button variant="contained" onClick={handleFetchStuent}>
-                Fetch Student
-              </Button>
+            <Grid item xs={12} sm={4} md={2}>
+              <Button
+                disabled={showStudentTable}
+                onClick={handleFetchStuent}
+                label="Fetch Student"
+              />
             </Grid>
           </Grid>
-          {showStudentTable ? (
+          {showStudentTable && (
             <CustomTableSelect
               columns={[
                 "Roll Number",
@@ -190,8 +208,6 @@ const IssueNewBookPage = () => {
               indexToSelect={3}
               tableName="studentsTable"
             />
-          ) : (
-            ""
           )}
         </div>
         <br />
@@ -205,7 +221,7 @@ const IssueNewBookPage = () => {
           >
             <div>
               <Grid container spacing={2}>
-                <Grid item>
+                <Grid item xs={12} sm={6} md={3}>
                   <InputField
                     disabled
                     label="Card Number"
@@ -213,7 +229,7 @@ const IssueNewBookPage = () => {
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
-                <Grid item>
+                <Grid item xs={12} sm={6} md={3}>
                   <InputField
                     disabled
                     label="Accession Number"
@@ -221,21 +237,28 @@ const IssueNewBookPage = () => {
                     InputLabelProps={{ shrink: true }}
                   />
                 </Grid>
-                <Grid item>
+                <Grid item xs={12} sm={6} md={3}>
                   <InputField
                     label="Issue Date"
                     name="issueDate"
                     type="date"
+                    value={issueDate}
                     onChange={handleChange}
                     InputLabelProps={{ shrink: true }}
+                    inputProps={{
+                      max: yesterdayDate(),
+                    }}
+                    required={false}
                   />
                 </Grid>
               </Grid>
             </div>
             <div className="m-5">
-              <Button variant="contained" type="submit">
-                Issue Now
-              </Button>
+              <Button
+                disabled={disableIssueButton()}
+                type="submit"
+                label="Issue Now"
+              />
             </div>
           </form>
         </div>
@@ -243,21 +266,25 @@ const IssueNewBookPage = () => {
       <div>
         <AlertDialog
           title="Confirm?"
-          content="This action can not be undone"
+          content={
+            <>
+              Issue Book:- <br />
+              Accession Number: {selectedAccessionNumber} <br />
+              Library Card Number: {selectedCardNumber} <br />
+              Issue Date: {new Date(issueDate).toDateString()}
+            </>
+          }
           open={showAlertDialog}
-          handleClick={(e, f) => {
+          handleClick={(e) => {
             if (e) handleIssueNewBook();
             setShowAlertDialog(false);
           }}
         />
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
-          }
+        <SnackbarFeedbackCustom
+          feedback={showSnackbarFeedback}
+          handleClose={setSnackbarFeedback}
         />
+        <BackdropSpinner open={showBackdropSpinner} />
       </div>
     </div>
   );

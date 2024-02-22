@@ -1,328 +1,122 @@
-const API_URL = "http://localhost:8080";
+export const localIp = true;
 
-export const loginWithCredentials = (userCredentials) => {
+const ip1 = "localhost";
+const ip2 = "192.168.1.6";
+
+const API_URL = `http://${localIp ? ip1 : ip2}:8080/api`;
+
+const logResponseToConsole = ({ status, message, payload }, success = true) =>
+  success
+    ? console.log({ status, message, payload })
+    : console.error({ status, message, payload });
+
+const postOptions = (obj) => {
+  return {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(obj),
+  };
+};
+
+export const restCall = (url, obj, crs = null) => {
   return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/api/auth/admin/email-sign-on/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(userCredentials),
-    })
+    fetch(`${API_URL}/${url}`, postOptions(obj))
       .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
+        if (!Array.isArray(crs)) crs = [crs];
+        if (crs.length === 0) {
+          reject(`CRS UNDEFINED at ${url}`);
+          return;
+        }
 
-        if (statusCode === 200) {
-          resolve(status);
+        const response = await res.json();
+        if (crs.includes(response.status)) {
+          console.log(response.status);
+          resolve(response);
         } else {
-          console.error(payload);
-          reject(status);
+          logResponseToConsole(response, false);
+          reject(response.message);
         }
       })
-      .catch((error) => reject(error));
+      .catch((err) => {
+        console.log(err);
+
+        reject("Could not connect to Server");
+      });
   });
 };
 
 export const adminLoginWithCredentials = (userCredentials) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/api/auth/admin/email-sign-on/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(userCredentials),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
+  return restCall("auth/admin/login", userCredentials, "AUTH200ADM");
 };
 
 export const studentLoginWithCredentials = (userCredentials) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/api/auth/students/email-sign-on/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(userCredentials),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(status);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
+  return restCall("auth/students/login", userCredentials, ["AUTH200STU"]);
 };
 
 export const applicantLoginWithCredentials = (userCredentials) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/api/auth/applicants/email-sign-on/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(userCredentials),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(status);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
+  return restCall("auth/applicants/login", userCredentials, "AUTH200LAPP");
 };
 
 export const createAdminAuth = (userCredentials) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/api/auth/admin/email-sign-on/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(userCredentials),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(status);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
+  return restCall("auth/admin/signup", userCredentials);
 };
 
 export const initalizeSignUpWithCredentials = (userCredentials) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/api/auth/applicants/email-sign-on/create-user/send-otp`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(userCredentials),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve({ status, payload });
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
+  return restCall(
+    "auth/applicants/create-user/send-otp",
+    userCredentials,
+    "AUTH200SAPP"
+  );
 };
 
 export const compleateSignUpWithCredentials = (userCredentials) => {
-  return new Promise((resolve, reject) => {
-    fetch(
-      `${API_URL}/api/auth/applicants/email-sign-on/create-user/verify-otp`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(userCredentials),
-      }
-    )
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(status);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
+  return restCall(
+    "auth/applicants/create-user/verify-otp",
+    userCredentials,
+    "AUTH200VAPP"
+  );
 };
 
 export const createApplication = (applicantionDetails) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/api/applicant/create-new-application`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(applicantionDetails),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          console.error(payload);
-          reject(payload);
-        }
-      })
-      .catch((error) => reject(error));
-  });
+  return restCall(
+    "applicant/create-new-application",
+    applicantionDetails,
+    "APP200CNA"
+  );
 };
 
 export const fetchApplication = () => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/api/applicant/get-application`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
+  return restCall("applicant/get-application", {}, "APP200FA");
 };
 
-export const signOut = () => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/api/auth/email-sign-on/sign-out`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(status);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
+export const deleteApplication = () => {
+  return restCall("applicant/delete-application", {}, "APP200DA");
 };
 
 export const verifyAuthRole = (role) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/api/auth/ping`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ role }),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
+  return restCall("auth-secured/ping", { role }, "AUTH200PING");
+};
 
-        if (statusCode === 200) {
-          resolve(status);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
+export const signOut = () => {
+  return restCall("auth/sign-out", {}, "AUTH200SOUT");
 };
 
 export const changePassword = (credentials) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/api/auth/change-password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(credentials),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(status);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
+  return restCall(
+    "auth-secured/admin/change-password",
+    credentials,
+    "AUTH200CAP"
+  );
 };
 
-export const forgotPassword = (credentials) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/api/auth/forgot-password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(credentials),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
+export const resetPasswordAdminSendOtp = (email) =>
+  restCall("auth/admin/reset-password-init", { email }, "AUTH200RAPI");
 
-        if (statusCode === 200) {
-          resolve(status);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const resetPasswordAdminVerifyOtp = (cred) =>
+  restCall("auth/admin/reset-password-verify", cred, "AUTH200RAPV");
+
+export const resetPasswordAdmin = (cred) =>
+  restCall("auth/admin/reset-password", cred, "AUTH200RAP");

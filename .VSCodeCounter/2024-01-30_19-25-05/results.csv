@@ -1,0 +1,173 @@
+"filename", "language", "JSON", "JavaScript", "TypeScript JSX", "CSS", "JavaScript JSX", "Markdown", "HTML", "comment", "blank", "total"
+"d:\Programming\Projects\library\client\.eslintrc.js", "JavaScript", 0, 28, 0, 0, 0, 0, 0, 0, 1, 29
+"d:\Programming\Projects\library\client\README.md", "Markdown", 0, 0, 0, 0, 0, 38, 0, 0, 33, 71
+"d:\Programming\Projects\library\client\package-lock.json", "JSON", 18515, 0, 0, 0, 0, 0, 0, 0, 1, 18516
+"d:\Programming\Projects\library\client\package.json", "JSON", 49, 0, 0, 0, 0, 0, 0, 0, 1, 50
+"d:\Programming\Projects\library\client\public\index.html", "HTML", 0, 0, 0, 0, 0, 0, 23, 23, 2, 48
+"d:\Programming\Projects\library\client\public\manifest.json", "JSON", 25, 0, 0, 0, 0, 0, 0, 0, 1, 26
+"d:\Programming\Projects\library\client\src\App.js", "JavaScript", 0, 19, 0, 0, 0, 0, 0, 0, 3, 22
+"d:\Programming\Projects\library\client\src\_codux\boards\login-page.board.tsx", "TypeScript JSX", 0, 0, 9, 0, 0, 0, 0, 0, 2, 11
+"d:\Programming\Projects\library\client\src\components\feedback\dialog\alert-dialog.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 44, 0, 0, 0, 2, 46
+"d:\Programming\Projects\library\client\src\components\feedback\snackbar\snackbar-full.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 16, 0, 0, 0, 3, 19
+"d:\Programming\Projects\library\client\src\components\feedback\snackbar\snackbar.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 29, 0, 0, 4, 3, 36
+"d:\Programming\Projects\library\client\src\components\feedback\spinner\spinner.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 10, 0, 0, 0, 2, 12
+"d:\Programming\Projects\library\client\src\components\forms\hooks\useLengthTrigger\uselengthTrigger.hook.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 16, 0, 0, 0, 4, 20
+"d:\Programming\Projects\library\client\src\components\forms\input-field\input-field.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 13, 0, 0, 1, 4, 18
+"d:\Programming\Projects\library\client\src\components\forms\input-select\input-select.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 25, 0, 0, 0, 3, 28
+"d:\Programming\Projects\library\client\src\components\forms\link-button\link-button.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 10, 0, 0, 0, 3, 13
+"d:\Programming\Projects\library\client\src\components\forms\search-query\search-query.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 59, 0, 0, 0, 7, 66
+"d:\Programming\Projects\library\client\src\components\forms\use-form-hook\use-form.hook.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 12, 0, 0, 0, 5, 17
+"d:\Programming\Projects\library\client\src\components\modals\modal.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 51, 0, 0, 0, 5, 56
+"d:\Programming\Projects\library\client\src\components\protected-route\protected-toute.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 29, 0, 0, 0, 6, 35
+"d:\Programming\Projects\library\client\src\components\table\custom-table-select.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 71, 0, 0, 0, 8, 79
+"d:\Programming\Projects\library\client\src\components\table\custom-table.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 74, 0, 0, 0, 5, 79
+"d:\Programming\Projects\library\client\src\components\table\spanning-table.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 30, 0, 0, 0, 3, 33
+"d:\Programming\Projects\library\client\src\dashboard\admin\components\database-form\database-form.component.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 26, 0, 0, 0, 4, 30
+"d:\Programming\Projects\library\client\src\dashboard\admin\components\database-form\database.component.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 87, 0, 0, 0, 6, 93
+"d:\Programming\Projects\library\client\src\dashboard\admin\components\navbar\navbar.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 109, 0, 0, 1, 12, 122
+"d:\Programming\Projects\library\client\src\dashboard\admin\hooks\http-requests.hooks.admin.js", "JavaScript", 0, 296, 0, 0, 0, 0, 0, 0, 39, 335
+"d:\Programming\Projects\library\client\src\dashboard\admin\hooks\useSignOut.hooks.jsx", "JavaScript JSX", 0, 0, 0, 0, 11, 0, 0, 0, 5, 16
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\database\database.pages.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 122, 0, 0, 0, 11, 133
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\database\database.routes.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 34, 0, 0, 0, 4, 38
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\database\issued-books\issued-books.database.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 87, 0, 0, 0, 7, 94
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\database\returned-books\returned-books.database.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 87, 0, 0, 0, 8, 95
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\homepage\homepage.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 9, 0, 0, 0, 2, 11
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\issue-book-route.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 32, 0, 0, 0, 3, 35
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\issue-new-book\issue-new-book.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 282, 0, 0, 0, 19, 301
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\return-issued-book\return-issued-book.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 183, 0, 0, 0, 12, 195
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\search-issued-books\search-issued-books.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 151, 0, 0, 0, 12, 163
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\search-issued-books\view-book.issue-book.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 70, 0, 0, 0, 8, 78
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\searh-returned-books\search-returned-books.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 159, 0, 0, 0, 11, 170
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\searh-returned-books\view-book.issue-book.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 71, 0, 0, 0, 8, 79
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-books\add-book\add-book.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 177, 0, 0, 0, 8, 185
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-books\book-accessions\add-book-accession.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 152, 0, 0, 0, 12, 164
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-books\manage-books.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 20, 0, 0, 0, 3, 23
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-books\search-books\search-books.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 118, 0, 0, 0, 12, 130
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-books\view-book\view-book.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 73, 0, 0, 0, 8, 81
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-staff\add-staff\add-staff.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 109, 0, 0, 0, 6, 115
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-staff\manage-staff.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 20, 0, 0, 0, 3, 23
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-staff\search-staff\search-staff.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 62, 0, 0, 0, 9, 71
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-staff\view-staff\view-staff.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 34, 0, 0, 0, 7, 41
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\add-student\add-student.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 310, 0, 0, 0, 19, 329
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\approve-student\approve-student.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 105, 0, 0, 0, 11, 116
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\approve-student\view-applicant.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 119, 0, 0, 0, 9, 128
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\library-cards\add-library-card\add-library-card.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 131, 0, 0, 0, 10, 141
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\manage-students.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 31, 0, 0, 0, 3, 34
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\search-students\search-student.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 104, 0, 0, 0, 11, 115
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\view-student\view-student.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 99, 0, 0, 0, 12, 111
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\profile\change-password\change-password.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 90, 0, 0, 0, 8, 98
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\profile\profile.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 14, 0, 0, 0, 3, 17
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\admin-routes.route.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 26, 0, 0, 0, 3, 29
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\database.routes.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 34, 0, 0, 0, 3, 37
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\issue-books.route.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 28, 0, 0, 0, 3, 31
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\manage-books.route.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 18, 0, 0, 0, 3, 21
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\manage-staff.route.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 16, 0, 0, 0, 3, 19
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\manage-students.route.jsx", "JavaScript JSX", 0, 0, 0, 0, 28, 0, 0, 0, 3, 31
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\profile.router.jsx", "JavaScript JSX", 0, 0, 0, 0, 12, 0, 0, 0, 3, 15
+"d:\Programming\Projects\library\client\src\dashboard\admin\settings\manage-programs\manage-programs.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 8, 0, 0, 0, 2, 10
+"d:\Programming\Projects\library\client\src\dashboard\applicant\applicant.page.jsx", "JavaScript JSX", 0, 0, 0, 0, 39, 0, 0, 0, 6, 45
+"d:\Programming\Projects\library\client\src\dashboard\applicant\applied-status.page.applicant.jsx", "JavaScript JSX", 0, 0, 0, 0, 43, 0, 0, 0, 3, 46
+"d:\Programming\Projects\library\client\src\dashboard\applicant\apply-student.page.applicant.jsx", "JavaScript JSX", 0, 0, 0, 0, 201, 0, 0, 1, 11, 213
+"d:\Programming\Projects\library\client\src\dashboard\dashboard.routes.jsx", "JavaScript JSX", 0, 0, 0, 0, 49, 0, 0, 3, 3, 55
+"d:\Programming\Projects\library\client\src\dashboard\http-requests.js", "JavaScript", 0, 302, 0, 0, 0, 0, 0, 0, 27, 329
+"d:\Programming\Projects\library\client\src\dashboard\login-page\forgot-password.page.jsx", "JavaScript JSX", 0, 0, 0, 0, 111, 0, 0, 2, 8, 121
+"d:\Programming\Projects\library\client\src\dashboard\login-page\login-page.page.jsx", "JavaScript JSX", 0, 0, 0, 0, 155, 0, 0, 1, 13, 169
+"d:\Programming\Projects\library\client\src\dashboard\login-page\sign-up.page.jsx", "JavaScript JSX", 0, 0, 0, 0, 185, 0, 0, 1, 10, 196
+"d:\Programming\Projects\library\client\src\dashboard\staff\components\navbar\navbar.component.jsx", "JavaScript JSX", 0, 0, 0, 0, 102, 0, 0, 0, 11, 113
+"d:\Programming\Projects\library\client\src\dashboard\staff\hooks\http-requests.hooks.admin.js", "JavaScript", 0, 608, 0, 0, 0, 0, 0, 1, 47, 656
+"d:\Programming\Projects\library\client\src\dashboard\staff\hooks\useSignOut.hooks.jsx", "JavaScript JSX", 0, 0, 0, 0, 11, 0, 0, 0, 5, 16
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\homepage\homepage.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 9, 0, 0, 0, 2, 11
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\issue-book-route.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 29, 0, 0, 0, 3, 32
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\issue-new-book\issue-new-book.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 267, 0, 0, 0, 18, 285
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\return-issued-book\return-issued-book.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 211, 0, 0, 0, 15, 226
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\search-issued-books\search-issued-books.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 154, 0, 0, 0, 12, 166
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\search-issued-books\view-book.issue-book.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 52, 0, 0, 0, 7, 59
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\searh-returned-books\search-returned-books.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 162, 0, 0, 0, 11, 173
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\searh-returned-books\view-book.issue-book.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 55, 0, 0, 0, 7, 62
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\view-book\view-book.issue-book.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 62, 0, 0, 0, 7, 69
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-books\add-book\add-book.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 166, 0, 0, 12, 11, 189
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-books\book-accessions\add-book-accession.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 157, 0, 0, 0, 13, 170
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-books\manage-books.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 24, 0, 0, 0, 3, 27
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-books\search-books\search-books.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 105, 0, 0, 0, 11, 116
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-books\view-book\view-book.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 78, 0, 0, 0, 8, 86
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\add-student\add-student.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 188, 0, 0, 1, 11, 200
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\approve-student\approve-student.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 89, 0, 0, 0, 9, 98
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\approve-student\view-applicant.page.admin.jsx", "JavaScript JSX", 0, 0, 0, 0, 119, 0, 0, 0, 9, 128
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\library-cards\add-library-card\add-library-card.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 152, 0, 0, 0, 13, 165
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\manage-students.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 29, 0, 0, 0, 3, 32
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\search-students\search-student.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 84, 0, 0, 0, 9, 93
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\view-student\view-student.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 72, 0, 0, 0, 8, 80
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\profile\change-password\change-password.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 90, 0, 0, 0, 8, 98
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\profile\profile.page.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 14, 0, 0, 0, 3, 17
+"d:\Programming\Projects\library\client\src\dashboard\staff\routes\issue-books.route.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 28, 0, 0, 0, 3, 31
+"d:\Programming\Projects\library\client\src\dashboard\staff\routes\manage-books.route.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 18, 0, 0, 0, 3, 21
+"d:\Programming\Projects\library\client\src\dashboard\staff\routes\manage-students.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 28, 0, 0, 0, 3, 31
+"d:\Programming\Projects\library\client\src\dashboard\staff\routes\profile.router.jsx", "JavaScript JSX", 0, 0, 0, 0, 12, 0, 0, 0, 3, 15
+"d:\Programming\Projects\library\client\src\dashboard\staff\routes\staff-routes.route.staff.jsx", "JavaScript JSX", 0, 0, 0, 0, 22, 0, 0, 0, 3, 25
+"d:\Programming\Projects\library\client\src\dashboard\student\components\navbar\navbar.component.user.jsx", "JavaScript JSX", 0, 0, 0, 0, 86, 0, 0, 0, 8, 94
+"d:\Programming\Projects\library\client\src\dashboard\student\hooks\http-requests.hooks.student.js", "JavaScript", 0, 24, 0, 0, 0, 0, 0, 0, 3, 27
+"d:\Programming\Projects\library\client\src\dashboard\student\pages\homepage\homepage.page.user.jsx", "JavaScript JSX", 0, 0, 0, 0, 9, 0, 0, 0, 2, 11
+"d:\Programming\Projects\library\client\src\dashboard\student\pages\issue-history\issue-history.page.student.jsx", "JavaScript JSX", 0, 0, 0, 0, 132, 0, 0, 0, 9, 141
+"d:\Programming\Projects\library\client\src\dashboard\student\routes\student-routes.user.jsx", "JavaScript JSX", 0, 0, 0, 0, 16, 0, 0, 0, 3, 19
+"d:\Programming\Projects\library\client\src\index.css", "CSS", 0, 0, 0, 12, 0, 0, 0, 0, 2, 14
+"d:\Programming\Projects\library\client\src\index.js", "JavaScript", 0, 13, 0, 0, 0, 0, 0, 0, 2, 15
+"d:\Programming\Projects\library\client\src\utils\functions.js", "JavaScript", 0, 55, 0, 0, 0, 0, 0, 9, 15, 79
+"d:\Programming\Projects\library\package-lock.json", "JSON", 317, 0, 0, 0, 0, 0, 0, 0, 1, 318
+"d:\Programming\Projects\library\package.json", "JSON", 14, 0, 0, 0, 0, 0, 0, 0, 1, 15
+"d:\Programming\Projects\library\server\package-lock.json", "JSON", 3174, 0, 0, 0, 0, 0, 0, 0, 1, 3175
+"d:\Programming\Projects\library\server\package.json", "JSON", 29, 0, 0, 0, 0, 0, 0, 0, 1, 30
+"d:\Programming\Projects\library\server\src\app.js", "JavaScript", 0, 27, 0, 0, 0, 0, 0, 1, 10, 38
+"d:\Programming\Projects\library\server\src\index.js", "JavaScript", 0, 12, 0, 0, 0, 0, 0, 0, 6, 18
+"d:\Programming\Projects\library\server\src\models\applications\applications.controllers.js", "JavaScript", 0, 67, 0, 0, 0, 0, 0, 1, 17, 85
+"d:\Programming\Projects\library\server\src\models\applications\applications.schema.js", "JavaScript", 0, 60, 0, 0, 0, 0, 0, 0, 3, 63
+"d:\Programming\Projects\library\server\src\models\auth\admin\aduth_admin.controllers.js", "JavaScript", 0, 20, 0, 0, 0, 0, 0, 0, 5, 25
+"d:\Programming\Projects\library\server\src\models\auth\applicant\auth_applicant.controllers.js", "JavaScript", 0, 41, 0, 0, 0, 0, 0, 8, 8, 57
+"d:\Programming\Projects\library\server\src\models\auth\auth.controllers.js", "JavaScript", 0, 53, 0, 0, 0, 0, 0, 0, 12, 65
+"d:\Programming\Projects\library\server\src\models\auth\auth.schema.js", "JavaScript", 0, 44, 0, 0, 0, 0, 0, 0, 7, 51
+"d:\Programming\Projects\library\server\src\models\auth\functions.js", "JavaScript", 0, 24, 0, 0, 0, 0, 0, 1, 4, 29
+"d:\Programming\Projects\library\server\src\models\auth\student\auth_student.controllers.js", "JavaScript", 0, 11, 0, 0, 0, 0, 0, 0, 5, 16
+"d:\Programming\Projects\library\server\src\models\book-accessions\book-accessions.controllers.js", "JavaScript", 0, 43, 0, 0, 0, 0, 0, 0, 10, 53
+"d:\Programming\Projects\library\server\src\models\book-accessions\book-accessions.schema.js", "JavaScript", 0, 21, 0, 0, 0, 0, 0, 0, 3, 24
+"d:\Programming\Projects\library\server\src\models\books\books.controllers.js", "JavaScript", 0, 81, 0, 0, 0, 0, 0, 0, 15, 96
+"d:\Programming\Projects\library\server\src\models\books\books.schema.js", "JavaScript", 0, 54, 0, 0, 0, 0, 0, 0, 5, 59
+"d:\Programming\Projects\library\server\src\models\issue-book\issue-book.controllers.js", "JavaScript", 0, 104, 0, 0, 0, 0, 0, 0, 19, 123
+"d:\Programming\Projects\library\server\src\models\issue-book\issue-book.schema.js", "JavaScript", 0, 23, 0, 0, 0, 0, 0, 0, 3, 26
+"d:\Programming\Projects\library\server\src\models\library-cards\library-cards.controllers.js", "JavaScript", 0, 33, 0, 0, 0, 0, 0, 0, 7, 40
+"d:\Programming\Projects\library\server\src\models\library-cards\library-cards.schema.js", "JavaScript", 0, 21, 0, 0, 0, 0, 0, 0, 3, 24
+"d:\Programming\Projects\library\server\src\models\returned-book\returned-books.controllers.models.js", "JavaScript", 0, 152, 0, 0, 0, 0, 0, 0, 29, 181
+"d:\Programming\Projects\library\server\src\models\returned-book\returned-books.schema.js", "JavaScript", 0, 27, 0, 0, 0, 0, 0, 0, 3, 30
+"d:\Programming\Projects\library\server\src\models\staff\staff.controllers.js", "JavaScript", 0, 11, 0, 0, 0, 0, 0, 0, 5, 16
+"d:\Programming\Projects\library\server\src\models\staff\staff.schema.js", "JavaScript", 0, 65, 0, 0, 0, 0, 0, 0, 3, 68
+"d:\Programming\Projects\library\server\src\models\students\students.controllers.js", "JavaScript", 0, 52, 0, 0, 0, 0, 0, 0, 13, 65
+"d:\Programming\Projects\library\server\src\models\students\students.schema.js", "JavaScript", 0, 54, 0, 0, 0, 0, 0, 0, 3, 57
+"d:\Programming\Projects\library\server\src\router\admin\admin.router.js", "JavaScript", 0, 11, 0, 0, 0, 0, 0, 0, 4, 15
+"d:\Programming\Projects\library\server\src\router\admin\books\books.middlewares.admin.js", "JavaScript", 0, 63, 0, 0, 0, 0, 0, 0, 5, 68
+"d:\Programming\Projects\library\server\src\router\admin\books\books.router.admin.js", "JavaScript", 0, 108, 0, 0, 0, 0, 0, 0, 10, 118
+"d:\Programming\Projects\library\server\src\router\admin\database\database.router.admin.js", "JavaScript", 0, 169, 0, 0, 0, 0, 0, 0, 15, 184
+"d:\Programming\Projects\library\server\src\router\admin\issue-book\issue-book.middlewares.js", "JavaScript", 0, 325, 0, 0, 0, 0, 0, 12, 26, 363
+"d:\Programming\Projects\library\server\src\router\admin\issue-book\issue-book.router.admin.js", "JavaScript", 0, 115, 0, 0, 0, 0, 0, 0, 11, 126
+"d:\Programming\Projects\library\server\src\router\admin\settings\settings.router.admin.js", "JavaScript", 0, 45, 0, 0, 0, 0, 0, 0, 6, 51
+"d:\Programming\Projects\library\server\src\router\admin\staff\staff.router.admin.js", "JavaScript", 0, 43, 0, 0, 0, 0, 0, 0, 6, 49
+"d:\Programming\Projects\library\server\src\router\admin\students\students.router.admin.js", "JavaScript", 0, 203, 0, 0, 0, 0, 0, 0, 35, 238
+"d:\Programming\Projects\library\server\src\router\applicant\applicant.router.js", "JavaScript", 0, 37, 0, 0, 0, 0, 0, 0, 8, 45
+"d:\Programming\Projects\library\server\src\router\auth\admin\admin-router.auth.router.js", "JavaScript", 0, 5, 0, 0, 0, 0, 0, 0, 4, 9
+"d:\Programming\Projects\library\server\src\router\auth\admin\email-sign-on.admin.auth.router.js", "JavaScript", 0, 44, 0, 0, 0, 0, 0, 0, 9, 53
+"d:\Programming\Projects\library\server\src\router\auth\applicants\applicants.email-sign-on.auth.router.js", "JavaScript", 0, 5, 0, 0, 0, 0, 0, 0, 4, 9
+"d:\Programming\Projects\library\server\src\router\auth\applicants\email-sign-on.applicants.auth.router.js", "JavaScript", 0, 98, 0, 0, 0, 0, 0, 6, 23, 127
+"d:\Programming\Projects\library\server\src\router\auth\auth.router.js", "JavaScript", 0, 37, 0, 0, 0, 0, 0, 50, 16, 103
+"d:\Programming\Projects\library\server\src\router\auth\email-sign-on\email-sign-on-jwt.js", "JavaScript", 0, 3, 0, 0, 0, 0, 0, 0, 2, 5
+"d:\Programming\Projects\library\server\src\router\auth\email-sign-on\email-sign-on.router.js", "JavaScript", 0, 98, 0, 0, 0, 0, 0, 0, 16, 114
+"d:\Programming\Projects\library\server\src\router\auth\passport\jwt.js", "JavaScript", 0, 16, 0, 0, 0, 0, 0, 0, 5, 21
+"d:\Programming\Projects\library\server\src\router\auth\students\email-sign-on.student.auth.js", "JavaScript", 0, 40, 0, 0, 0, 0, 0, 0, 9, 49
+"d:\Programming\Projects\library\server\src\router\auth\students\students-router.auth.router.js", "JavaScript", 0, 5, 0, 0, 0, 0, 0, 0, 4, 9
+"d:\Programming\Projects\library\server\src\router\router.js", "JavaScript", 0, 97, 0, 0, 0, 0, 0, 1, 17, 115
+"d:\Programming\Projects\library\server\src\router\student\issue-history\issue-history.router.student.js", "JavaScript", 0, 39, 0, 0, 0, 0, 0, 0, 5, 44
+"d:\Programming\Projects\library\server\src\secrets.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, 1, 1
+"d:\Programming\Projects\library\server\src\services\email-templates.js", "JavaScript", 0, 89, 0, 0, 0, 0, 0, 0, 4, 93
+"d:\Programming\Projects\library\server\src\services\mongo-functions.js", "JavaScript", 0, 15, 0, 0, 0, 0, 0, 0, 5, 20
+"d:\Programming\Projects\library\server\src\services\mongo.js", "JavaScript", 0, 36, 0, 0, 0, 0, 0, 10, 10, 56
+"d:\Programming\Projects\library\server\src\services\nodemailer.js", "JavaScript", 0, 7, 0, 0, 0, 0, 0, 0, 3, 10
+"d:\Programming\Projects\library\server\src\utils\custom-response-codes.js", "JavaScript", 0, 216, 0, 0, 0, 0, 0, 0, 3, 219
+"d:\Programming\Projects\library\server\src\utils\excel-bulk.entry.js", "JavaScript", 0, 52, 0, 0, 0, 0, 0, 3, 11, 66
+"d:\Programming\Projects\library\server\src\utils\functions.js", "JavaScript", 0, 95, 0, 0, 0, 0, 0, 3, 16, 114
+"Total", "-", 22123, 4561, 9, 12, 7562, 38, 23, 156, 1354, 35838

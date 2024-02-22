@@ -1,17 +1,35 @@
 import SnackbarFeedback from "./snackbar.component";
 
-const SnackbarFeedbackCustom = ({
-  showSnackbarFeedback,
-  setSnackbarFeedback,
-}) => {
+const SnackbarFeedbackCustom = ({ feedback = [0, 0, ""], handleClose }) => {
+  const handleOpen = () => {
+    if (feedback[0] === 1) return true;
+    else return false;
+  };
+
+  const handleSeverity = () => {
+    switch (feedback[1]) {
+      case 1:
+        return "success";
+      case 2:
+        return "error";
+
+      default:
+        return "info";
+    }
+  };
+
   return (
     <div>
       <SnackbarFeedback
-        open={showSnackbarFeedback.open}
-        message={showSnackbarFeedback.message}
-        severity={showSnackbarFeedback.severity}
+        open={handleOpen()}
+        message={feedback[2]}
+        severity={handleSeverity()}
         handleClose={() =>
-          setSnackbarFeedback({ open: false, severity: "", message: "" })
+          handleClose({
+            open: false,
+            severity: handleSeverity(),
+            message: feedback[2],
+          })
         }
       />
     </div>

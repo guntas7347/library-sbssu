@@ -1,24 +1,29 @@
 const { Auth_Admin } = require("../auth.schema");
 const { createPasswordHash } = require("../functions");
 
-const getAdminDoc = async (email, select) => {
-  return await Auth_Admin.findOne({ email }).select(select);
-};
-
-const createAdminAccount = async (credentials) => {
-  const { email, password, displayName, role } = credentials;
+const createAuthAdmin = async (credentials) => {
+  const { password } = credentials;
   return await Auth_Admin.create({
     ...credentials,
-    userName: displayName,
-    email,
     password: await createPasswordHash(password),
-    createdAt: new Date(),
-    role,
   });
 };
 
-const fetchAdminDocById = async (id, select) => {
-  return await Auth_Admin.findById(id).select(select);
+const getAuthAdminByEmail = async (email, select) => {
+  return await Auth_Admin.findOne({ email }).select(select);
 };
 
-module.exports = { createAdminAccount, getAdminDoc, fetchAdminDocById };
+const getAuthAdminById = async (_id, select) => {
+  return await Auth_Admin.findById(_id).select(select);
+};
+
+const updateAuthAdminById = async (_id, update) => {
+  return await Auth_Admin.findByIdAndUpdate(_id, update);
+};
+
+module.exports = {
+  createAuthAdmin,
+  getAuthAdminByEmail,
+  getAuthAdminById,
+  updateAuthAdminById,
+};

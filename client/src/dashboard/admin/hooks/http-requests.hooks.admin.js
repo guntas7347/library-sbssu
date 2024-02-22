@@ -1,9 +1,15 @@
-const API_URL = "http://localhost:8080/api/admin";
+import fileDownload from "js-file-download";
+import { localIp } from "../../http-requests";
+
+const ip1 = "localhost";
+const ip2 = "192.168.1.6";
+
+const API_URL = `http://${localIp ? ip1 : ip2}:8080/api/admin`;
 
 const logResponseToConsole = ({ status, message, payload }, success = true) =>
   success
-    ? console.log(status + "\n" + message + "\n" + payload)
-    : console.error(status + "\n" + message + "\n" + payload);
+    ? console.log({ status, message, payload })
+    : console.error({ status, message, payload });
 
 const postOptions = (obj) => {
   return {
@@ -16,14 +22,35 @@ const postOptions = (obj) => {
   };
 };
 
-const restCall = (url, obj, crs) => {
+export const restCall = (url, obj, crs = [], blob = false) => {
   return new Promise((resolve, reject) => {
     fetch(`${API_URL}/${url}`, postOptions(obj))
       .then(async (res) => {
+        if (!Array.isArray(crs)) crs = [crs];
+        if (crs.length === 0) {
+          reject(`CRS UNDEFINED at ${url}`);
+          return;
+        }
+
+        if (blob) {
+          const contentDisposition = res.headers.get("Content-Disposition");
+          const fileName = contentDisposition
+            .split("filename=")[1]
+            .replace(/^"|"$/g, "");
+
+          fileDownload(await res.blob(), fileName);
+          resolve("File Downloaded Successfully");
+          return;
+        }
+
         const response = await res.json();
-        if (response.status === crs) {
-          logResponseToConsole(response);
-          resolve(response.message);
+        if (crs.includes(response.status)) {
+          console.log(response.status);
+          if (response.payload === null) {
+            resolve(response.message);
+          } else {
+            resolve(response.payload);
+          }
         } else {
           logResponseToConsole(response, false);
           reject(response.message);
@@ -31,345 +58,134 @@ const restCall = (url, obj, crs) => {
       })
       .catch((err) => {
         console.log(err);
-        reject("Unknow Error, Check console log for more info...");
+        if (blob) {
+          reject("Download Failed");
+          return;
+        }
+        reject("Could not connect to Server");
       });
   });
 };
 
-export const createStudent = (obj) => {
-  return restCall("students/create-new-student", obj, "STU201CNS");
-};
+export const createNewStudent = (obj) =>
+  restCall("students/create-new-student", obj, ["STU201CNS"]);
 
-export const fetchAllStudents = (filter) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/students/fetch-all-students`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(filter),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
+export const fetchStudentByRollNumber = (rollNumber) =>
+  restCall("students/fetch-student-by-roll-number", { rollNumber }, [
+    "STU200FSBRN",
+  ]);
 
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const allotLibraryCardToStudent = ({ rollNumber, cardNumber }) =>
+  restCall(
+    "students/allot-library-card-to-student",
+    { rollNumber, cardNumber },
+    ["STU200ALCTS"]
+  );
 
-export const fetchAllApplications = (filter) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/students/fetch-all-applications`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(filter),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
+export const fetchAllStudents = (filter) =>
+  restCall("students/fetch-all-students", filter, ["STU200FAS"]);
 
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const fetchAllApplications = (filter) =>
+  restCall("students/fetch-all-applications", filter, "STU200FAA");
 
-export const fetchOneApplication = (applicationNumber) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/students/fetch-one-application`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(applicationNumber),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
+export const fetchOneApplication = (_id) =>
+  restCall("students/fetch-one-application", { _id }, "APP200FA");
 
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const processApplication = (decision) =>
+  restCall("students/process-application", decision, [
+    "APP200APA",
+    "APP200RPA",
+  ]);
 
-export const processApplication = (applicationDetails) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/students/process-application`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(applicationDetails),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
+export const addNewBook = (bookDetails) =>
+  restCall("/books/add-new-book", bookDetails, "BKS200ANB");
 
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const fetchAllBooks = (filter) =>
+  restCall("books/fetch-all-books", filter, "BKS200FAB");
 
-export const addNewBook = (bookDetails) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/add-new-book`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(bookDetails),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { success, status, payload } = await res.json();
+export const fetchBookByISBN = (isbn) =>
+  restCall("books/fetch-book-by-isbn", { isbn }, "BKS200FBBI");
 
-        if (success) {
-          resolve(status);
-        } else {
-          console.error(status, payload);
-          if (statusCode === 500) {
-            if (payload._message) {
-              reject(payload._message);
-            }
-            reject("Unknow Error, Check console log for more info...");
-          }
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const createBookAccession = (bookAccessionDetails) =>
+  restCall("books/add-book-accession", bookAccessionDetails, "BKS200ABA");
 
-export const fetchAllBooks = (filter) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/fetch-all-books`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(filter),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
+export const fetchBookDetails = (_id) =>
+  restCall("books/fetch-book-by-id", { _id }, "BKS200FBDBI");
 
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          reject({ ...status, statusCode });
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const fetchBookByAccessionNumber = (accessionNumber) =>
+  restCall(
+    "books/fetch-book-by-accession-number",
+    { accessionNumber },
+    "BKS200FBBAN"
+  );
 
-export const fetchBookDetails = (book) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/fetch-book-details`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(book),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
+export const fetchStudentById = (_id) =>
+  restCall("students/fetch-student-by-id", { _id }, "STU200FSBI");
 
-        if (statusCode === 200) {
-          resolve(payload);
-        }
-        if (status === "Book not found") {
-          resolve(payload);
-        } else {
-          reject({ ...status, statusCode });
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const issueNewBook = (issueBookDetails) =>
+  restCall("books/issue-books/issue-new-book", issueBookDetails, "ISB200INB");
 
-export const fetchBookByISBN = (ISBN) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/fetch-book-by-isbn`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(ISBN),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
+export const fetchIssuedBookByAccessionNumber = (accessionNumber) =>
+  restCall(
+    "books/issue-books/fetch-issued-book-by-accession-number",
+    { accessionNumber },
+    "ISB200FIBBAN"
+  );
 
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const returnIssuedBook = (returningBookDetails) =>
+  restCall(
+    "books/return-books/return-issued-book",
+    returningBookDetails,
+    "ISB200RIB"
+  );
 
-export const createBookAccession = (bookAccessionDetails) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/add-book-accession`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(bookAccessionDetails),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { status } = await res.json();
+export const issueBookFine = (returningBookDetails) =>
+  restCall(
+    "books/issue-books/calculate-issue-book-fine",
+    returningBookDetails,
+    "ISB200CIBF"
+  );
 
-        if (statusCode === 200) {
-          resolve(status);
-        } else {
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const fetchAllFines = (filter) =>
+  restCall("fines/fetch-all-fines", filter, "FIN200FAF");
 
-export const fetchBookByAccessionNumber = (accessionNumber) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/fetch-book-by-accession-number`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(accessionNumber),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
+export const fetchFineById = (_id) =>
+  restCall("fines/fetch-fine-doc", { _id }, "FIN200FFBI");
 
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const addRecieptNumber = (data) =>
+  restCall("fines/add-reciept-number", data, "FIN200ARN");
 
-export const fetchStudentByRollNumber = (rollNumber) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/students/fetch-student-by-roll-number`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ rollNumber }),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { status, payload } = await res.json();
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const fetchAllIssuedBooks = (filter) =>
+  restCall("books/issue-books/fetch-all-issued-books", filter, "ISB200FAIB");
 
-export const fetchStudentById = (_id) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/students/fetch-student-by-id`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ _id }),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { status, payload } = await res.json();
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
+export const downloadAllIssuedBooks = (filter) =>
+  restCall("books/issue-books/download-all-issued-books", filter, "", true);
 
-export const createLibraryCard = (LibraryCardDetails) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/students/create-library-card`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(LibraryCardDetails),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { success, status } = await res.json();
+export const fetchAllReturnedBooks = (filter) =>
+  restCall("books/return-books/fetch-all-returned-books", filter, "ISB200FARB");
 
-        if (success) {
-          resolve(status);
-        } else {
-          console.error(status);
-          if (statusCode === 500) {
-            if (status._message) {
-              reject(status._message);
-            }
-            reject("Unknow Error, Check console log for more info...");
-          }
-          reject(status);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        reject("Unknow Error, Check console log for more info...");
-      });
-  });
-};
+export const downloadAllReturnedBooks = (filter) =>
+  restCall("books/return-books/download-all-returned-books", filter, "", true);
 
+export const fetchReturnedBook = (_id) =>
+  restCall("books/return-books/fetch-returned-book", { _id }, "ISB200FRB");
+
+export const fetchIssuedBook = (_id) =>
+  restCall("books/issue-books/fetch-issued-book", { _id }, "ISB200FIB");
+
+export const createNewStaff = (staff) =>
+  restCall("staff/create-new-staff", staff, ["AUTH200AADM"]);
+
+export const fetchAllStaff = (filter) =>
+  restCall("staff/search-all-staff", filter, ["STF200FAS"]);
+
+export const fetchStaffById = (_id) =>
+  restCall("staff/fetch-staff-by-id", { _id }, ["STF200FSBI"]);
+
+export const db_fetchIssuedBookDoc = (_id) =>
+  restCall("database/get-issued-book", { _id }, "DBSF200ISB");
+
+//
 export const fetchSettingsAcademicPrograms = () => {
   return new Promise((resolve, reject) => {
     fetch(`${API_URL}/settings/get-academic-programs`, {})
@@ -402,285 +218,5 @@ export const fetchBookDetailsByIsbnApi = (isbn) => {
       .catch((error) =>
         resolve({ title: "", publish_date: "", publishers: [""] })
       );
-  });
-};
-
-export const issueNewBook = (issueBookDetails) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/issue-books/issue-new-book`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(issueBookDetails),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(status);
-        } else {
-          reject(status);
-        }
-      })
-      .catch(async (error) => reject(error));
-  });
-};
-
-export const fetchIssuedBookByAccessionNumber = (bookAccessionNumber) => {
-  return new Promise((resolve, reject) => {
-    fetch(
-      `${API_URL}/books/issue-books/fetch-issued-book-by-accession-number`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(bookAccessionNumber),
-      }
-    )
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
-
-export const returnIssuedBook = (returningBookDetails) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/issue-books/return-issued-book`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(returningBookDetails),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(status);
-        } else {
-          reject(status);
-        }
-      })
-      .catch(async (error) => reject(error));
-  });
-};
-export const issueBookFine = (returningBookDetails) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/issue-books/issue-book-fine`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(returningBookDetails),
-    })
-      .then(async (res) => {
-        // const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        switch (status) {
-          case "No Fine":
-            resolve(payload);
-            break;
-          case "Fine":
-            resolve(payload);
-            break;
-          case "Invalid Issued Book":
-            reject(status);
-            break;
-          default:
-            reject(status);
-            break;
-        }
-      })
-      .catch(async (error) => reject(error));
-  });
-};
-
-export const fetchAllIssuedBooks = (filter) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/issue-books/fetch-all-issued-books`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(filter),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
-
-export const fetchAllReturnedBooks = (filter) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/issue-books/fetch-all-returned-books`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(filter),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
-
-export const fetchReturnedBook = (_id) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/issue-books/fetch-returned-book`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ _id }),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
-
-export const fetchIssuedBook = (_id) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/issue-books/fetch-issued-book`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ _id }),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
-
-export const createNewStaff = (staff) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/staff/create-new-staff`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(staff),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
-
-export const fetchAllStaff = (filter) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/staff/search-all-staff`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(filter),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
-
-export const fetchStaffById = (_id) => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/staff/fetch-staff-by-id`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ _id }),
-    })
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { payload, status } = await res.json();
-
-        if (statusCode === 200) {
-          resolve(payload);
-        } else {
-          console.error(payload);
-          reject(status);
-        }
-      })
-      .catch((error) => reject(error));
   });
 };

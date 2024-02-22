@@ -9,8 +9,9 @@ const ProtectedRoute = ({ redirectPath = "/", children, role }) => {
   useEffect(() => {
     const asyncFunc = async () => {
       await verifyAuthRole(role)
-        .then((resRole) => {
-          if (resRole === role) {
+        .then((res) => {
+          console.log(res);
+          if (res.payload === role) {
             setIsLoading(false);
             setSession(true);
           } else {

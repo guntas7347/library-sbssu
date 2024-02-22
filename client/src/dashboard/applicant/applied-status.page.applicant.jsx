@@ -1,10 +1,21 @@
+import { Button } from "@mui/material";
 import SpanningTable from "../../components/table/spanning-table.component";
+import { deleteApplication } from "../http-requests";
+import { useState } from "react";
+import AlertDialog from "../../components/feedback/dialog/alert-dialog.component";
+import SnackbarFeedbackCustom from "../../components/feedback/snackbar/snackbar-full.component";
 
 const AppliedStatusPage = ({ applicationDoc }) => {
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
+  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
+    severity: "info",
+    message: "",
+    open: false,
+  });
+
   const {
     rollNumber,
-    applicationNumber,
-    name,
+    fullName,
     fathersName,
     gender,
     dob,
@@ -14,19 +25,30 @@ const AppliedStatusPage = ({ applicationDoc }) => {
     email,
     phoneNumber,
     createdAt,
-    status,
   } = applicationDoc;
+
+  const handleWithdraw = async () => {
+    await deleteApplication()
+      .then((res) =>
+        setSnackbarFeedback({
+          severity: "success",
+          open: true,
+          message: res.message,
+        })
+      )
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
+    window.location.reload();
+  };
 
   return (
     <div>
-      <h1 className="">Application Status: {status}</h1>
+      <h1 className="">Your application is under review.</h1>
       <h3>Application Details</h3>
       <div className="m-2">
         <SpanningTable
           rows={[
-            ["Application Number", applicationNumber],
             ["Roll Number", rollNumber],
-            ["Name", name],
+            ["Name", fullName],
             ["Fathers Name", fathersName],
             ["Gender", gender],
             ["Date Of Birth", new Date(dob).toDateString()],
@@ -37,6 +59,26 @@ const AppliedStatusPage = ({ applicationDoc }) => {
             ["Phone Number", phoneNumber],
             ["Application Date", new Date(createdAt).toDateString()],
           ]}
+        />
+      </div>
+      <div>
+        <Button onClick={() => setShowAlertDialog(true)}>
+          Withdraw Application
+        </Button>
+      </div>
+      <div>
+        <AlertDialog
+          title="Confirm?"
+          content="This action can not be undone"
+          open={showAlertDialog}
+          handleClick={(e) => {
+            if (e) handleWithdraw();
+            setShowAlertDialog(false);
+          }}
+        />
+        <SnackbarFeedbackCustom
+          feedback={showSnackbarFeedback}
+          handleClose={setSnackbarFeedback}
         />
       </div>
     </div>

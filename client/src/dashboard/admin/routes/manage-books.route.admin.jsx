@@ -12,7 +12,7 @@ const ManageBooksRoute = () => {
       <Route path="/add-book/" element={<AddBookPage />} />
       <Route path="/add-book-accession/" element={<AddBookAccessionPage />} />
       <Route path="/search-books/" element={<SearchBooksPage />} />
-      <Route path="/view-book/:accessionNumber" element={<ViewBookPage />} />
+      <Route path="/view-book/:_id" element={<ViewBookPage />} />
     </Routes>
   );
 };

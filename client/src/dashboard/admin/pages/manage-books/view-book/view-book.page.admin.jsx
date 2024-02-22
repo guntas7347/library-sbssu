@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { formatTime } from "../../../../../utils/functions";
 
 const ViewBookPage = () => {
-  const { accessionNumber } = useParams();
+  const { _id } = useParams();
 
   const [bookData, setBookData] = useState([]);
 
@@ -23,29 +23,31 @@ const ViewBookPage = () => {
 
   useEffect(() => {
     const asyncFunc = async () => {
-      await fetchBookDetails({ id: accessionNumber }).then((book) => {
-        if (book == null) {
-          return;
-        }
-        setBookData({
-          ...book,
-          accessionNumbers: mergeArrayElementsToString(book.accessionNumbers),
+      await fetchBookDetails(_id)
+        .then((book) => {
+          setBookData({
+            ...book,
+            accessionNumbers: createAccessionNumbersString(
+              book.accessionNumbers
+            ),
+          });
+        })
+        .catch((err) => {
+          setBookData({ title: "Book not found" });
         });
-      });
     };
     asyncFunc();
   }, []);
 
-  const mergeArrayElementsToString = (array = []) => {
+  const createAccessionNumbersString = (array = []) => {
     let string = "";
     let isFirst = true;
-    const numberOfAccessionNumbers = array.length;
     array.forEach((element) => {
       if (isFirst) {
-        string += `(${numberOfAccessionNumbers}) ` + element;
+        string += `(${array.length}) ` + element.accessionNumber;
         isFirst = false;
       } else {
-        string += ", " + element;
+        string += ", " + element.accessionNumber;
       }
     });
     return string;

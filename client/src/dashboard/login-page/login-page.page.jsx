@@ -5,7 +5,6 @@ import {
   Container,
   CssBaseline,
   Grid,
-  Switch,
   Typography,
 } from "@mui/material";
 import InputField from "../../components/forms/input-field/input-field.component";
@@ -14,12 +13,11 @@ import { useForm } from "../../components/forms/use-form-hook/use-form.hook.comp
 import {
   adminLoginWithCredentials,
   applicantLoginWithCredentials,
-  loginWithCredentials,
+  signOut,
   studentLoginWithCredentials,
 } from "../http-requests";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import SnackbarFeedback from "../../components/feedback/snackbar/snackbar.component";
+import { useEffect, useState } from "react";
 import SnackbarFeedbackCustom from "../../components/feedback/snackbar/snackbar-full.component";
 import InputSelect from "../../components/forms/input-select/input-select.component";
 
@@ -46,16 +44,10 @@ const LoginPage = () => {
       case "ADMIN":
         await adminLoginWithCredentials(formFields)
           .then((res) => {
-            console.log(res);
-            if (res === "ADMIN") {
-              navigate("/dashboard/admin");
-            } else {
-              navigate("/dashboard/staff");
-            }
+            if (res.payload === "ADMIN") navigate("/dashboard/admin");
+            if (res.payload === "STAFF") navigate("/dashboard/staff");
           })
-          .catch((err) =>
-            setSnackbarFeedback({ open: true, severity: "error", message: err })
-          );
+          .catch((err) => setSnackbarFeedback([1, 2, err]));
         break;
 
       case "STUDENT":
@@ -63,9 +55,7 @@ const LoginPage = () => {
           .then(() => {
             navigate("/dashboard/student");
           })
-          .catch((err) =>
-            setSnackbarFeedback({ open: true, severity: "error", message: err })
-          );
+          .catch((err) => setSnackbarFeedback([1, 2, err]));
         break;
 
       case "APPLICANT":
@@ -73,15 +63,20 @@ const LoginPage = () => {
           .then(() => {
             navigate("/dashboard/applicant");
           })
-          .catch((err) =>
-            setSnackbarFeedback({ open: true, severity: "error", message: err })
-          );
+          .catch((err) => setSnackbarFeedback([1, 2, err]));
         break;
 
       default:
         break;
     }
   };
+
+  useEffect(() => {
+    const asyncFunc = async () => {
+      await signOut().catch((err) => console.log(err));
+    };
+    asyncFunc();
+  }, []);
 
   return (
     <div>
@@ -138,31 +133,31 @@ const LoginPage = () => {
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link to={"/forgot-password"}>Forgot password?</Link>
+                <Link to={"/forgot-password"}>Forgot password</Link>
               </Grid>
               <Grid item>
-                <Link to={"/sign-up"}>{"Don't have an account? Sign Up"}</Link>
+                <Link to={"/sign-up"}>Create Account</Link>
               </Grid>
-              <Grid item>
-                <InputSelect
-                  name="Login Type"
-                  fields={[
-                    { name: "Student", value: "STUDENT" },
-                    { name: "Admin", value: "ADMIN" },
-                    { name: "Applicant", value: "APPLICANT" },
-                  ]}
-                  value={loginType}
-                  onChange={(e) => setLoginType(e.target.value)}
-                />
-              </Grid>
+            </Grid>
+            <Grid item>
+              <InputSelect
+                name="Login Type"
+                fields={[
+                  { name: "Student", value: "STUDENT" },
+                  { name: "Admin", value: "ADMIN" },
+                  { name: "Applicant", value: "APPLICANT" },
+                ]}
+                value={loginType}
+                onChange={(e) => setLoginType(e.target.value)}
+              />
             </Grid>
           </Box>
         </Box>
         {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
       </Container>
       <SnackbarFeedbackCustom
-        showSnackbarFeedback={showSnackbarFeedback}
-        setSnackbarFeedback={setSnackbarFeedback}
+        feedback={showSnackbarFeedback}
+        handleClose={setSnackbarFeedback}
       />
     </div>
   );

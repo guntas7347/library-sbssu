@@ -7,27 +7,27 @@ const {
 } = require("../library-cards/library-cards.controllers");
 const issueBookMongo = require("./issue-book.schema");
 
-const issueNewBook = async (issueBookDetails, session) => {
+const createIssueBook = async (issueBookDetails, session) => {
   return await issueBookMongo.create([issueBookDetails], { session });
 };
 
-const fetchIssuedBookByBookAccessionId = async (bookAccessionId) => {
+const getIssuedBookByBookAccessionId = async (bookAccessionId) => {
   return await issueBookMongo
     .findOne({ bookAccessionId })
     .populate({
       path: "bookAccessionId",
-      populate: { path: "bookId", select: "title author ISBN -_id" },
+      populate: { path: "bookId", select: "title author -_id" },
     })
     .populate({
       path: "libraryCardId",
-      populate: { path: "studentId", select: "rollNumber name program -_id" },
+      populate: { path: "studentId", select: "rollNumber fullName -_id" },
     })
     .populate({
       path: "issuedBy",
     });
 };
 
-const fetchIssuedBookDocById = async (_id, populate = true) => {
+const getIssuedBookById = async (_id, populate = false) => {
   const query = issueBookMongo.findById(_id);
   if (populate) {
     query
@@ -37,7 +37,7 @@ const fetchIssuedBookDocById = async (_id, populate = true) => {
       })
       .populate({
         path: "libraryCardId",
-        populate: { path: "studentId", select: "rollNumber name -_id" },
+        populate: { path: "studentId", select: "rollNumber fullName -_id" },
       })
       .populate({ path: "issuedBy", select: "idNumber fullName -_id" });
   }
@@ -45,11 +45,11 @@ const fetchIssuedBookDocById = async (_id, populate = true) => {
   return await query.exec();
 };
 
-const deleteIssuedBookDoc = async (_id, session) => {
+const deleteIssuedBook = async (_id, session) => {
   return await issueBookMongo.findByIdAndDelete(_id, { session });
 };
 
-const fetchAllIssuedBooks = async (filter) => {
+const findIssuedBooks = async (filter) => {
   const { sortSelect, sortValue } = filter;
 
   const query = issueBookMongo.find();
@@ -109,14 +109,14 @@ const fetchAllIssuedBooks = async (filter) => {
     })
     .populate({
       path: "libraryCardId",
-      populate: { path: "studentId", select: "rollNumber name -_id" },
+      populate: { path: "studentId", select: "rollNumber fullName -_id" },
     });
 };
 
 module.exports = {
-  issueNewBook,
-  fetchIssuedBookByBookAccessionId,
-  fetchIssuedBookDocById,
-  deleteIssuedBookDoc,
-  fetchAllIssuedBooks,
+  createIssueBook,
+  getIssuedBookByBookAccessionId,
+  getIssuedBookById,
+  deleteIssuedBook,
+  findIssuedBooks,
 };

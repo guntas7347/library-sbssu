@@ -3,12 +3,13 @@ import { Button, FormControl, Grid } from "@mui/material";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import {
-  createStudent,
+  createNewStudent,
   fetchSettingsAcademicPrograms,
 } from "../../../hooks/http-requests.hooks.admin";
 import InputSelect from "../../../../../components/forms/input-select/input-select.component";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
 import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
 
 const AddStudentPage = () => {
   const [academicPrograms, setAcademicPrograms] = useState([
@@ -26,11 +27,12 @@ const AddStudentPage = () => {
     rollNumber: "",
     fullName: "",
     fathersName: "",
-    gender: "male",
     dob: "",
-    program: "BTECH",
-    specialization: "CSE",
-    batch: new Date().getFullYear(),
+    gender: "",
+    category: "",
+    program: "",
+    specialization: "",
+    batch: "",
     email: "",
     phoneNumber: "",
   };
@@ -42,8 +44,9 @@ const AddStudentPage = () => {
     rollNumber,
     fullName,
     fathersName,
-    gender,
     dob,
+    gender,
+    category,
     program,
     specialization,
     batch,
@@ -52,14 +55,12 @@ const AddStudentPage = () => {
   } = formFields;
 
   const handleSubmit = async () => {
-    await createStudent(formFields)
+    await createNewStudent(formFields)
       .then((res) => {
-        setSnackbarFeedback({ open: true, severity: "success", message: res });
+        setSnackbarFeedback([1, 1, res]);
         resetFormFields();
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   useEffect(() => {
@@ -196,7 +197,6 @@ const AddStudentPage = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={6} md={6}>
               <InputField
-                fullWidth
                 label="Roll Number"
                 type="number"
                 name="rollNumber"
@@ -215,7 +215,6 @@ const AddStudentPage = () => {
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <InputField
-                fullWidth
                 label="Name"
                 type="text"
                 name="fullName"
@@ -225,7 +224,6 @@ const AddStudentPage = () => {
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <InputField
-                fullWidth
                 label="Father's Name"
                 type="text"
                 name="fathersName"
@@ -235,7 +233,6 @@ const AddStudentPage = () => {
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <InputField
-                fullWidth
                 label="Date of Birth"
                 type="date"
                 name="dob"
@@ -244,7 +241,7 @@ const AddStudentPage = () => {
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={6}>
+            <Grid item xs={12} sm={3} md={3}>
               <InputSelect
                 label="Gender"
                 name="gender"
@@ -254,6 +251,19 @@ const AddStudentPage = () => {
                   { name: "Other", value: "other" },
                 ]}
                 value={gender}
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={3} md={3}>
+              <InputSelect
+                label="Category"
+                name="category"
+                fields={[
+                  { name: "General", value: "general" },
+                  { name: "SC/ST", value: "SCST" },
+                  { name: "Other", value: "other" },
+                ]}
+                value={category}
                 onChange={handleChange}
               />
             </Grid>
@@ -277,7 +287,6 @@ const AddStudentPage = () => {
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <InputField
-                fullWidth
                 label="Email"
                 type="email"
                 name="email"
@@ -287,7 +296,6 @@ const AddStudentPage = () => {
             </Grid>
             <Grid item xs={12} sm={6} md={6}>
               <InputField
-                fullWidth
                 label="Phone Number"
                 type="number"
                 name="phoneNumber"
@@ -321,11 +329,9 @@ const AddStudentPage = () => {
             setShowAlertDialog(false);
           }}
         />
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() => setSnackbarFeedback({ open: false })}
+        <SnackbarFeedbackCustom
+          feedback={showSnackbarFeedback}
+          handleClose={setSnackbarFeedback}
         />
       </div>
     </div>

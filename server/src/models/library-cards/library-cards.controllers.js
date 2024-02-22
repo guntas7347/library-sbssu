@@ -1,43 +1,35 @@
 const libraryCards = require("./library-cards.schema");
 
-const createLibraryCard = async (libraryCardDetails) => {
-  return await libraryCards.create(libraryCardDetails);
+const createLibraryCard = async (libraryCardDetails, session) => {
+  return await libraryCards.create([libraryCardDetails], { session });
 };
 
-const fetchLibraryCardsByStudentId = async (studentId) => {
+const getLibraryCardsByStudentId = async (studentId) => {
   return await libraryCards.find({ studentId: studentId });
 };
 
-const fetchLibraryCardByCardNumber = async (
+const getLibraryCardByCardNumber = async (
   cardNumber,
   populate = false,
   select
 ) => {
   const query = libraryCards.findOne({ cardNumber });
-
-  if (populate) {
-    query.populate({ path: "studentId", select });
-  }
-
+  if (populate) query.populate({ path: "studentId", select });
   return await query.exec();
 };
 
-const fetchLibraryCardById = async (id) => {
+const getLibraryCardById = async (id) => {
   return await libraryCards.findById(id);
 };
 
-const updateLibraryCardStatus = async (_id, status, session) => {
-  return await libraryCards.findByIdAndUpdate(_id, { status }, { session });
+const updateLibraryCardById = async (_id, update, session) => {
+  return await libraryCards.findByIdAndUpdate(_id, update, { session });
 };
 
-const fetchLibraryCardIdByCardNumber = async (cardNumber) => {
-  return await libraryCards.findOne({ cardNumber }).select("_id");
-};
 module.exports = {
   createLibraryCard,
-  fetchLibraryCardsByStudentId,
-  fetchLibraryCardByCardNumber,
-  fetchLibraryCardById,
-  updateLibraryCardStatus,
-  fetchLibraryCardIdByCardNumber,
+  getLibraryCardsByStudentId,
+  getLibraryCardByCardNumber,
+  getLibraryCardById,
+  updateLibraryCardById,
 };

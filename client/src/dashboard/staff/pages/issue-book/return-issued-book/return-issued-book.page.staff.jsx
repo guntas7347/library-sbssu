@@ -64,9 +64,7 @@ const ReturnIssuedBookPage = () => {
       .then((res) => {
         setIssuedBookDoc(res);
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   const returnDate = formatDate();
@@ -74,18 +72,10 @@ const ReturnIssuedBookPage = () => {
   const handleReturnBook = async () => {
     await returnIssuedBook({ _id })
       .then((res) => {
-        setSnackbarFeedback({
-          open: true,
-          severity: "success",
-          message: res,
-        });
+        setSnackbarFeedback([1, 1, res]);
       })
       .catch((err) => {
-        setSnackbarFeedback({
-          open: true,
-          severity: "error",
-          message: err,
-        });
+        setSnackbarFeedback([1, 2, err]);
       });
   };
 
@@ -98,18 +88,16 @@ const ReturnIssuedBookPage = () => {
           handleReturnBook();
         }
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   const handleFineDialoge = async () => {
     await returnIssuedBook({ _id })
       .then((res) => {
-        setSnackbarFeedback({ open: true, severity: "success", message: res });
+        setSnackbarFeedback([1, 1, res]);
       })
       .catch((err) => {
-        setSnackbarFeedback({ open: true, severity: "error", message: err });
+        setSnackbarFeedback([1, 2, err]);
       });
   };
 
@@ -214,7 +202,7 @@ const ReturnIssuedBookPage = () => {
           message={showSnackbarFeedback.message}
           severity={showSnackbarFeedback.severity}
           handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
+            setSnackbarFeedback({ open: false, severity: "info", message: "" })
           }
         />
       </div>

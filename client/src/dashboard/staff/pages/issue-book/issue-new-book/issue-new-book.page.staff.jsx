@@ -46,9 +46,7 @@ const IssueNewBookPage = () => {
           )
         );
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   const handleFetchStuent = () => {
@@ -65,9 +63,7 @@ const IssueNewBookPage = () => {
           ])
         );
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   const addLibraryCardsValueToObject = (obj) => {
@@ -111,13 +107,11 @@ const IssueNewBookPage = () => {
 
     await issueNewBook(issueBookDetails)
       .then((res) => {
-        setSnackbarFeedback({ open: true, severity: "success", message: res });
+        setSnackbarFeedback([1, 1, res]);
         handleFetchBook();
         handleFetchStuent();
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   const rowsArray = (array, keysArray) => {
@@ -273,7 +267,7 @@ const IssueNewBookPage = () => {
           message={showSnackbarFeedback.message}
           severity={showSnackbarFeedback.severity}
           handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
+            setSnackbarFeedback({ open: false, severity: "info", message: "" })
           }
         />
       </div>

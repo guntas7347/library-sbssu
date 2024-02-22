@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const LibraryCardsSchema = new mongoose.Schema({
   studentId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Student",
+    ref: "student",
     required: true,
   },
   cardNumber: {
@@ -12,12 +12,12 @@ const LibraryCardsSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    required: true,
+    default: "available",
   },
 });
 
 module.exports = mongoose.model(
-  "LibraryCard",
+  "libraryCard",
   LibraryCardsSchema,
-  "LibraryCards"
+  "libraryCards"
 );

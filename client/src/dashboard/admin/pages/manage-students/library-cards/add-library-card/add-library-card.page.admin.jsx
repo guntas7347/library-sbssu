@@ -1,19 +1,19 @@
 import { useState } from "react";
 import { useForm } from "../../../../../../components/forms/use-form-hook/use-form.hook.component";
 import {
-  createLibraryCard,
+  allotLibraryCardToStudent,
   fetchStudentByRollNumber,
 } from "../../../../hooks/http-requests.hooks.admin";
-import { sortObjectUsingKeys } from "../../../../../../utils/functions";
-import { Alert, Button, Grid, Snackbar } from "@mui/material";
+import { rowsArray } from "../../../../../../utils/functions";
+import { Button, Grid } from "@mui/material";
 import InputField from "../../../../../../components/forms/input-field/input-field.component";
-import CustomTableSelect from "../../../../../../components/table/custom-table-select.component";
 import AlertDialog from "../../../../../../components/feedback/dialog/alert-dialog.component";
 import SnackbarFeedback from "../../../../../../components/feedback/snackbar/snackbar.component";
+import CustomTable from "../../../../../../components/table/custom-table.component";
+import SnackbarFeedbackCustom from "../../../../../../components/feedback/snackbar/snackbar-full.component";
 
-const AddLibraryCardPage = () => {
+const AllotLibraryCardPage = () => {
   const [showStudentTable, setShowStudentTable] = useState(false);
-  const [showCardNumberField, setShowAccessionNumberField] = useState(false);
 
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [showSnackbarFeedback, setSnackbarFeedback] = useState({
@@ -29,58 +29,41 @@ const AddLibraryCardPage = () => {
     cardNumber: "",
   });
 
-  const { rollNumber } = formFields;
+  const { rollNumber, cardNumber } = formFields;
 
   const handleFetchStudent = async () => {
     await fetchStudentByRollNumber(rollNumber)
       .then(async (res) => {
-        setRowData(rowsArray([res]));
+        setRowData(
+          rowsArray(
+            [res],
+            ["_id", "rollNumber", "fullName", "program", "batch"]
+          )
+        );
         setShowStudentTable(true);
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
-  };
-
-  const handleSelect = (_, selectedValue) => {
-    if (selectedValue !== null) {
-      setShowAccessionNumberField(selectedValue);
-    } else {
-      setShowAccessionNumberField(false);
-    }
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   const handleSubmit = async () => {
-    await createLibraryCard(formFields)
+    await allotLibraryCardToStudent(formFields)
       .then((res) => {
-        setSnackbarFeedback({ open: true, severity: "success", message: res });
-        setShowAccessionNumberField(false);
-        setShowStudentTable(false);
+        setSnackbarFeedback([1, 1, res]);
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
-  };
-
-  const rowsArray = (array) => {
-    return array.map((obj) => {
-      return Object.values(
-        sortObjectUsingKeys(obj, ["rollNumber", "name", "program", "batch"])
-      );
-    });
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   return (
-    <div>
-      <br />
-      <br />
-      <div className="m-5">
+    <div className="m-5">
+      <h2 className="text-center pb-4">Allot Library card to Student</h2>
+      <div>
         <Grid container spacing={4}>
           <Grid item>
             <InputField
               label="Student's Roll Number"
               name="rollNumber"
               type="number"
+              value={rollNumber}
               disabled={showStudentTable}
               onChange={handleChange}
             />
@@ -92,47 +75,42 @@ const AddLibraryCardPage = () => {
           </Grid>
         </Grid>
         {showStudentTable ? (
-          <CustomTableSelect
-            columns={["Roll Number", "Name", "Program", "Batch"]}
-            rows={rowData}
-            onSelect={handleSelect}
-            indexToSelect={0}
-          />
-        ) : (
-          ""
-        )}
-        <br />
-
-        {showCardNumberField ? (
-          <div>
-            <Grid container spacing={2}>
-              <Grid item>
-                <InputField
-                  label="Roll Number"
-                  type="number"
-                  name="rollNumber"
-                  value={rollNumber}
-                  disabled
-                  InputLabelProps={{ shrink: true }}
-                />
+          <div className="my-3">
+            <CustomTable
+              columns={["Roll Number", "Name", "Program", "Batch"]}
+              rows={rowData}
+            />
+            <div className="mt-5">
+              <Grid container spacing={2}>
+                <Grid item>
+                  <InputField
+                    label="Roll Number"
+                    type="number"
+                    name="rollNumber"
+                    value={rollNumber}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+                <Grid item>
+                  <InputField
+                    label="Card Number"
+                    type="text"
+                    name="cardNumber"
+                    value={cardNumber}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item>
+                  <Button
+                    onClick={() => setShowAlertDialog(true)}
+                    variant="contained"
+                  >
+                    Submit
+                  </Button>
+                </Grid>
               </Grid>
-              <Grid item>
-                <InputField
-                  label="Card Number"
-                  type="text"
-                  name="cardNumber"
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item>
-                <Button
-                  onClick={() => setShowAlertDialog(true)}
-                  variant="contained"
-                >
-                  Submit
-                </Button>
-              </Grid>
-            </Grid>
+            </div>
           </div>
         ) : (
           ""
@@ -140,25 +118,19 @@ const AddLibraryCardPage = () => {
       </div>
       <div>
         <AlertDialog
-          title="Confirm?"
-          content="This action can not be undone"
           open={showAlertDialog}
           handleClick={(e) => {
             if (e) handleSubmit();
             setShowAlertDialog(false);
           }}
         />
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
-          }
+        <SnackbarFeedbackCustom
+          feedback={showSnackbarFeedback}
+          handleClose={setSnackbarFeedback}
         />
       </div>
     </div>
   );
 };
 
-export default AddLibraryCardPage;
+export default AllotLibraryCardPage;

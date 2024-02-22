@@ -1,29 +1,32 @@
-import { Button } from "@mui/material";
-import { Link } from "react-router-dom";
+import LinkButton from "../../../../components/forms/link-button/link-button.component";
 
 const IssueBooksPage = () => {
   const previousPath = "/dashboard/admin/issue-books";
   return (
     <div className="text-center">
       <h1 className="my-4">Issue Books</h1>
-      <Button as={Link} to={`${previousPath}/issue-new-book`}>
-        Issue new Book
-      </Button>
+      <LinkButton
+        to={`${previousPath}/issue-new-book`}
+        label="Issue new Book"
+      />
       <br />
       <br />
-      <Button as={Link} to={`${previousPath}/return-issued-book`}>
-        Return Issued Book
-      </Button>
+      <LinkButton
+        to={`${previousPath}/return-issued-book`}
+        label="Return Issued Book"
+      />
       <br />
       <br />
-      <Button as={Link} to={`${previousPath}/search-issued-books`}>
-        Search Issued Books
-      </Button>
+      <LinkButton
+        to={`${previousPath}/search-issued-books`}
+        label="Search Issued Books"
+      />
       <br />
       <br />
-      <Button as={Link} to={`${previousPath}/search-returned-books`}>
-        Search Returned Books
-      </Button>
+      <LinkButton
+        to={`${previousPath}/search-returned-books`}
+        label="Search Returned Books"
+      />
     </div>
   );
 };

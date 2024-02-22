@@ -1,14 +1,11 @@
 import { Button, Grid } from "@mui/material";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
-import {
-  addNewBook,
-  fetchBookDetailsByIsbnApi,
-} from "../../../hooks/http-requests.hooks.admin";
-import useLengthTrigger from "../../../../../components/forms/hooks/useLengthTrigger/uselengthTrigger.hook.component";
+import { addNewBook } from "../../../hooks/http-requests.hooks.admin";
 import { useState } from "react";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
 import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
 
 const AddBookPage = () => {
   const [showAlertDialog, setShowAlertDialog] = useState(false);
@@ -18,7 +15,7 @@ const AddBookPage = () => {
     severity: "",
   });
 
-  const { formFields, handleChange, setFormFields } = useForm({
+  const { formFields, handleChange } = useForm({
     isbn: "",
     title: "",
     author: "",
@@ -31,38 +28,32 @@ const AddBookPage = () => {
     callNumber: "",
   });
 
-  const { title, author, publisher, publicationYear } = formFields;
-
-  // const handleAutoFetch = async () => {
-  //   const { title, publish_date, publishers } = await fetchBookDetailsByIsbnApi(
-  //     formFields.ISBN
-  //   );
-
-  //   setFormFields({
-  //     ...formFields,
-  //     title,
-  //     publisher: publishers[0],
-  //     publicationYear: new Date(publish_date).getFullYear(),
-  //   });
-  // };
-
-  // useLengthTrigger(formFields.ISBN, 13, handleAutoFetch);
+  const {
+    title,
+    author,
+    isbn,
+    volume,
+    pages,
+    source,
+    cost,
+    callNumber,
+    publicationYear,
+    placeAndPublishers,
+  } = formFields;
 
   const handleAddNewBook = async () => {
+    console.log(formFields);
     await addNewBook(formFields)
       .then((res) => {
-        setSnackbarFeedback({ open: true, severity: "success", message: res });
+        setSnackbarFeedback([1, 1, res]);
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   return (
     <div>
-      <br />
-      <br />
-      <div className="m-5">
+      <h2 className="text-center my-4">Add New Book</h2>
+      <div className="mx-3 mx-md-4 mx-lg-5">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -70,7 +61,7 @@ const AddBookPage = () => {
           }}
         >
           <Grid container spacing={2}>
-            <Grid item>
+            <Grid item xs={12} sm={4} md={4}>
               <InputField
                 label="Title"
                 type="text"
@@ -79,7 +70,7 @@ const AddBookPage = () => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={4} md={4}>
               <InputField
                 label="Author"
                 type="text"
@@ -88,23 +79,25 @@ const AddBookPage = () => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={4} md={4}>
               <InputField
                 label="ISBN Number"
                 type="number"
                 name="isbn"
+                value={isbn}
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={4} md={4}>
               <InputField
                 label="Place and Publishers"
                 type="text"
                 name="placeAndPublishers"
+                value={placeAndPublishers}
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={4} md={4}>
               <InputField
                 label="Publication Year"
                 type="number"
@@ -113,72 +106,73 @@ const AddBookPage = () => {
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={4} md={4}>
               <InputField
                 label="Pages"
-                type="text"
+                type="number"
                 name="pages"
-                value={publisher}
+                value={pages}
                 onChange={handleChange}
               />
             </Grid>
 
-            <Grid item>
+            <Grid item xs={12} sm={4} md={4}>
               <InputField
                 label="Volume"
                 type="text"
                 name="volume"
+                value={volume}
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={4} md={4}>
               <InputField
                 label="Source"
                 type="text"
                 name="source"
+                value={source}
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={4} md={4}>
               <InputField
                 label="Price"
                 type="number"
                 name="cost"
+                value={cost}
                 onChange={handleChange}
               />
             </Grid>
-            <Grid item>
+            <Grid item xs={12} sm={4} md={4}>
               <InputField
                 label="Call Number"
-                type="text"
+                type="number"
                 name="callNumber"
+                value={callNumber}
                 onChange={handleChange}
               />
             </Grid>
           </Grid>
-          <br />
-          <Button type="submit" variant="contained">
-            Submit
-          </Button>
+          <Grid container justifyContent="center">
+            <Grid item xs={12} sm={6} md={3}>
+              <Button fullWidth type="submit" variant="contained">
+                Submit
+              </Button>
+            </Grid>
+          </Grid>
         </form>
       </div>
       <div>
         <AlertDialog
-          title="Confirm?"
-          content="This action can not be undone"
           open={showAlertDialog}
           handleClick={(e) => {
             if (e) handleAddNewBook();
             setShowAlertDialog(false);
           }}
         />
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
-          }
+        <SnackbarFeedbackCustom
+          feedback={showSnackbarFeedback}
+          handleClose={setSnackbarFeedback}
         />
       </div>
     </div>

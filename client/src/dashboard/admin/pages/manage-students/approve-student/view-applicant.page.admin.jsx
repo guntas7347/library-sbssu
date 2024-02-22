@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
   fetchOneApplication,
@@ -6,15 +6,16 @@ import {
 } from "../../../hooks/http-requests.hooks.admin";
 import SpanningTable from "../../../../../components/table/spanning-table.component";
 import { Button, Grid } from "@mui/material";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
 
 const ViewApplicantPage = () => {
-  const param = useParams();
+  const { _id } = useParams();
+
+  const navigate = useNavigate();
 
   const [studentDoc, setStudentDoc] = useState({
-    applicationNumber: null,
-    rollNumber: null,
-    name: "",
+    rollNumber: "",
+    fullName: "",
     fathersName: "",
     gender: "",
     dob: "",
@@ -22,9 +23,9 @@ const ViewApplicantPage = () => {
     specialization: "",
     batch: "",
     email: "",
-    phoneNumber: null,
+    phoneNumber: "",
   });
-
+  const [decisionTaken, setDecisionTaken] = useState(false);
   const [showSnackbarFeedback, setSnackbarFeedback] = useState({
     open: false,
     message: "",
@@ -33,8 +34,7 @@ const ViewApplicantPage = () => {
 
   const {
     rollNumber,
-    applicationNumber,
-    name,
+    fullName,
     fathersName,
     gender,
     dob,
@@ -45,60 +45,36 @@ const ViewApplicantPage = () => {
     phoneNumber,
     createdAt,
   } = studentDoc;
-
   useEffect(() => {
-    const asyncFunc = async () =>
-      setStudentDoc(
-        await fetchOneApplication({
-          applicationNumber: param.applicationNumber,
-        })
-      );
+    const asyncFunc = async () => {
+      await fetchOneApplication(_id)
+        .then((res) => setStudentDoc(res))
+        .catch((err) =>
+          setSnackbarFeedback({ open: true, message: err, severity: "error" })
+        );
+    };
     asyncFunc();
   }, []);
 
   const handleClick = async (e) => {
     const decision = e.target.name;
-    await processApplication({ applicationNumber, decision })
+    await processApplication({ decision, _id })
       .then((res) => {
-        setSnackbarFeedback({ open: true, severity: "success", message: res });
+        setSnackbarFeedback([1, 1, res]);
+        setDecisionTaken(true);
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   return (
-    <div className="text-center">
+    <div className="text-center m-3">
       <h1 className="">Application Details</h1>
-      <Grid className="mx-5" container spacing={2}>
-        <Grid item>
-          <Button
-            name="reject"
-            variant="contained"
-            color="error"
-            onClick={handleClick}
-          >
-            Reject
-          </Button>
-        </Grid>
-        <Grid item>
-          <Button
-            name="success"
-            variant="contained"
-            color="success"
-            onClick={handleClick}
-          >
-            Approve
-          </Button>
-        </Grid>
-      </Grid>
 
       <div className="m-2">
         <SpanningTable
           rows={[
-            ["Application Number", applicationNumber],
             ["Roll Number", rollNumber],
-            ["Name", name],
+            ["Name", fullName],
             ["Fathers Name", fathersName],
             ["Gender", gender],
             ["Date Of Birth", new Date(dob).toDateString()],
@@ -111,14 +87,37 @@ const ViewApplicantPage = () => {
           ]}
         />
       </div>
+      {!decisionTaken && (
+        <div>
+          <Grid className="p-5 m-5" container spacing={2}>
+            <Grid item>
+              <Button
+                name="REJECT"
+                variant="contained"
+                color="error"
+                onClick={handleClick}
+              >
+                Reject
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                name="APPROVE"
+                variant="contained"
+                color="success"
+                onClick={handleClick}
+              >
+                Approve
+              </Button>
+            </Grid>
+          </Grid>
+        </div>
+      )}
+
       <div>
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
-          }
+        <SnackbarFeedbackCustom
+          feedback={showSnackbarFeedback}
+          handleClose={setSnackbarFeedback}
         />
       </div>
     </div>

@@ -1,11 +1,11 @@
 import { Button, Grid } from "@mui/material";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { useState } from "react";
 import { createNewStaff } from "../../../hooks/http-requests.hooks.admin";
 import InputSelect from "../../../../../components/forms/input-select/input-select.component";
+import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
 
 const AddStaffPage = () => {
   const [showAlertDialog, setShowAlertDialog] = useState(false);
@@ -22,7 +22,9 @@ const AddStaffPage = () => {
   const { idNumber, fullName, email, password, role } = formFields;
 
   const handleSubmit = async () => {
-    await createNewStaff(formFields);
+    await createNewStaff(formFields)
+      .then((res) => setSnackbarFeedback([1, 1, res]))
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   return (
@@ -101,13 +103,9 @@ const AddStaffPage = () => {
             setShowAlertDialog(false);
           }}
         />
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
-          }
+        <SnackbarFeedbackCustom
+          feedback={showSnackbarFeedback}
+          handleClose={setSnackbarFeedback}
         />
       </div>
     </div>

@@ -1,67 +1,57 @@
 const { formatString } = require("../../utils/functions");
 const studentsCol = require("./students.schema");
 
-const createNewStudent = async (StudentDetails, session) => {
-  return await studentsCol.create(
-    [{ ...StudentDetails, createdAt: new Date() }],
-    { session }
-  );
+const createStudent = async (StudentDetails, session) => {
+  return await studentsCol.create([StudentDetails], { session });
 };
 
-const fetchAllStudents = async (filter, select) => {
+const findStudents = async (filter, select) => {
   const { sortSelect, sortValue } = filter;
-  // const sortValue = formatString(filter.sortValue);
 
   const query = studentsCol.find();
 
   switch (sortSelect) {
-    case "rollNumber":
-      query.where({ rollNumber: sortValue });
-      break;
-
-    case "name":
-      query.where({ name: sortValue });
-      break;
-
-    case "phoneNumber":
-      query.where({ phoneNumber: sortValue });
+    case "fetchAllStudents":
       break;
 
     default:
+      query.where({ [sortSelect]: sortValue });
       break;
   }
   query.select(select);
   return await query.exec();
 };
 
-const fetchStudentByRollNumber = async (rollNumber, populate = false) => {
+const getStudentByRollNumber = async (rollNumber, populate = false, select) => {
   const query = studentsCol.findOne({ rollNumber });
 
-  if (populate) query.populate("libraryCards");
+  if (populate) query.populate({ path: "libraryCards", select });
 
   return await query.exec();
 };
 
-const fetchStudentById = async (id, populate = false) => {
-  const query = studentsCol.findById(id);
-
+const getStudentById = async (_id, populate = false, selectLibraryCard) => {
+  const query = studentsCol.findById(_id);
   if (populate)
-    query.populate({ path: "libraryCards", select: "cardNumber status -_id" });
+    query.populate({ path: "libraryCards", select: selectLibraryCard });
 
   return await query.exec();
 };
 
-const addLibraryCardToStudent = async (studentId, libraryCardId) => {
-  return await studentsCol.updateOne(
-    { _id: studentId },
-    { $push: { libraryCards: libraryCardId } }
+const addLibraryCardToStudent = async (_id, libraryCardId, session) => {
+  return await studentsCol.findByIdAndUpdate(
+    _id,
+    {
+      $push: { libraryCards: libraryCardId },
+    },
+    { session }
   );
 };
 
 module.exports = {
-  createNewStudent,
-  fetchAllStudents,
-  fetchStudentByRollNumber,
-  fetchStudentById,
+  createStudent,
+  findStudents,
+  getStudentByRollNumber,
+  getStudentById,
   addLibraryCardToStudent,
 };

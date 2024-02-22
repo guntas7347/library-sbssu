@@ -32,11 +32,7 @@ const SearchReturnedBooks = () => {
       .then((res) => {
         setRowData(rowsArray(res));
         if (res.length === 0) {
-          setSnackbarFeedback({
-            open: true,
-            severity: "error",
-            message: "No data Found",
-          });
+          setSnackbarFeedback([1, 2, "No data found"]);
         }
       })
       .catch((err) => console.error(err));
@@ -161,7 +157,7 @@ const SearchReturnedBooks = () => {
           message={showSnackbarFeedback.message}
           severity={showSnackbarFeedback.severity}
           handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
+            setSnackbarFeedback({ open: false, severity: "info", message: "" })
           }
         />
       </div>

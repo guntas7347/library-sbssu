@@ -40,9 +40,7 @@ const ChangePasswordPage = () => {
             message: res,
           });
         })
-        .catch((err) =>
-          setSnackbarFeedback({ open: true, severity: "error", message: err })
-        );
+        .catch((err) => setSnackbarFeedback([1, 2, err]));
     }
   };
 

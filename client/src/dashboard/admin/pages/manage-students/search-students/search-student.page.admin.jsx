@@ -1,17 +1,23 @@
 import { Button, Grid } from "@mui/material";
-import InputSelect from "../../../../../components/forms/input-select/input-select.component";
 import CustomTable from "../../../../../components/table/custom-table.component";
 import { fetchAllStudents } from "../../../hooks/http-requests.hooks.admin";
-import InputField from "../../../../../components/forms/input-field/input-field.component";
-import { sortObjectUsingKeys } from "../../../../../utils/functions";
+import { rowsArray } from "../../../../../utils/functions";
 import { useState } from "react";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { useNavigate } from "react-router-dom";
+import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
+import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
 
 const SearchStudentsPage = () => {
   const navigate = useNavigate();
 
   const [rowData, setRowData] = useState([]);
+
+  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
+    severity: "info",
+    message: "",
+    open: false,
+  });
 
   const { formFields, handleChange } = useForm({
     sortSelect: "fetchAllStudents",
@@ -20,24 +26,17 @@ const SearchStudentsPage = () => {
 
   const handleFetch = async () => {
     await fetchAllStudents(formFields)
-      .then((res) => setRowData(rowsArray(res)))
+      .then((res) => {
+        setRowData(
+          rowsArray(res, ["_id", "rollNumber", "fullName", "program", "batch"])
+        );
+        if (res.length === 0) {
+          setSnackbarFeedback([1, 2, "No data found"]);
+        }
+      })
       .catch((err) => {
-        console.error(err);
+        setSnackbarFeedback([1, 2, err]);
       });
-  };
-
-  const rowsArray = (array) => {
-    return array.map((obj) => {
-      return Object.values(
-        sortObjectUsingKeys(obj, [
-          "_id",
-          "rollNumber",
-          "name",
-          "program",
-          "batch",
-        ])
-      );
-    });
   };
 
   const handleRowClick = (e) => {
@@ -49,33 +48,42 @@ const SearchStudentsPage = () => {
       <h3 className="m-3">Search Students</h3>
       <div>
         <div className="mx-5 d-flex">
-          <Grid container spacing={2}>
-            <Grid item>
-              <InputSelect
-                fields={[
-                  { name: "Search All Students", value: "fetchAllStudents" },
-                  { name: "Roll Number", value: "rollNumber" },
-                  { name: "Name", value: "name" },
-                  { name: "Phone Number", value: "phoneNumber" },
-                  { name: "Email", value: "email" },
-                  { name: "Specialization", value: "specialization" },
-                  { name: "Batch", value: "batch" },
-                  { name: "Date Of Birth", value: "dob" },
-                ]}
-                value={formFields.sortSelect}
-                onChange={handleChange}
-                name="sortSelect"
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Value"
-                name="sortValue"
-                onChange={handleChange}
-              />
-            </Grid>
-          </Grid>
-          <Button onClick={handleFetch}>Search</Button>
+          <SearchQueriesComponent
+            selectFields={[
+              {
+                name: "Search All Students",
+                value: "fetchAllStudents",
+                inputField: "none",
+              },
+              {
+                name: "Roll Number",
+                value: "rollNumber",
+                inputField: "number",
+              },
+              { name: "Date Of Birth", value: "dob", inputField: "date" },
+
+              { name: "Name", value: "name", inputField: "text" },
+              {
+                name: "Phone Number",
+                value: "phoneNumber",
+                inputField: "number",
+              },
+              { name: "Email", value: "email", inputField: "text" },
+              {
+                name: "Specialization",
+                value: "specialization",
+                inputField: "text",
+              },
+              { name: "Batch", value: "batch", inputField: "number" },
+            ]}
+            selectValue={formFields.sortSelect}
+            selectName="sortSelect"
+            inputName="sortValue"
+            inputValue={formFields.selectValue}
+            onChange={handleChange}
+          />
+
+          <Button onClick={handleFetch}>Submit</Button>
         </div>
         <div className="p-5">
           <CustomTable
@@ -84,6 +92,12 @@ const SearchStudentsPage = () => {
             handleRowClick={handleRowClick}
           />
         </div>
+      </div>
+      <div>
+        <SnackbarFeedbackCustom
+          feedback={showSnackbarFeedback}
+          handleClose={setSnackbarFeedback}
+        />
       </div>
     </div>
   );

@@ -1,11 +1,19 @@
 const { Auth_Student } = require("../auth.schema");
 
-const createStudentAuth = async (data, session) => {
+const createAuthStudent = async (data, session) => {
   return await Auth_Student.create([data], { session });
 };
 
-const findStudentAuth = async (email) => {
-  return await Auth_Student.findOne({ email }).select("email password");
+const getAuthStudentByEmail = async (email) => {
+  return await Auth_Student.findOne({ email });
 };
 
-module.exports = { createStudentAuth, findStudentAuth };
+const getAuthStudentById = async (_id) => {
+  return await Auth_Student.findById(_id);
+};
+
+module.exports = {
+  createAuthStudent,
+  getAuthStudentByEmail,
+  getAuthStudentById,
+};

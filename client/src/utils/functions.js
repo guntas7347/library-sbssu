@@ -59,7 +59,7 @@ const options = {
 export const formatTime = (dateString) =>
   new Date(dateString).toLocaleString("en-US", options);
 
-export const rowsArray = (array, keysArray) => {
+export const rowsArray = (array = [], keysArray = []) => {
   return array.map((obj) => {
     return Object.values(sortObjectUsingKeys(obj, keysArray));
   });

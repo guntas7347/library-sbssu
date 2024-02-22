@@ -8,109 +8,81 @@ import {
 } from "../../../hooks/http-requests.hooks.admin";
 import SpanningTable from "../../../../../components/table/spanning-table.component";
 import { useState } from "react";
-import { formatDate } from "../../../../../utils/functions";
+import { formatDate, formatTime } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
+import Spinner from "../../../../../components/feedback/spinner/spinner.component";
 
 const ReturnIssuedBookPage = () => {
-  const [showSubmitConfirmationAlertDialog, setShowAlertDialog] =
-    useState(false);
+  const [ShowAlertDialog, setShowAlertDialog] = useState(false);
   const [showSnackbarFeedback, setSnackbarFeedback] = useState({
     open: false,
     message: "",
     severity: "",
   });
-
-  const [showFineAlertDialog, setShowFineAlertDialog] = useState({
-    open: false,
-    fineAmount: 0,
-  });
-
+  const [isStudentFetching, setIsStudentFetching] = useState(false);
+  const [fine, setFine] = useState(false);
   const { formFields, handleChange, resetFormFields } = useForm({
     accessionNumber: "",
   });
-
-  const defaultIssuedBookDoc = {
-    title: null,
-    ISBN: "",
-    author: "",
-    accessionNumber: "",
-    libraryCard: "",
-    issueDate: "",
-    name: "",
-    program: "",
-    rollNumber: "",
-  };
-
-  const [issuedBookDoc, setIssuedBookDoc] = useState(defaultIssuedBookDoc);
-
+  const [issuedBookDoc, setIssuedBookDoc] = useState([]);
   const {
     title,
-    ISBN,
     author,
     accessionNumber,
     libraryCard,
     issueDate,
-    name,
-    program,
+    fullName,
+    issuedBy,
     rollNumber,
     _id,
   } = issuedBookDoc;
-
+  console.log(issuedBookDoc);
   const handleFetch = async () => {
-    await fetchIssuedBookByAccessionNumber({
-      accessionNumber: +formFields.accessionNumber,
-    })
+    console.log("handlefetch");
+    setIsStudentFetching(true);
+    await fetchIssuedBookByAccessionNumber(+formFields.accessionNumber)
       .then((res) => {
-        setIssuedBookDoc(res);
+        setTimeout(() => {
+          setIssuedBookDoc(res);
+          console.log("triggering");
+        }, 1000);
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => {
+        setSnackbarFeedback([1, 2, err]);
+        setIsStudentFetching(false);
+      });
   };
 
   const returnDate = formatDate();
 
   const handleReturnBook = async () => {
+    console.log("handleReturnBook");
     await returnIssuedBook({ _id })
       .then((res) => {
-        setSnackbarFeedback({
-          open: true,
-          severity: "success",
-          message: res,
-        });
+        setSnackbarFeedback([1, 1, res]);
+        resetFormFields();
+        setIssuedBookDoc([]);
+        setIsStudentFetching(false);
       })
       .catch((err) => {
-        setSnackbarFeedback({
-          open: true,
-          severity: "error",
-          message: err,
-        });
+        setSnackbarFeedback([1, 2, err]);
       });
   };
 
   const handleCheckFine = async () => {
+    console.log("handleCheckFine");
     await issueBookFine({ _id })
       .then(async (fine) => {
-        if (fine != null) {
-          setShowFineAlertDialog({ open: true, fineAmount: fine });
-        } else {
-          handleReturnBook();
-        }
+        if (fine != null) setFine(fine);
+        setShowAlertDialog(true);
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
-  const handleFineDialoge = async () => {
-    await returnIssuedBook({ _id })
-      .then((res) => {
-        setSnackbarFeedback({ open: true, severity: "success", message: res });
-      })
-      .catch((err) => {
-        setSnackbarFeedback({ open: true, severity: "error", message: err });
-      });
+  const isStudentFetched = () => {
+    if (issuedBookDoc.length === 0) return false;
+    else return true;
   };
 
   return (
@@ -121,11 +93,11 @@ const ReturnIssuedBookPage = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            setShowAlertDialog(true);
+            handleFetch();
           }}
         >
           <Grid container spacing={2}>
-            <Grid item>
+            <Grid item xs={12} sm={6} md={3}>
               <InputField
                 label="Accession Number"
                 name="accessionNumber"
@@ -134,87 +106,92 @@ const ReturnIssuedBookPage = () => {
                 value={formFields.accessionNumber}
               />
             </Grid>
-            <Grid item>
-              <Button variant="contained" onClick={handleFetch}>
-                Fetch
+            <Grid item xs={12} sm={6} md={3}>
+              <Button variant="contained" type="submit">
+                Search
               </Button>
             </Grid>
           </Grid>
         </form>
       </div>
       <div>
-        <div className="mb-3">
-          <SpanningTable
-            rows={[
-              ["Accession Number", accessionNumber],
-              ["Library Card Number", libraryCard],
-              ["Issue Date", issueDate],
-              ["Book title", title],
-              ["Book Author", author],
-              ["ISBN", ISBN],
-              ["Student Name", name],
-              ["Roll Number", rollNumber],
-              ["Program", program],
-            ]}
-          />
-        </div>
-        <div className="">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setShowAlertDialog(true);
-            }}
-          >
-            <Grid container spacing={2}>
-              <Grid item>
-                <InputField
-                  label="Return Date"
-                  name="returnDate"
-                  value={returnDate}
-                  disabled
-                  InputLabelProps={{ shrink: true }}
+        {isStudentFetching &&
+          (isStudentFetched() ? (
+            <div>
+              <div className="mb-3">
+                <SpanningTable
+                  rows={[
+                    ["Accession Number", accessionNumber],
+                    ["Library Card Number", libraryCard],
+                    ["Issue Date", formatTime(issueDate)],
+                    ["Issued By", issuedBy],
+                    ["Book title", title],
+                    ["Book Author", author],
+                    ["Student Name", fullName],
+                    ["Roll Number", rollNumber],
+                  ]}
                 />
-              </Grid>
-              <Grid item>
-                <Button variant="contained" type="submit">
-                  Return
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </div>
+              </div>
+              <div className="">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleCheckFine();
+                  }}
+                >
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={3} md={2}>
+                      <InputField
+                        label="Return Date"
+                        name="returnDate"
+                        value={returnDate}
+                        disabled
+                        style={{ textAlign: "center" }}
+                        InputLabelProps={{ shrink: true }}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={3} md={2}>
+                      <Button variant="contained" type="submit">
+                        Return
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </form>
+              </div>
+            </div>
+          ) : (
+            <div
+              className="d-flex justify-content-center align-items-center"
+              style={{
+                height: "50vh",
+              }}
+            >
+              <Spinner />
+            </div>
+          ))}
       </div>
       <div>
         <AlertDialog
           title="Confirm?"
-          content="This action can not be undone"
-          open={showSubmitConfirmationAlertDialog}
-          handleClick={(e, f) => {
-            if (e) handleCheckFine();
+          content={
+            <>
+              Return Book:-
+              <br />
+              Accession Number: {accessionNumber}
+              <br />
+              Fine:{" "}
+              {fine ? <span style={{ color: "red" }}>₹{fine}</span> : "N/A"}
+            </>
+          }
+          open={ShowAlertDialog}
+          handleClick={(e) => {
+            if (e) handleReturnBook();
             setShowAlertDialog(false);
           }}
         />
-        <AlertDialog
-          title="Pay Fine"
-          content={`The issuer is subject to fine of ${showFineAlertDialog.fineAmount} for late submit`}
-          open={showFineAlertDialog.open}
-          agreeMessage="Paid"
-          disagreeMessage="Pending"
-          handleClick={(e, f) => {
-            if (e) handleFineDialoge();
-            setShowFineAlertDialog({
-              open: false,
-              fineAmount: 0,
-            });
-          }}
-        />
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
-          }
+        <SnackbarFeedbackCustom
+          feedback={showSnackbarFeedback}
+          handleClose={setSnackbarFeedback}
         />
       </div>
     </div>

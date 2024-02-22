@@ -11,7 +11,7 @@ import CustomTableSelect from "../../../../../../components/table/custom-table-s
 import AlertDialog from "../../../../../../components/feedback/dialog/alert-dialog.component";
 import SnackbarFeedback from "../../../../../../components/feedback/snackbar/snackbar.component";
 
-const AddLibraryCardPage = () => {
+const AllotLibraryCardPage = () => {
   const [showStudentTable, setShowStudentTable] = useState(false);
   const [showCardNumberField, setShowAccessionNumberField] = useState(false);
 
@@ -37,9 +37,7 @@ const AddLibraryCardPage = () => {
         setRowData(rowsArray([res]));
         setShowStudentTable(true);
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   const handleSelect = (_, selectedValue) => {
@@ -53,13 +51,11 @@ const AddLibraryCardPage = () => {
   const handleSubmit = async () => {
     await createLibraryCard(formFields)
       .then((res) => {
-        setSnackbarFeedback({ open: true, severity: "success", message: res });
+        setSnackbarFeedback([1, 1, res]);
         setShowAccessionNumberField(false);
         setShowStudentTable(false);
       })
-      .catch((err) =>
-        setSnackbarFeedback({ open: true, severity: "error", message: err })
-      );
+      .catch((err) => setSnackbarFeedback([1, 2, err]));
   };
 
   const rowsArray = (array) => {
@@ -153,7 +149,7 @@ const AddLibraryCardPage = () => {
           message={showSnackbarFeedback.message}
           severity={showSnackbarFeedback.severity}
           handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "", message: "" })
+            setSnackbarFeedback({ open: false, severity: "info", message: "" })
           }
         />
       </div>
@@ -161,4 +157,4 @@ const AddLibraryCardPage = () => {
   );
 };
 
-export default AddLibraryCardPage;
+export default AllotLibraryCardPage;

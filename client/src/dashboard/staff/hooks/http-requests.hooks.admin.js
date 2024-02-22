@@ -187,7 +187,7 @@ export const fetchAllBooks = (filter) => {
 
 export const fetchBookDetails = (book) => {
   return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/books/fetch-book-details`, {
+    fetch(`${API_URL}/books/fetch-book-by-id`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
