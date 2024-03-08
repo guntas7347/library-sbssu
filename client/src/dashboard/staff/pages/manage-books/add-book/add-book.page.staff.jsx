@@ -8,7 +8,7 @@ import {
 import useLengthTrigger from "../../../../../components/forms/hooks/useLengthTrigger/uselengthTrigger.hook.component";
 import { useState } from "react";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
 
 const AddBookPage = () => {
   const [showAlertDialog, setShowAlertDialog] = useState(false);

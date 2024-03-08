@@ -1,4 +1,3 @@
-import { Button } from "@mui/material";
 import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { useState } from "react";
@@ -7,6 +6,9 @@ import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/
 import { fetchAllFines } from "../../../hooks/http-requests.hooks.admin";
 import { rowsArray } from "../../../../../utils/functions";
 import { useNavigate } from "react-router-dom";
+import Button from "../../../../../components/buttons/button.component";
+
+import "./search-fines.styles.scss";
 
 const SearchFinesPage = () => {
   const navigate = useNavigate();
@@ -46,8 +48,8 @@ const SearchFinesPage = () => {
 
   return (
     <div className="text-center">
-      <h3 className="m-3">Search Fines</h3>
-      <div className="mx-5 d-flex">
+      <h1 className="page-header">Search Fines</h1>
+      <div className="container-searchFines white-container">
         <SearchQueriesComponent
           selectFields={[
             {
@@ -60,7 +62,7 @@ const SearchFinesPage = () => {
           inputValue={formFields.selectValue}
           onChange={handleChange}
         />
-        <Button onClick={handleClick}>Submit</Button>
+        <Button onClick={handleClick} label="Search" />
       </div>
       <div className="p-5">
         <CustomTable

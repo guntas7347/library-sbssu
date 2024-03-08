@@ -1,26 +1,18 @@
-import { Button, Grid } from "@mui/material";
-import InputSelect from "../../../../../components/forms/input-select/input-select.component";
 import CustomTable from "../../../../../components/table/custom-table.component";
 import { fetchAllApplications } from "../../../hooks/http-requests.hooks.admin";
-import InputField from "../../../../../components/forms/input-field/input-field.component";
-import { rowsArray, sortObjectUsingKeys } from "../../../../../utils/functions";
-import { useState } from "react";
+import { rowsArray } from "../../../../../utils/functions";
+import { useContext, useState } from "react";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { useNavigate } from "react-router-dom";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
 import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
-import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const ApproveStudentPage = () => {
   const navigate = useNavigate();
 
-  const [rowData, setRowData] = useState([]);
+  const { setFeedback } = useContext(SnackBarContext);
 
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    severity: "info",
-    message: "",
-    open: false,
-  });
+  const [rowData, setRowData] = useState([]);
 
   const { formFields, handleChange } = useForm({
     sortSelect: "fetchAllApplications",
@@ -34,11 +26,11 @@ const ApproveStudentPage = () => {
           rowsArray(res, ["_id", "rollNumber", "fullName", "program", "batch"])
         );
         if (res.length === 0) {
-          setSnackbarFeedback([1, 2, "No data found"]);
+          setFeedback([1, 2, "No data found"]);
         }
       })
       .catch((err) => {
-        setSnackbarFeedback([1, 2, err]);
+        setFeedback([1, 2, err]);
       });
   };
 
@@ -48,10 +40,11 @@ const ApproveStudentPage = () => {
 
   return (
     <div className="text-center">
-      <h3 className="m-3">Search Applications</h3>
-      <div>
-        <div className="mx-5 d-flex">
+      <h1 className="text-4xl font-bold">Search Applications</h1>
+      <div className="">
+        <div className="grid grid-cols-3 gap-5 my-5">
           <SearchQueriesComponent
+            className="col-span-2 gap-5"
             selectFields={[
               {
                 name: "Roll Number",
@@ -71,22 +64,18 @@ const ApproveStudentPage = () => {
             onChange={handleChange}
           />
 
-          <Button onClick={handleFetch}>Submit</Button>
+          <button className="my-button" onClick={handleFetch}>
+            Submit
+          </button>
         </div>
 
-        <div className="p-5">
+        <div>
           <CustomTable
             columns={["Roll Number", "Name", "Program", "Batch"]}
             rows={rowData}
             handleRowClick={handleRowClick}
           />
         </div>
-      </div>
-      <div>
-        <SnackbarFeedbackCustom
-          feedback={showSnackbarFeedback}
-          handleClose={setSnackbarFeedback}
-        />
       </div>
     </div>
   );

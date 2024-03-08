@@ -1,24 +1,18 @@
-import { Button, Grid } from "@mui/material";
 import InputSelect from "../../../../../components/forms/input-select/input-select.component";
 import CustomTable from "../../../../../components/table/custom-table.component";
 import { fetchAllStaff } from "../../../hooks/http-requests.hooks.admin";
-import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { sortObjectUsingKeys } from "../../../../../utils/functions";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { useNavigate } from "react-router-dom";
-import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const SearchStaffPage = () => {
   const navigate = useNavigate();
 
-  const [rowData, setRowData] = useState([]);
+  const { setFeedback } = useContext(SnackBarContext);
 
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
+  const [rowData, setRowData] = useState([]);
 
   const { formFields, handleChange } = useForm({
     sortSelect: "fetchAllStaff",
@@ -29,7 +23,7 @@ const SearchStaffPage = () => {
     await fetchAllStaff()
       .then((res) => setRowData(rowsArray(res)))
       .catch((err) => {
-        setSnackbarFeedback([1, 2, err]);
+        setFeedback([1, 2, err]);
       });
   };
 
@@ -47,34 +41,27 @@ const SearchStaffPage = () => {
 
   return (
     <div className="text-center">
-      <h3 className="m-3">Search Staff</h3>
+      <h1 className="text-3xl font-bold m-5">Search Staff</h1>
       <div>
-        <div className="mx-5 d-flex">
-          <Grid container spacing={2}>
-            <Grid item>
-              <InputSelect
-                fields={[{ name: "Search All Staff", value: "fetchAllStaff" }]}
-                value={formFields.sortSelect}
-                onChange={handleChange}
-                name="sortSelect"
-              />
-            </Grid>
-          </Grid>
-          <Button onClick={handleFetch}>Search</Button>
+        <div className="bg-white p-7 grid grid-cols-2 gap-5 my-5 rounded-3xl">
+          <InputSelect
+            fields={[{ name: "Search All Staff", value: "fetchAllStaff" }]}
+            value={formFields.sortSelect}
+            onChange={handleChange}
+            name="sortSelect"
+          />
+
+          <button className="my-button" onClick={handleFetch}>
+            Search
+          </button>
         </div>
-        <div className="p-5">
+        <div className="">
           <CustomTable
             columns={["ID Number", "Name", "Role"]}
             rows={rowData}
             handleRowClick={handleRowClick}
           />
         </div>
-      </div>
-      <div>
-        <SnackbarFeedbackCustom
-          feedback={showSnackbarFeedback}
-          handleClose={setSnackbarFeedback}
-        />
       </div>
     </div>
   );

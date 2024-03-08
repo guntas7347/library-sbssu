@@ -1,4 +1,4 @@
-import SnackbarFeedback from "./snackbar.component";
+import SnackbarFeedback from "./snackbar-old.component";
 
 const SnackbarFeedbackCustom = ({ feedback = [0, 0, ""], handleClose }) => {
   const handleOpen = () => {

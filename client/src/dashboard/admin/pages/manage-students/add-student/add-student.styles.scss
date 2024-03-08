@@ -1,0 +1,22 @@
+.container-add-student {
+  background-color: white;
+  padding: 30px;
+  border-radius: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  input,
+  select {
+    width: 100%;
+  }
+}
+
+.submit-button-add-student {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 20px 0;
+  button {
+    width: 20vw;
+  }
+}

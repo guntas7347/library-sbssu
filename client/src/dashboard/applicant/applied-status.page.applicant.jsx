@@ -1,17 +1,13 @@
-import { Button } from "@mui/material";
 import SpanningTable from "../../components/table/spanning-table.component";
 import { deleteApplication } from "../http-requests";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import AlertDialog from "../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedbackCustom from "../../components/feedback/snackbar/snackbar-full.component";
+import { SnackBarContext } from "../../components/context/snackbar.context";
 
 const AppliedStatusPage = ({ applicationDoc }) => {
+  const { setFeedback } = useContext(SnackBarContext);
+
   const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    severity: "info",
-    message: "",
-    open: false,
-  });
 
   const {
     rollNumber,
@@ -30,21 +26,22 @@ const AppliedStatusPage = ({ applicationDoc }) => {
   const handleWithdraw = async () => {
     await deleteApplication()
       .then((res) =>
-        setSnackbarFeedback({
+        setFeedback({
           severity: "success",
           open: true,
           message: res.message,
         })
       )
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
     window.location.reload();
   };
 
   return (
     <div>
-      <h1 className="">Your application is under review.</h1>
-      <h3>Application Details</h3>
-      <div className="m-2">
+      <h2 className="text-2xl md:text-4xl font-bold my-5">
+        Application Details
+      </h2>
+      <div className="px-3 md:px-5 text-xs md:text-base">
         <SpanningTable
           rows={[
             ["Roll Number", rollNumber],
@@ -61,10 +58,10 @@ const AppliedStatusPage = ({ applicationDoc }) => {
           ]}
         />
       </div>
-      <div>
-        <Button onClick={() => setShowAlertDialog(true)}>
+      <div className="my-3">
+        <button className="my-button" onClick={() => setShowAlertDialog(true)}>
           Withdraw Application
-        </Button>
+        </button>
       </div>
       <div>
         <AlertDialog
@@ -75,10 +72,6 @@ const AppliedStatusPage = ({ applicationDoc }) => {
             if (e) handleWithdraw();
             setShowAlertDialog(false);
           }}
-        />
-        <SnackbarFeedbackCustom
-          feedback={showSnackbarFeedback}
-          handleClose={setSnackbarFeedback}
         />
       </div>
     </div>

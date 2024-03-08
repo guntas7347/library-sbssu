@@ -22,10 +22,15 @@ const setJwtCookie = async (req, res, next) => {
     const jwtCredentials = { uid: _id };
     const jwt = createJWT(jwtCredentials);
     const cookieOptions = {
+      // secure: true, // only use for production
+
       httpOnly: true,
       expires: new Date(Date.now() + 1000 * 60 * TOKEN_EXPIRY_MINUTES),
+      path: "/",
     };
+
     res.cookie("session", jwt, cookieOptions);
+
     next();
   } catch (err) {
     console.log(err);

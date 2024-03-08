@@ -1,26 +1,15 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Container,
-  CssBaseline,
-  Grid,
-  Typography,
-} from "@mui/material";
-import InputField from "../../components/forms/input-field/input-field.component";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
 import {
   resetPasswordAdmin,
   resetPasswordAdminSendOtp,
   resetPasswordAdminVerifyOtp,
 } from "../http-requests";
+import { useContext, useState } from "react";
+import { SnackBarContext } from "../../components/context/snackbar.context";
 import { Link } from "react-router-dom";
-import { useState } from "react";
-import SnackbarFeedbackCustom from "../../components/feedback/snackbar/snackbar-full.component";
 
 const ForgotPassword = () => {
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState();
+  const { setFeedback } = useContext(SnackBarContext);
 
   const [showPasswordField, setShowPasswordField] = useState(false);
   const [showOtpField, setShowOtpField] = useState(false);
@@ -36,11 +25,11 @@ const ForgotPassword = () => {
   const handleSendOtp = async () => {
     await resetPasswordAdminSendOtp(formFields.email)
       .then(({ message }) => {
-        setSnackbarFeedback([1, 1, message]);
+        setFeedback([1, 1, message]);
         setShowOtpField(true);
       })
       .catch((err) => {
-        setSnackbarFeedback([1, 2, err]);
+        setFeedback([1, 2, err]);
       });
   };
 
@@ -51,17 +40,17 @@ const ForgotPassword = () => {
     })
       .then((res) => {
         console.log(res);
-        setSnackbarFeedback([1, 1, res.message]);
+        setFeedback([1, 1, res.message]);
         setShowPasswordField(true);
       })
       .catch((err) => {
-        setSnackbarFeedback([1, 2, err]);
+        setFeedback([1, 2, err]);
       });
   };
 
   const handleUpdatePassword = async () => {
     if (formFields.newPassword !== formFields.confirmNewPassword) {
-      setSnackbarFeedback([1, 2, "Passwords must match"]);
+      setFeedback([1, 2, "Passwords must match"]);
       return;
     }
 
@@ -71,119 +60,91 @@ const ForgotPassword = () => {
       newPassword: formFields.newPassword,
     })
       .then((res) => {
-        setSnackbarFeedback([1, 1, res.message]);
+        setFeedback([1, 1, res.message]);
       })
       .catch((err) => {
-        setSnackbarFeedback([1, 2, err]);
+        setFeedback([1, 2, err]);
       });
   };
 
-  const DynamicButton = () => {
-    if (showOtpField) {
-      if (showPasswordField) {
-        return (
-          <Button
-            onClick={handleUpdatePassword}
-            variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-          >
-            Update Password
-          </Button>
-        );
-      }
-      return (
-        <Button
-          onClick={handleVerifyOtp}
-          variant="contained"
-          sx={{ mt: 3, mb: 2 }}
-        >
-          Verify OTP
-        </Button>
-      );
-    }
-
-    return (
-      <Button onClick={handleSendOtp} variant="contained" sx={{ mt: 3, mb: 2 }}>
-        Send OTP
-      </Button>
-    );
-  };
-
   return (
-    <div>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Reset your password
-          </Typography>
-          <Box component="form" noValidate sx={{ mt: 1 }}>
-            <InputField
-              margin="normal"
-              label="Email Address"
-              name="email"
-              type="email"
-              disabled={showOtpField}
-              onChange={handleChange}
-            />
+    <div className="h-screen flex flex-row justify-center items-center">
+      <div className="bg-white p-10 flex flex-col items-center gap-6 justify-center">
+        <div className="self-start flex flex-row items-center gap-5">
+          <img
+            className="h-10 inline-block"
+            src="https://sbssu.ac.in/images/Tricolor.png"
+            alt="sbssu logo"
+          />
+          <h1 className="text-3xl text-indigo-900 font-bold inline-block">
+            SBSSU Library Portal
+          </h1>
+        </div>
+        <div className="self-start">
+          <p className="text-xl font-bold">Reset your password</p>
+          <p>Enter you email</p>
+        </div>
+        <div className="grid gap-2 w-80">
+          <input
+            className="border h-12 px-2.5"
+            placeholder="Email Address"
+            name="email"
+            type="email"
+            onChange={handleChange}
+          />
+          {showOtpField && (
+            <>
+              <input
+                className="border h-12 px-2.5"
+                placeholder="One Time Password"
+                name="otp"
+                type="number"
+                onChange={handleChange}
+              />
+              {showPasswordField && (
+                <>
+                  <input
+                    className="border h-12 px-2.5"
+                    name="newPassword"
+                    placeholder="Password"
+                    type="password"
+                    onChange={handleChange}
+                  />
+                  <input
+                    className="border h-12 px-2.5"
+                    name="confirmNewPassword"
+                    placeholder="Confirm Password"
+                    type="password"
+                    onChange={handleChange}
+                  />
+                </>
+              )}
+            </>
+          )}
 
-            {showOtpField && (
-              <>
-                <InputField
-                  margin="normal"
-                  name="otp"
-                  label="OTP"
-                  type="password"
-                  disabled={showPasswordField}
-                  onChange={handleChange}
-                />
-                {showPasswordField && (
-                  <>
-                    <InputField
-                      margin="normal"
-                      name="newPassword"
-                      label="New Password"
-                      type="password"
-                      onChange={handleChange}
-                    />
-                    <InputField
-                      margin="normal"
-                      name="confirmNewPassword"
-                      label="Confirm New Password"
-                      type="password"
-                      onChange={handleChange}
-                    />
-                  </>
-                )}
-              </>
-            )}
-
-            <DynamicButton />
-
-            <Grid container>
-              <Grid item>
-                <Link to={"/"}>{"Already have an accession? Login In"}</Link>
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-        {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
-      </Container>
-      <div>
-        <SnackbarFeedbackCustom
-          feedback={showSnackbarFeedback}
-          handleClose={setSnackbarFeedback}
-        />
+          {showOtpField ? (
+            <>
+              {showPasswordField ? (
+                <button className="my-button" onClick={handleUpdatePassword}>
+                  Update Password
+                </button>
+              ) : (
+                <button className="my-button" onClick={handleVerifyOtp}>
+                  Verify OTP
+                </button>
+              )}
+            </>
+          ) : (
+            <button className="my-button" onClick={handleSendOtp}>
+              Send OTP
+            </button>
+          )}
+        </div>
+        <div className="flex flex-row w-full justify-center">
+          <div>
+            <Link to={"/"}>Login with credentials</Link>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -1,20 +1,22 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+
 import {
   fetchBookByAccessionNumber,
   fetchStudentByRollNumber,
   issueNewBook,
 } from "../../../hooks/http-requests.hooks.admin";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
-import { Grid } from "@mui/material";
 import CustomTableSelect from "../../../../../components/table/custom-table-select.component";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { rowsArray } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
 import BackdropSpinner from "../../../../../components/feedback/backdrop/backdrop.component";
 import Button from "../../../../../components/buttons/button.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const IssueNewBookPage = () => {
+  const { setFeedback } = useContext(SnackBarContext);
+
   const [showBookTable, setShowBookTable] = useState(false);
   const [showStudentTable, setShowStudentTable] = useState(false);
   const [bookRowData, setBookRowData] = useState([]);
@@ -25,11 +27,6 @@ const IssueNewBookPage = () => {
 
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [showBackdropSpinner, setShowBackdropSpinner] = useState(false);
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
 
   const { formFields, handleChange } = useForm({
     rollNumber: "",
@@ -50,7 +47,7 @@ const IssueNewBookPage = () => {
           )
         );
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
   };
 
   const handleFetchStuent = () => {
@@ -67,7 +64,7 @@ const IssueNewBookPage = () => {
           ])
         );
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
   };
 
   const addLibraryCardsValueToObject = (obj) => {
@@ -109,11 +106,11 @@ const IssueNewBookPage = () => {
     };
     await issueNewBook(issueBookDetails)
       .then((res) => {
-        setSnackbarFeedback([1, 1, res]);
+        setFeedback([1, 1, res]);
         handleFetchBook();
         handleFetchStuent();
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
     setShowBackdropSpinner(false);
   };
 
@@ -130,88 +127,86 @@ const IssueNewBookPage = () => {
   };
 
   return (
-    <div className="text-center m-5">
-      <h2>Issue a Book</h2>
-      <br />
-      <br />
-      <div>
-        <div>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={3}>
-              <InputField
-                label="Book's Accession Number"
-                name="accessionNumber"
-                type="text"
-                value={accessionNumber}
-                disabled={showBookTable}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4} md={2}>
-              <Button
-                disabled={showBookTable}
-                onClick={handleFetchBook}
-                label="Fetch Book"
-              />
-            </Grid>
-          </Grid>
+    <div className="text-center">
+      <h1 className="page-header">Issue a Book</h1>
 
-          {showBookTable && (
-            <CustomTableSelect
-              columns={[
-                "ISBN",
-                "Title",
-                "Author",
-                "Accession Number",
-                "Avalability",
-              ]}
-              rows={bookRowData}
-              onSelect={handleSelect}
-              indexToSelect={3}
-              tableName="booksTable"
+      <div className="white-container grid grid-rows-3 gap-0 items-center ">
+        <div>
+          <div className="grid grid-cols-2 gap-5">
+            <InputField
+              className="w-full"
+              label="Book's Accession Number"
+              name="accessionNumber"
+              type="text"
+              value={accessionNumber}
+              disabled={showBookTable}
+              onChange={handleChange}
             />
-          )}
+            <Button
+              disabled={showBookTable}
+              onClick={handleFetchBook}
+              label="Fetch Book"
+            />
+          </div>
+          <div>
+            {showBookTable && (
+              <div className="m-5">
+                <CustomTableSelect
+                  columns={[
+                    "ISBN",
+                    "Title",
+                    "Author",
+                    "Accession Number",
+                    "Avalability",
+                  ]}
+                  rows={bookRowData}
+                  onSelect={handleSelect}
+                  indexToSelect={3}
+                  tableName="booksTable"
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         <div>
-          <br />
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} md={3}>
-              <InputField
-                label="Student's Roll Number"
-                name="rollNumber"
-                type="text"
-                value={rollNumber}
-                disabled={showStudentTable}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4} md={2}>
-              <Button
-                disabled={showStudentTable}
-                onClick={handleFetchStuent}
-                label="Fetch Student"
-              />
-            </Grid>
-          </Grid>
-          {showStudentTable && (
-            <CustomTableSelect
-              columns={[
-                "Roll Number",
-                "Name",
-                "Program",
-                "Card Number",
-                "Avalability",
-              ]}
-              rows={studentRowData}
-              onSelect={handleSelect}
-              indexToSelect={3}
-              tableName="studentsTable"
+          <div className="grid grid-cols-2 gap-5">
+            <InputField
+              className="w-full"
+              label="Student's Roll Number"
+              name="rollNumber"
+              type="text"
+              value={rollNumber}
+              disabled={showStudentTable}
+              onChange={handleChange}
             />
-          )}
+            <Button
+              disabled={showStudentTable}
+              onClick={handleFetchStuent}
+              label="Fetch Student"
+            />
+          </div>
+          <div>
+            {showStudentTable && (
+              <div className="m-5">
+                <CustomTableSelect
+                  columns={[
+                    "Roll Number",
+                    "Name",
+                    "Program",
+                    "Card Number",
+                    "Avalability",
+                  ]}
+                  rows={studentRowData}
+                  onSelect={handleSelect}
+                  indexToSelect={3}
+                  tableName="studentsTable"
+                />
+              </div>
+            )}
+          </div>
         </div>
-        <br />
-        <br />
+
         <div>
           <form
             onSubmit={(e) => {
@@ -219,50 +214,45 @@ const IssueNewBookPage = () => {
               setShowAlertDialog(true);
             }}
           >
-            <div>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={3}>
-                  <InputField
-                    disabled
-                    label="Card Number"
-                    value={selectedCardNumber}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <InputField
-                    disabled
-                    label="Accession Number"
-                    value={selectedAccessionNumber}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6} md={3}>
-                  <InputField
-                    label="Issue Date"
-                    name="issueDate"
-                    type="date"
-                    value={issueDate}
-                    onChange={handleChange}
-                    InputLabelProps={{ shrink: true }}
-                    inputProps={{
-                      max: yesterdayDate(),
-                    }}
-                    required={false}
-                  />
-                </Grid>
-              </Grid>
-            </div>
-            <div className="m-5">
-              <Button
-                disabled={disableIssueButton()}
-                type="submit"
-                label="Issue Now"
+            <div className="grid grid-cols-3 gap-5">
+              <InputField
+                disabled
+                className="w-full"
+                label="Card Number"
+                name="cardNumber"
+                value={selectedCardNumber}
+              />
+
+              <InputField
+                disabled
+                className="w-full"
+                label="Accession Number"
+                name="accessionNumber"
+                value={selectedAccessionNumber}
+              />
+
+              <InputField
+                className="w-full"
+                label="Issue Date"
+                name="issueDate"
+                type="date"
+                value={issueDate}
+                onChange={handleChange}
+                max={yesterdayDate()}
+                required={false}
               />
             </div>
+            <button
+              className="my-button mt-5"
+              disabled={disableIssueButton()}
+              type="submit"
+            >
+              Issue Now
+            </button>
           </form>
         </div>
       </div>
+
       <div>
         <AlertDialog
           title="Confirm?"
@@ -280,10 +270,7 @@ const IssueNewBookPage = () => {
             setShowAlertDialog(false);
           }}
         />
-        <SnackbarFeedbackCustom
-          feedback={showSnackbarFeedback}
-          handleClose={setSnackbarFeedback}
-        />
+
         <BackdropSpinner open={showBackdropSpinner} />
       </div>
     </div>

@@ -1,0 +1,13 @@
+.container-search-query {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: inherit;
+  div {
+    transition: opacity 0.3s;
+  }
+
+  .hide-inputfield-search-query {
+    opacity: 0;
+    visibility: hidden;
+  }
+}

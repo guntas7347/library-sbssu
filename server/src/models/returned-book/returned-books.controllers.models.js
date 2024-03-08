@@ -178,10 +178,14 @@ const getReturnedBookById = async (_id, populate = false) => {
   return await query.exec();
 };
 
+const countReturnedBookDocs = async (filter) =>
+  await returnedBooksMongo.countDocuments(filter);
+
 module.exports = {
   createReturnBook,
   findReturnedBooks,
   getIssueHistory,
   getReturnedBookById,
   updateReturnBookById,
+  countReturnedBookDocs,
 };

@@ -9,7 +9,7 @@ import {
 } from "../../../hooks/http-requests.hooks.admin";
 import { sortObjectUsingKeys } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
 
 const AddBookAccessionPage = () => {
   const [showBookTable, setShowBookTable] = useState(false);

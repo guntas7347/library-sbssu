@@ -26,9 +26,13 @@ const updateBookAccession = async (bookAccessionId, update, session) => {
   );
 };
 
+const countBookAccessionDocs = async () =>
+  await bookAccessionsSchema.countDocuments();
+
 module.exports = {
   createBookAccession,
   getBookAccessionById,
   getBookAccessionByAccessionNumber,
   updateBookAccession,
+  countBookAccessionDocs,
 };

@@ -4,9 +4,11 @@ const {
   getBookByIsbn,
   findBooks,
   getBookById,
+  createBook,
 } = require("../../../models/books/books.controllers");
 const {
   createBookAccession,
+  countBookAccessionDocs,
 } = require("../../../models/book-accessions/book-accessions.controllers");
 const { formatObjectValues } = require("../../../utils/functions");
 const crs = require("../../../utils/custom-response-codes");
@@ -25,11 +27,11 @@ booksRouter.post("/add-new-book", async (req, res) => {
   try {
     const isbn = await getBookByIsbn(req.body.isbn);
     if (isbn !== null) return res.status(409).json(crs.BKS409ANB());
-    console.log("hello");
     const formatedData = formatObjectValues(req.body);
-    await addNewBook(formatedData);
+    await createBook(formatedData);
     return res.status(200).json(crs.BKS200ANB());
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 });
@@ -111,6 +113,15 @@ booksRouter.post(
     }
   }
 );
+
+booksRouter.post("/count-book-accessions", async (req, res) => {
+  try {
+    const numberOfBookAccessions = await countBookAccessionDocs();
+    return res.status(200).json(crs.BKS200CTBA(numberOfBookAccessions));
+  } catch (err) {
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+});
 
 booksRouter.use("/issue-books", issueBookRouter);
 booksRouter.use("/return-books", returnBookRouter);

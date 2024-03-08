@@ -4,7 +4,7 @@ const IssueBooksPage = () => {
   const previousPath = "/dashboard/admin/issue-books";
   return (
     <div className="text-center">
-      <h1 className="my-4">Issue Books</h1>
+      <h1 className="my-4 text-4xl font-bold">Issue Books</h1>
       <LinkButton
         to={`${previousPath}/issue-new-book`}
         label="Issue new Book"

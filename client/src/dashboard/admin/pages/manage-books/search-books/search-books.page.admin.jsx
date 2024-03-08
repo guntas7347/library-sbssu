@@ -1,4 +1,3 @@
-import { Button } from "@mui/material";
 import CustomTable from "../../../../../components/table/custom-table.component";
 import { fetchAllBooks } from "../../../hooks/http-requests.hooks.admin";
 import { useState } from "react";
@@ -6,7 +5,6 @@ import { sortObjectUsingKeys } from "../../../../../utils/functions";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { useNavigate } from "react-router-dom";
 import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
 import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
 
 const SearchBooksPage = () => {
@@ -85,10 +83,11 @@ const SearchBooksPage = () => {
 
   return (
     <div className="text-center">
-      <h3 className="m-3">Search Books</h3>
+      <h1 className="text-4xl font-bold m-5">Search Books</h1>
       <div>
-        <div className="mx-5 d-flex">
+        <div className="grid grid-cols-9 gap-10 my-5 white-container">
           <SearchQueriesComponent
+            className="col-span-6 w-full gap-10"
             selectFields={[
               {
                 name: "Search All Books",
@@ -106,9 +105,11 @@ const SearchBooksPage = () => {
             onChange={handleChange}
           />
 
-          <Button onClick={handleFetch}>Submit</Button>
+          <button className="my-button col-span-3" onClick={handleFetch}>
+            Submit
+          </button>
         </div>
-        <div className="p-5">
+        <div className="">
           <CustomTable
             columns={[
               "Accession Number",

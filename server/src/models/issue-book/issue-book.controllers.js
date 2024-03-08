@@ -113,10 +113,15 @@ const findIssuedBooks = async (filter) => {
     });
 };
 
+const countIssuedBookDocs = async (filter) => {
+  return await issueBookMongo.countDocuments(filter);
+};
+
 module.exports = {
   createIssueBook,
   getIssuedBookByBookAccessionId,
   getIssuedBookById,
   deleteIssuedBook,
   findIssuedBooks,
+  countIssuedBookDocs,
 };

@@ -11,7 +11,7 @@ import InputField from "../../../../../components/forms/input-field/input-field.
 import TransitionsModal from "../../../../../components/modals/modal.component";
 import { sortObjectUsingKeys } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
 
 const IssueNewBookPage = () => {
   const [showBookTable, setShowBookTable] = useState(false);

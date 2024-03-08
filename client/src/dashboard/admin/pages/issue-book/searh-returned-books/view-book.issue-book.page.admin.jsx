@@ -57,7 +57,7 @@ const ViewReturnedBookPage = () => {
               ["Returned By", returnedBy],
               ["Student Roll Number", rollNumber],
               ["Student Name", name],
-              ["Fine", "₹" + fine],
+              ["Fine", fine === "Null" ? "Null" : `₹${fine}`],
             ]}
           />
         </div>

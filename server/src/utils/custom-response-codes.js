@@ -333,6 +333,36 @@ const crs = {
       "Account Locked due to miltiple incorrect OTP inputs",
       payload
     ),
+  ISB200CIBD: (payload = null) =>
+    createCustomResponseObject(
+      "ISB200CIBD",
+      "Number of Issued books fetched",
+      payload
+    ),
+  REB200CRBD: (payload = null) =>
+    createCustomResponseObject(
+      "REB200CRBD",
+      "Number of Returned books fetched",
+      payload
+    ),
+  BKS200CTBA: (payload = null) =>
+    createCustomResponseObject(
+      "BKS200CTBA",
+      "Number of Book Accessions fetched",
+      payload
+    ),
+  STU200CTS: (payload = null) =>
+    createCustomResponseObject(
+      "STU200CTS",
+      "Number of Students fetched",
+      payload
+    ),
+  AUTH200RECAPTCHA: (payload = null) =>
+    createCustomResponseObject(
+      "AUTH200RECAPTCHA",
+      "reCAPTCHA success",
+      payload
+    ),
 };
 
 module.exports = crs;

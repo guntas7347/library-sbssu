@@ -1,8 +1,5 @@
 import fileDownload from "js-file-download";
-import { localIp } from "../../http-requests";
-
-const ip1 = "localhost";
-const ip2 = "192.168.1.6";
+import { ip1, ip2, localIp } from "../../http-requests";
 
 const API_URL = `http://${localIp ? ip1 : ip2}:8080/api/admin`;
 
@@ -185,6 +182,18 @@ export const fetchStaffById = (_id) =>
 export const db_fetchIssuedBookDoc = (_id) =>
   restCall("database/get-issued-book", { _id }, "DBSF200ISB");
 
+export const getNumberOfIssuedBooks = (filter = null) =>
+  restCall("books/issue-books/count-issued-books", { filter }, "ISB200CIBD");
+
+export const getNumberOfReturnedBooks = (filter = null) =>
+  restCall("books/return-books/count-returned-books", { filter }, "REB200CRBD");
+
+export const getNumberOfBookAccessions = () =>
+  restCall("books/count-book-accessions", {}, "BKS200CTBA");
+
+export const getNumberOfStudents = (filter = null) =>
+  restCall("students/count-total-students", { filter }, "STU200CTS");
+
 //
 export const fetchSettingsAcademicPrograms = () => {
   return new Promise((resolve, reject) => {
@@ -218,5 +227,20 @@ export const fetchBookDetailsByIsbnApi = (isbn) => {
       .catch((error) =>
         resolve({ title: "", publish_date: "", publishers: [""] })
       );
+  });
+};
+
+export const fetchWeather = async () => {
+  const API_KEY = "3dce05be7c8e1bebc039ccd19cadcc54";
+  return new Promise((resolve, reject) => {
+    fetch(
+      `https://api.openweathermap.org/data/2.5/weather?lat=30.914519&lon=74.652159&appid=${API_KEY}`
+    )
+      .then(async (res) => {
+        const weather = await res.json();
+        const { main } = weather;
+        resolve((main.temp - 273.15).toFixed(1));
+      })
+      .catch(() => resolve("Unable to Fetch"));
   });
 };

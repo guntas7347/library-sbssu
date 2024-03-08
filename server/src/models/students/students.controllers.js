@@ -48,10 +48,14 @@ const addLibraryCardToStudent = async (_id, libraryCardId, session) => {
   );
 };
 
+const countStudentDocs = async (filter) =>
+  await studentsCol.countDocuments(filter);
+
 module.exports = {
   createStudent,
   findStudents,
   getStudentByRollNumber,
   getStudentById,
   addLibraryCardToStudent,
+  countStudentDocs,
 };

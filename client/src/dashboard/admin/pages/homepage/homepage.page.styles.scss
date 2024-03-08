@@ -1,0 +1,57 @@
+.header-container-homepage {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  text-align: start;
+  text-indent: 0cap;
+  margin-bottom: 30px;
+  div {
+    h3 {
+      font-size: 30px;
+      margin-bottom: 5px;
+    }
+  }
+}
+
+.dropdown {
+  button {
+    width: 200px;
+    border: 1px solid;
+    border-radius: 10px;
+    height: 40px;
+    background-color: white;
+  }
+  button:hover {
+    cursor: pointer;
+  }
+  div {
+    position: absolute;
+    width: 200px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    background-color: white;
+    border: 1px solid;
+    border-radius: 2px;
+    button {
+      height: 40px;
+      background-color: inherit;
+      border: none;
+    }
+    button:hover {
+      background-color: #f5f7ff;
+    }
+  }
+}
+
+.container-issuebookpage {
+  display: grid;
+  grid-template-columns: row;
+  button {
+    width: 30%;
+  }
+}

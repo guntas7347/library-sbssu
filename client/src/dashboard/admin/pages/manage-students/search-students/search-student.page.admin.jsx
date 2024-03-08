@@ -1,23 +1,17 @@
-import { Button, Grid } from "@mui/material";
 import CustomTable from "../../../../../components/table/custom-table.component";
 import { fetchAllStudents } from "../../../hooks/http-requests.hooks.admin";
 import { rowsArray } from "../../../../../utils/functions";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { useNavigate } from "react-router-dom";
 import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
-import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const SearchStudentsPage = () => {
   const navigate = useNavigate();
+  const { setFeedback } = useContext(SnackBarContext);
 
   const [rowData, setRowData] = useState([]);
-
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    severity: "info",
-    message: "",
-    open: false,
-  });
 
   const { formFields, handleChange } = useForm({
     sortSelect: "fetchAllStudents",
@@ -31,11 +25,11 @@ const SearchStudentsPage = () => {
           rowsArray(res, ["_id", "rollNumber", "fullName", "program", "batch"])
         );
         if (res.length === 0) {
-          setSnackbarFeedback([1, 2, "No data found"]);
+          setFeedback([1, 2, "No data found"]);
         }
       })
       .catch((err) => {
-        setSnackbarFeedback([1, 2, err]);
+        setFeedback([1, 2, err]);
       });
   };
 
@@ -45,10 +39,11 @@ const SearchStudentsPage = () => {
 
   return (
     <div className="text-center">
-      <h3 className="m-3">Search Students</h3>
+      <h3 className="text-4xl font-bold">Search Students</h3>
       <div>
-        <div className="mx-5 d-flex">
+        <div className="grid grid-cols-3 gap-5 my-5 white-container">
           <SearchQueriesComponent
+            className="col-span-2 gap-5"
             selectFields={[
               {
                 name: "Search All Students",
@@ -83,21 +78,17 @@ const SearchStudentsPage = () => {
             onChange={handleChange}
           />
 
-          <Button onClick={handleFetch}>Submit</Button>
+          <button className="my-button" onClick={handleFetch}>
+            Submit
+          </button>
         </div>
-        <div className="p-5">
+        <div>
           <CustomTable
             columns={["Roll Number", "Name", "Program", "Batch"]}
             rows={rowData}
             handleRowClick={handleRowClick}
           />
         </div>
-      </div>
-      <div>
-        <SnackbarFeedbackCustom
-          feedback={showSnackbarFeedback}
-          handleClose={setSnackbarFeedback}
-        />
       </div>
     </div>
   );

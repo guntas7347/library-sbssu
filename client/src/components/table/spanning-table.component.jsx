@@ -1,31 +1,24 @@
-import {
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableRow,
-} from "@mui/material";
-
 const SpanningTable = ({ rows }) => {
   return (
-    <Paper>
-      <TableContainer>
-        <Table>
-          <TableBody>
-            {rows.map((row, index) => {
-              return (
-                <TableRow key={index}>
-                  {row.map((cell, index) => {
-                    return <TableCell key={index}>{cell}</TableCell>;
-                  })}
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Paper>
+    <div style={{ overflow: "auto" }}>
+      <table>
+        <tbody>
+          {rows.map((row, index) => {
+            return (
+              <tr key={index}>
+                {row.map((td, index) => {
+                  return (
+                    <td className="text-left" key={index}>
+                      {td}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

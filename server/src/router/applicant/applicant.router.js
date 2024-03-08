@@ -3,6 +3,7 @@ const {
   createApplication,
   getApplicationById,
   deleteApplication,
+  deleteApplicationById,
 } = require("../../models/applications/applications.controllers");
 const crs = require("../../utils/custom-response-codes");
 const {
@@ -18,6 +19,7 @@ applicantRouter.post("/create-new-application", async (req, res) => {
     await createApplication({ ...req.body, _id: req.user.uid });
     return res.status(200).json(crs.APP200CNA());
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 });
@@ -34,7 +36,7 @@ applicantRouter.post("/get-application", async (req, res) => {
 
 applicantRouter.post("/delete-application", async (req, res) => {
   try {
-    const a = await deleteApplication(req.user.uid);
+    await deleteApplicationById(req.user.uid);
     return res.status(200).json(crs.APP200DA());
   } catch (err) {
     console.log(err);

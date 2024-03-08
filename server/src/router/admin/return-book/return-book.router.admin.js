@@ -11,8 +11,22 @@ const {
 } = require("./return-book.middlewares");
 const crs = require("../../../utils/custom-response-codes");
 const { createExcel, dateTimeString } = require("../../../utils/functions");
+const {
+  countReturnedBookDocs,
+} = require("../../../models/returned-book/returned-books.controllers.models");
 
 const returnBookRouter = express.Router();
+
+returnBookRouter.post("/count-returned-books", async (req, res) => {
+  try {
+    const numberOfReturnedBookDocs = await countReturnedBookDocs(
+      req.body.filter
+    );
+    return res.status(200).json(crs.REB200CRBD(numberOfReturnedBookDocs));
+  } catch (err) {
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+});
 
 returnBookRouter.post(
   "/return-issued-book",

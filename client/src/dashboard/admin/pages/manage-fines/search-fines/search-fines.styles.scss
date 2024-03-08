@@ -1,0 +1,11 @@
+.container-searchFines {
+  margin-bottom: 20px;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  align-items: center;
+  gap: 30px;
+  select,
+  input {
+    width: 100%;
+  }
+}

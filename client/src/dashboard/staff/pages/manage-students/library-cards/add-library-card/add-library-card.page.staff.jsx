@@ -9,7 +9,7 @@ import { Alert, Button, Grid, Snackbar } from "@mui/material";
 import InputField from "../../../../../../components/forms/input-field/input-field.component";
 import CustomTableSelect from "../../../../../../components/table/custom-table-select.component";
 import AlertDialog from "../../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedback from "../../../../../../components/feedback/snackbar/snackbar-old.component";
 
 const AllotLibraryCardPage = () => {
   const [showStudentTable, setShowStudentTable] = useState(false);

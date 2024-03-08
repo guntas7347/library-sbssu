@@ -9,7 +9,7 @@ import {
 import InputSelect from "../../../../../components/forms/input-select/input-select.component";
 import TransitionsModal from "../../../../../components/modals/modal.component";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
 
 const AddStudentPage = () => {
   const [academicPrograms, setAcademicPrograms] = useState([

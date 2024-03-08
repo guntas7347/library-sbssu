@@ -11,19 +11,21 @@ import ManageFinesRoute from "./manage-fines.routes.admin";
 
 const AdminRoutes = () => {
   return (
-    <div>
+    <>
       <NavigationBar />
-      <Routes>
-        <Route index element={<Homepage />} />
-        <Route path="/profile/*" element={<ProfileRoute />} />
-        <Route path="/issue-books/*" element={<IssueBooksRoute />} />
-        <Route path="/manage-fines/*" element={<ManageFinesRoute />} />
-        <Route path="/manage-books/*" element={<ManageBooksRoute />} />
-        <Route path="/manage-students/*" element={<ManageStudentsRoute />} />
-        <Route path="/manage-staff/*" element={<ManageStaffRoute />} />
-        <Route path="/database/*" element={<DatabaseRoutes />} />
-      </Routes>
-    </div>
+      <div className="admin-dashboard-body">
+        <Routes>
+          <Route index element={<Homepage />} />
+          <Route path="/profile/*" element={<ProfileRoute />} />
+          <Route path="/issue-books/*" element={<IssueBooksRoute />} />
+          <Route path="/manage-fines/*" element={<ManageFinesRoute />} />
+          <Route path="/manage-books/*" element={<ManageBooksRoute />} />
+          <Route path="/manage-students/*" element={<ManageStudentsRoute />} />
+          <Route path="/manage-staff/*" element={<ManageStaffRoute />} />
+          <Route path="/database/*" element={<DatabaseRoutes />} />
+        </Routes>
+      </div>
+    </>
   );
 };
 

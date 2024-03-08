@@ -1,19 +1,15 @@
-import { Button, Grid } from "@mui/material";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { createNewStaff } from "../../../hooks/http-requests.hooks.admin";
 import InputSelect from "../../../../../components/forms/input-select/input-select.component";
-import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const AddStaffPage = () => {
+  const { setFeedback } = useContext(SnackBarContext);
+
   const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
 
   const { formFields, handleChange } = useForm({
     fullName: "",
@@ -23,74 +19,68 @@ const AddStaffPage = () => {
 
   const handleSubmit = async () => {
     await createNewStaff(formFields)
-      .then((res) => setSnackbarFeedback([1, 1, res]))
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .then((res) => setFeedback([1, 1, res]))
+      .catch((err) => setFeedback([1, 2, err]));
   };
 
   return (
     <div>
-      <br />
-      <br />
-      <div className="m-5">
+      <h1 className="text-2xl font-bold my-5 text-center">
+        Add new staff member
+      </h1>
+      <div className="bg-white p-10">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             setShowAlertDialog(true);
           }}
         >
-          <Grid container spacing={2}>
-            <Grid item>
-              <InputField
-                label="ID Number"
-                type="number"
-                name="idNumber"
-                value={idNumber}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Full Name"
-                type="text"
-                name="fullName"
-                value={fullName}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Email"
-                type="text"
-                name="email"
-                value={email}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Password"
-                type="text"
-                name="password"
-                value={password}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <InputSelect
-                name="role"
-                fields={[
-                  { name: "Staff", value: "STAFF" },
-                  { name: "Admin", value: "ADMIN" },
-                ]}
-                value={role}
-                onChange={handleChange}
-              />
-            </Grid>
-          </Grid>
-          <br />
-          <Button type="submit" variant="contained">
+          <div className="grid grid-cols-3 gap-10 my-5">
+            <InputField
+              label="ID Number"
+              type="number"
+              name="idNumber"
+              value={idNumber}
+              onChange={handleChange}
+            />
+
+            <InputField
+              label="Full Name"
+              type="text"
+              name="fullName"
+              value={fullName}
+              onChange={handleChange}
+            />
+
+            <InputField
+              label="Email"
+              type="text"
+              name="email"
+              value={email}
+              onChange={handleChange}
+            />
+
+            <InputField
+              label="Password"
+              type="text"
+              name="password"
+              value={password}
+              onChange={handleChange}
+            />
+
+            <InputSelect
+              name="role"
+              fields={[
+                { name: "Staff", value: "STAFF" },
+                { name: "Admin", value: "ADMIN" },
+              ]}
+              value={role}
+              onChange={handleChange}
+            />
+          </div>{" "}
+          <button className="my-button" type="submit">
             Submit
-          </Button>
+          </button>
         </form>
       </div>
       <div>
@@ -102,10 +92,6 @@ const AddStaffPage = () => {
             if (e) handleSubmit();
             setShowAlertDialog(false);
           }}
-        />
-        <SnackbarFeedbackCustom
-          feedback={showSnackbarFeedback}
-          handleClose={setSnackbarFeedback}
         />
       </div>
     </div>

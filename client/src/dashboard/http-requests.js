@@ -1,7 +1,7 @@
 export const localIp = true;
 
-const ip1 = "localhost";
-const ip2 = "192.168.1.6";
+export const ip1 = "localhost";
+export const ip2 = "https://9f4f-38-137-46-9.ngrok-free.app/";
 
 const API_URL = `http://${localIp ? ip1 : ip2}:8080/api`;
 
@@ -120,3 +120,6 @@ export const resetPasswordAdminVerifyOtp = (cred) =>
 
 export const resetPasswordAdmin = (cred) =>
   restCall("auth/admin/reset-password", cred, "AUTH200RAP");
+
+export const verifyReCaptcha = (token) =>
+  restCall("auth/verify-recaptcha", { token }, "AUTH200RECAPTCHA");

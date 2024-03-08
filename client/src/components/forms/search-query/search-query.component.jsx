@@ -1,9 +1,10 @@
-import { Grid } from "@mui/material";
+import { useEffect, useState } from "react";
 import InputSelect from "../input-select/input-select.component";
 import InputField from "../input-field/input-field.component";
-import { useEffect, useState } from "react";
+import "./search-query.styles.scss";
 
 const SearchQueriesComponent = ({
+  className = "",
   selectFields,
   selectValue,
   selectName = "sortSelect",
@@ -15,50 +16,41 @@ const SearchQueriesComponent = ({
   const [inputLabel, setInputField] = useState("Field");
 
   useEffect(() => {
-    const { inputField = "none", name } = selectFields.find(
-      (field) => field.value === selectValue
-    );
+    var fieldValue = selectFields.find((field) => field.value === selectValue);
+    if (!fieldValue) fieldValue = { inputField: "none", name: "none" };
+    const { inputField = "none", name } = fieldValue;
     setInputField(name);
     setInputFieldType(inputField);
   });
 
-  const conditionallyRenderInputField = () => {
-    switch (inputFieldType) {
-      case "none":
-        break;
-
-      default:
-        return (
-          <Grid item xs={12} sm={3} md={3}>
-            <InputField
-              fullWidth
-              label={inputLabel}
-              name={inputName}
-              value={inputValue}
-              onChange={onChange}
-              type={inputFieldType}
-              InputLabelProps={
-                inputFieldType === "date" ? { shrink: true } : {}
-              }
-            />
-          </Grid>
-        );
-    }
-  };
-
   return (
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={3} md={3}>
-        <InputSelect
-          fullWidth
-          fields={selectFields}
-          value={selectValue}
-          onChange={onChange}
-          name={selectName}
-        />
-      </Grid>
-      {conditionallyRenderInputField()}
-    </Grid>
+    <div className={className}>
+      <div className="container-search-query">
+        <div>
+          <InputSelect
+            className="w-full"
+            fields={selectFields}
+            value={selectValue}
+            onChange={onChange}
+            name={selectName}
+          />
+        </div>
+        <div
+          className={`${
+            inputFieldType === "none" && "hide-inputfield-search-query"
+          }`}
+        >
+          <InputField
+            className="w-full"
+            label={inputLabel}
+            name={inputName}
+            value={inputValue}
+            onChange={onChange}
+            type={inputFieldType}
+          />
+        </div>
+      </div>
+    </div>
   );
 };
 

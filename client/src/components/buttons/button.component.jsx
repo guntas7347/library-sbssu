@@ -1,8 +1,14 @@
 import React from "react";
+import "./button.styles.css";
 
 const Button = (props) => {
   const { label } = props;
-  return <button {...props}>{label}</button>;
+
+  return (
+    <button className="my-button" {...props}>
+      {label}
+    </button>
+  );
 };
 
 export default Button;

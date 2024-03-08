@@ -1,25 +1,43 @@
-import { FormControl, InputLabel, MenuItem, Select } from "@mui/material";
+import "./input-select.styles.css";
 
 const InputSelect = (props) => {
   const { fields, onChange, label } = props;
   return (
     <div>
-      <FormControl fullWidth>
-        <InputLabel>{label}</InputLabel>
-        <Select
-          labelId="demo-simple-select-label"
-          id="demo-simple-select"
-          onChange={onChange}
-          defaultValue={fields[0].value}
-          {...props}
-        >
+      <div className="inputSelect-container">
+        <select onChange={onChange} defaultValue={fields[0].value} {...props}>
+          <option defaultValue>--select an option--</option>
           {fields.map((menuItem, index) => (
-            <MenuItem key={index} value={menuItem.value}>
+            <option key={index} value={menuItem.value}>
               {menuItem.name}
-            </MenuItem>
+            </option>
           ))}
-        </Select>
-      </FormControl>
+        </select>
+        <label htmlFor="">{label}</label>
+      </div>
+    </div>
+  );
+};
+
+export const InputSelectB = (props) => {
+  const { fields, onChange, label } = props;
+
+  return (
+    <div className="flex flex-row justify-between">
+      <label htmlFor="">{label}</label>
+      <select
+        className="border border-black px-1 w-48"
+        onChange={onChange}
+        defaultValue={fields[0].value}
+        {...props}
+      >
+        <option defaultValue>--select an option--</option>
+        {fields.map((menuItem, index) => (
+          <option key={index} value={menuItem.value}>
+            {menuItem.name}
+          </option>
+        ))}
+      </select>
     </div>
   );
 };

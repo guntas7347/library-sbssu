@@ -1,31 +1,45 @@
-import * as React from "react";
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
-import Snackbar from "@mui/material/Snackbar";
-import MuiAlert from "@mui/material/Alert";
+import { useEffect, useState } from "react";
+import "./snackbar.styles.css";
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+const SnackBar = ({ feedback }) => {
+  /// feedback = [ {open}, {severity}, {message} ]
 
-export default function SnackbarFeedback({
-  severity = "info",
-  message = "",
-  open = false,
-  autoHideDuration = 6000,
-  handleClose,
-}) {
+  const [feedbackArray, setFeedbackArray] = useState([0, 0, ""]);
+
+  const handleOpen = () => {
+    if (feedbackArray[0] === 1) return true;
+    else return false;
+  };
+
+  const handleSeverity = () => {
+    switch (feedbackArray[1]) {
+      case 1:
+        return "success";
+      case 2:
+        return "danger";
+
+      default:
+        return "info";
+    }
+  };
+
+  useEffect(() => {
+    setFeedbackArray(feedback);
+  }, [feedback]);
+
+  // setTimeout(() => {
+  //   setFeedbackArray([0, feedbackArray[1], feedbackArray[2]]);
+  // }, 5000);
+
   return (
-    <Stack spacing={2} sx={{ width: "100%" }}>
-      <Snackbar
-        open={open}
-        autoHideDuration={autoHideDuration}
-        onClose={handleClose}
-      >
-        <Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
-          {message}
-        </Alert>
-      </Snackbar>
-    </Stack>
+    <div
+      className={`snackbar bg-${handleSeverity()} ${
+        handleOpen() && "pop-snackbar"
+      }`}
+    >
+      <p>{feedbackArray[2]}</p>
+    </div>
   );
-}
+};
+
+export default SnackBar;

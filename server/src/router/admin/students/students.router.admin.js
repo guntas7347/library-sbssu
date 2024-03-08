@@ -6,6 +6,7 @@ const {
   getStudentByRollNumber,
   createStudent,
   findStudents,
+  countStudentDocs,
 } = require("../../../models/students/students.controllers");
 const {
   createLibraryCard,
@@ -144,5 +145,14 @@ studentsRoute.post(
   fetchApplicationById,
   processDecision
 );
+
+studentsRoute.post("/count-total-students", async (req, res) => {
+  try {
+    const numberOfStudentDocs = await countStudentDocs(req.body.filter);
+    return res.status(200).json(crs.STU200CTS(numberOfStudentDocs));
+  } catch (err) {
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+});
 
 module.exports = { studentsRoute };

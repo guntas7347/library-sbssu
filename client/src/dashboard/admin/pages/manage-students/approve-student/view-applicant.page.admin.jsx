@@ -1,17 +1,16 @@
-import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
 import {
   fetchOneApplication,
   processApplication,
 } from "../../../hooks/http-requests.hooks.admin";
 import SpanningTable from "../../../../../components/table/spanning-table.component";
-import { Button, Grid } from "@mui/material";
-import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const ViewApplicantPage = () => {
   const { _id } = useParams();
 
-  const navigate = useNavigate();
+  const { setFeedback } = useContext(SnackBarContext);
 
   const [studentDoc, setStudentDoc] = useState({
     rollNumber: "",
@@ -26,11 +25,6 @@ const ViewApplicantPage = () => {
     phoneNumber: "",
   });
   const [decisionTaken, setDecisionTaken] = useState(false);
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
 
   const {
     rollNumber,
@@ -50,7 +44,7 @@ const ViewApplicantPage = () => {
       await fetchOneApplication(_id)
         .then((res) => setStudentDoc(res))
         .catch((err) =>
-          setSnackbarFeedback({ open: true, message: err, severity: "error" })
+          setFeedback({ open: true, message: err, severity: "error" })
         );
     };
     asyncFunc();
@@ -60,17 +54,17 @@ const ViewApplicantPage = () => {
     const decision = e.target.name;
     await processApplication({ decision, _id })
       .then((res) => {
-        setSnackbarFeedback([1, 1, res]);
+        setFeedback([1, 1, res]);
         setDecisionTaken(true);
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
   };
 
   return (
-    <div className="text-center m-3">
+    <div className="text-center">
       <h1 className="">Application Details</h1>
 
-      <div className="m-2">
+      <div className="">
         <SpanningTable
           rows={[
             ["Roll Number", rollNumber],
@@ -89,37 +83,15 @@ const ViewApplicantPage = () => {
       </div>
       {!decisionTaken && (
         <div>
-          <Grid className="p-5 m-5" container spacing={2}>
-            <Grid item>
-              <Button
-                name="REJECT"
-                variant="contained"
-                color="error"
-                onClick={handleClick}
-              >
-                Reject
-              </Button>
-            </Grid>
-            <Grid item>
-              <Button
-                name="APPROVE"
-                variant="contained"
-                color="success"
-                onClick={handleClick}
-              >
-                Approve
-              </Button>
-            </Grid>
-          </Grid>
+          <button name="REJECT" className="my-button" onClick={handleClick}>
+            Reject
+          </button>
+
+          <button name="APPROVE" className="my-button" onClick={handleClick}>
+            Approve
+          </button>
         </div>
       )}
-
-      <div>
-        <SnackbarFeedbackCustom
-          feedback={showSnackbarFeedback}
-          handleClose={setSnackbarFeedback}
-        />
-      </div>
     </div>
   );
 };

@@ -12,8 +12,21 @@ const {
   fetchIssuedBooks,
 } = require("./issue-book.middlewares");
 const { createExcel, dateTimeString } = require("../../../utils/functions");
+const {
+  countIssuedBookDocs,
+} = require("../../../models/issue-book/issue-book.controllers");
 
 const issueBookRouter = express.Router();
+
+issueBookRouter.post("/count-issued-books", async (req, res) => {
+  try {
+    const numberOfIssuedBookDocs = await countIssuedBookDocs(req.body.filter);
+    return res.status(200).json(crs.ISB200CIBD(numberOfIssuedBookDocs));
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+});
 
 issueBookRouter.post(
   "/issue-new-book",

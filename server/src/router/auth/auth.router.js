@@ -19,4 +19,23 @@ authRouter.post("/sign-out", async (req, res) => {
   }
 });
 
+authRouter.post("/verify-recaptcha", async (req, res) => {
+  try {
+    const RECAPTCHA_SECRET_KEY = "6LczFYgpAAAAALZmGHvfLp3XtaWYf7jH7ZFSfZFW";
+    const response = await fetch(
+      "https://www.google.com/recaptcha/api/siteverify",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `secret=${RECAPTCHA_SECRET_KEY}&response=${req.body.token}`,
+      }
+    );
+    const json = await response.json();
+    return res.status(200).json(crs.AUTH200RECAPTCHA(json));
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+});
+
 module.exports = { authRouter };

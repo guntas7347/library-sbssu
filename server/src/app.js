@@ -26,7 +26,7 @@ app.use(
     origin: function (origin, callback) {
       const allowedOrigins = [
         "http://localhost:3000",
-        "http://192.168.1.6:3000",
+        "http://192.168.1.9:3000",
       ];
 
       // Check if the origin is allowed to access the server

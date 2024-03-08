@@ -10,7 +10,7 @@ import SpanningTable from "../../../../../components/table/spanning-table.compon
 import { useState } from "react";
 import { formatDate } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
 
 const ReturnIssuedBookPage = () => {
   const [showSubmitConfirmationAlertDialog, setShowAlertDialog] =

@@ -1,11 +1,11 @@
-import { Button, Grid } from "@mui/material";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { addNewBook } from "../../../hooks/http-requests.hooks.admin";
 import { useState } from "react";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
 import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
+import Button from "../../../../../components/buttons/button.component";
 
 const AddBookPage = () => {
   const [showAlertDialog, setShowAlertDialog] = useState(false);
@@ -60,8 +60,8 @@ const AddBookPage = () => {
             setShowAlertDialog(true);
           }}
         >
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4} md={4}>
+          <div className="container-add-student">
+            <div>
               <InputField
                 label="Title"
                 type="text"
@@ -69,8 +69,8 @@ const AddBookPage = () => {
                 value={title}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={12} sm={4} md={4}>
+            </div>
+            <div>
               <InputField
                 label="Author"
                 type="text"
@@ -78,8 +78,8 @@ const AddBookPage = () => {
                 value={author}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={12} sm={4} md={4}>
+            </div>
+            <div>
               <InputField
                 label="ISBN Number"
                 type="number"
@@ -87,8 +87,8 @@ const AddBookPage = () => {
                 value={isbn}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={12} sm={4} md={4}>
+            </div>
+            <div>
               <InputField
                 label="Place and Publishers"
                 type="text"
@@ -96,8 +96,8 @@ const AddBookPage = () => {
                 value={placeAndPublishers}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={12} sm={4} md={4}>
+            </div>
+            <div>
               <InputField
                 label="Publication Year"
                 type="number"
@@ -105,8 +105,8 @@ const AddBookPage = () => {
                 value={publicationYear}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={12} sm={4} md={4}>
+            </div>
+            <div>
               <InputField
                 label="Pages"
                 type="number"
@@ -114,9 +114,8 @@ const AddBookPage = () => {
                 value={pages}
                 onChange={handleChange}
               />
-            </Grid>
-
-            <Grid item xs={12} sm={4} md={4}>
+            </div>
+            <div>
               <InputField
                 label="Volume"
                 type="text"
@@ -124,8 +123,8 @@ const AddBookPage = () => {
                 value={volume}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={12} sm={4} md={4}>
+            </div>
+            <div>
               <InputField
                 label="Source"
                 type="text"
@@ -133,8 +132,8 @@ const AddBookPage = () => {
                 value={source}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={12} sm={4} md={4}>
+            </div>
+            <div>
               <InputField
                 label="Price"
                 type="number"
@@ -142,8 +141,8 @@ const AddBookPage = () => {
                 value={cost}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item xs={12} sm={4} md={4}>
+            </div>
+            <div>
               <InputField
                 label="Call Number"
                 type="number"
@@ -151,15 +150,10 @@ const AddBookPage = () => {
                 value={callNumber}
                 onChange={handleChange}
               />
-            </Grid>
-          </Grid>
-          <Grid container justifyContent="center">
-            <Grid item xs={12} sm={6} md={3}>
-              <Button fullWidth type="submit" variant="contained">
-                Submit
-              </Button>
-            </Grid>
-          </Grid>
+            </div>
+          </div>
+
+          <Button fullWidth type="submit" label="Submit" />
         </form>
       </div>
       <div>

@@ -1,13 +1,5 @@
-import { Checkbox } from "@mui/material";
-import Paper from "@mui/material/Paper";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import { useEffect, useState } from "react";
+import "./table.styles.scss";
 
 const CustomTableSelect = ({
   tableName,
@@ -36,43 +28,49 @@ const CustomTableSelect = ({
     onSelect(tableName, selectedValue, isChecked);
   }, [isChecked, selectedValue, selectedRowIndex]);
 
+  console.log("tabel Rendered");
+
   return (
-    <Paper className="mb-5" sx={{ width: "100%", overflow: "hidden" }}>
-      <TableContainer sx={{ maxHeight: 440 }}>
-        <Table stickyHeader aria-label="sticky table">
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                <CheckBoxIcon className="mt-3" />
-              </TableCell>
-              {columns.map((column, index) => (
-                <TableCell key={index}>{column}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
+    <>
+      <div>
+        <table>
+          <thead>
+            <tr>
+              <th>Checked</th>
+              {columns.map((column, index) => {
+                return <th key={index}>{column}</th>;
+              })}
+            </tr>
+          </thead>
+          <tbody>
             {rows.map((row, index) => {
               return (
-                <TableRow key={index} hover>
-                  <TableCell>
-                    <Checkbox
-                      checked={selectedRowIndex === index}
+                <tr
+                  className={`${
+                    selectedRowIndex === index && "table-active-row"
+                  }`}
+                  key={index}
+                >
+                  <td>
+                    <input
+                      type="checkbox"
                       onChange={(e) => {
                         handleRowClick(index, row);
                         setIsChecked(e.target.checked);
                       }}
+                      checked={selectedRowIndex === index}
                     />
-                  </TableCell>
-                  {row.map((element, index) => {
-                    return <TableCell key={index}>{element}</TableCell>;
+                  </td>
+                  {row.map((td, index) => {
+                    return <td key={index}>{td}</td>;
                   })}
-                </TableRow>
+                </tr>
               );
             })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </Paper>
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 };
 export default CustomTableSelect;

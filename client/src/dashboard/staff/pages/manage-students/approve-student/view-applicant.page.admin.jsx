@@ -6,7 +6,7 @@ import {
 } from "../../../hooks/http-requests.hooks.admin";
 import SpanningTable from "../../../../../components/table/spanning-table.component";
 import { Button, Grid } from "@mui/material";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar.component";
+import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
 
 const ViewApplicantPage = () => {
   const param = useParams();

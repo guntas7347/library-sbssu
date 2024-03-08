@@ -1,40 +1,32 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Container,
-  CssBaseline,
-  Grid,
-  Typography,
-} from "@mui/material";
-import InputField from "../../components/forms/input-field/input-field.component";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { useContext, useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import ReCAPTCHA from "react-google-recaptcha";
+
+import "./login-page.styles.scss";
+
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
 import {
   adminLoginWithCredentials,
   applicantLoginWithCredentials,
   signOut,
   studentLoginWithCredentials,
+  verifyReCaptcha,
 } from "../http-requests";
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import SnackbarFeedbackCustom from "../../components/feedback/snackbar/snackbar-full.component";
+
 import InputSelect from "../../components/forms/input-select/input-select.component";
+import { SnackBarContext } from "../../components/context/snackbar.context";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { setFeedback } = useContext(SnackBarContext);
 
   const [loginType, setLoginType] = useState("ADMIN");
+
+  const [reCaptchaVerified, setReCaptchaVerified] = useState(false);
 
   const { formFields, handleChange } = useForm({
     email: "",
     password: "",
-  });
-
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
   });
 
   const handleSubmit = async (event) => {
@@ -47,7 +39,7 @@ const LoginPage = () => {
             if (res.payload === "ADMIN") navigate("/dashboard/admin");
             if (res.payload === "STAFF") navigate("/dashboard/staff");
           })
-          .catch((err) => setSnackbarFeedback([1, 2, err]));
+          .catch((err) => setFeedback([1, 2, err]));
         break;
 
       case "STUDENT":
@@ -55,7 +47,7 @@ const LoginPage = () => {
           .then(() => {
             navigate("/dashboard/student");
           })
-          .catch((err) => setSnackbarFeedback([1, 2, err]));
+          .catch((err) => setFeedback([1, 2, err]));
         break;
 
       case "APPLICANT":
@@ -63,7 +55,7 @@ const LoginPage = () => {
           .then(() => {
             navigate("/dashboard/applicant");
           })
-          .catch((err) => setSnackbarFeedback([1, 2, err]));
+          .catch((err) => setFeedback([1, 2, err]));
         break;
 
       default:
@@ -78,87 +70,79 @@ const LoginPage = () => {
     asyncFunc();
   }, []);
 
-  return (
-    <div>
-      <Container component="main" maxWidth="xs">
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-            <LockOutlinedIcon />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
-          >
-            <InputField
-              margin="normal"
-              required
-              fullWidth
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              onChange={handleChange}
-            />
-            <InputField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              autoComplete="current-password"
-              onChange={handleChange}
-            />
+  const handleVerify = async (token) => {
+    await verifyReCaptcha(token)
+      .then((res) => setReCaptchaVerified(res.payload.success))
+      .catch((err) => setFeedback(err));
+  };
 
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign In
-            </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link to={"/forgot-password"}>Forgot password</Link>
-              </Grid>
-              <Grid item>
-                <Link to={"/sign-up"}>Create Account</Link>
-              </Grid>
-            </Grid>
-            <Grid item>
-              <InputSelect
-                name="Login Type"
-                fields={[
-                  { name: "Student", value: "STUDENT" },
-                  { name: "Admin", value: "ADMIN" },
-                  { name: "Applicant", value: "APPLICANT" },
-                ]}
-                value={loginType}
-                onChange={(e) => setLoginType(e.target.value)}
-              />
-            </Grid>
-          </Box>
-        </Box>
-        {/* <Copyright sx={{ mt: 8, mb: 4 }} /> */}
-      </Container>
-      <SnackbarFeedbackCustom
-        feedback={showSnackbarFeedback}
-        handleClose={setSnackbarFeedback}
-      />
+  return (
+    <div className="h-screen flex flex-row justify-center items-center">
+      <div className="bg-white p-10 flex flex-col items-center gap-6 justify-center">
+        <div className="self-start flex flex-row items-center gap-5">
+          <img
+            className="h-10 inline-block"
+            src="https://sbssu.ac.in/images/Tricolor.png"
+            alt="sbssu logo"
+          />
+          <h1 className="text-3xl text-indigo-900 font-bold inline-block">
+            SBSSU Library Portal
+          </h1>
+        </div>
+        <div className="self-start">
+          <p className="text-xl font-bold">Hello! Lets get started</p>
+          <p>Sign-in to continue</p>
+        </div>
+        <div className="grid gap-2 w-80">
+          <input
+            className="border h-12 px-2.5"
+            placeholder="Email Address"
+            name="email"
+            type="email"
+            onChange={handleChange}
+          />
+          <input
+            className="border h-12 px-2.5"
+            name="password"
+            placeholder="Password"
+            type="password"
+            onChange={handleChange}
+          />
+          <div className="flex justify-center">
+            <ReCAPTCHA
+              sitekey="6LczFYgpAAAAALk-4XyUrx0bRXOXoWLK9phbwe1O"
+              onChange={handleVerify}
+            />
+          </div>
+          <button
+            disabled={!reCaptchaVerified}
+            className="my-button"
+            onClick={handleSubmit}
+          >
+            Sign In
+          </button>
+        </div>{" "}
+        <div className="flex flex-row w-full justify-between">
+          <div>
+            <Link to={"/forgot-password"}>Forgot password</Link>
+          </div>
+          <div>
+            <Link to={"/sign-up"}>Create Account</Link>
+          </div>
+        </div>
+        <div>
+          <InputSelect
+            name="Login Type"
+            fields={[
+              { name: "Student", value: "STUDENT" },
+              { name: "Admin", value: "ADMIN" },
+              { name: "Applicant", value: "APPLICANT" },
+            ]}
+            value={loginType}
+            onChange={(e) => setLoginType(e.target.value)}
+          />
+        </div>
+      </div>
     </div>
   );
 };
