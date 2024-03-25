@@ -54,41 +54,49 @@ const AddBookAccessionPage = () => {
   };
 
   const handleRowClick = (e) => {
-    navigate(`/dashboard/admin/manage-books/view-book/${e}`);
+    navigate(`/dashboard/admin/manage-books/search-books/${e}`);
   };
 
   return (
-    <div className="text-center">
-      <h2 className="page-header">Add Accession number to Book</h2>
-      <div className="white-container">
-        <div className="grid grid-cols-10 gap-5 mb-5">
-          <div className="col-span-8">
-            <InputField
-              className="w-full"
-              label="Book's ISBN"
-              name="isbn"
-              type="text"
-              value={isbn}
-              disabled={showBookTable}
-              onChange={handleChange}
-            />
-          </div>
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">
+        Add Accession number to Book
+      </h1>
+      <div className="bg-white p-5 rounded-3xl">
+        <div className="flex flex-row justify-around items-center">
+          <InputField
+            label="Book's ISBN"
+            name="isbn"
+            type="text"
+            value={isbn}
+            disabled={showBookTable}
+            onChange={handleChange}
+          />
 
-          <Button
-            className="col-span-2 my-button"
+          <button
+            className="my-button"
             disabled={showBookTable}
             onClick={handleFetchBook}
-            label="Fetch Book"
-          />
+          >
+            Fetch Book
+          </button>
         </div>
 
         {showBookTable ? (
           <div>
-            <CustomTable
-              columns={["ISBN", "Title", "Author", "Publication Year", "Price"]}
-              rows={rowData}
-              handleRowClick={handleRowClick}
-            />
+            <div className="my-10">
+              <CustomTable
+                columns={[
+                  "ISBN",
+                  "Title",
+                  "Author",
+                  "Publication Year",
+                  "Price",
+                ]}
+                rows={rowData}
+                handleRowClick={handleRowClick}
+              />
+            </div>
             <div className=" ">
               <form
                 onSubmit={(e) => {
@@ -96,31 +104,28 @@ const AddBookAccessionPage = () => {
                   setShowAlertDialog(true);
                 }}
               >
-                <div className="grid grid-cols-9 gap-5 mt-10">
-                  <div className="col-span-3">
-                    <InputField
-                      className="w-full"
-                      label="ISBN"
-                      type="number"
-                      name="isbn"
-                      value={isbn}
-                      disabled
-                      InputLabelProps={{ shrink: true }}
-                    />
+                <div className="grid grid-cols-3 gap-5 items-center">
+                  <InputField
+                    label="ISBN"
+                    type="number"
+                    name="isbn"
+                    value={isbn}
+                    disabled
+                    InputLabelProps={{ shrink: true }}
+                  />
+
+                  <InputField
+                    label="Accession Number"
+                    type="number"
+                    name="accessionNumber"
+                    onChange={handleChange}
+                  />
+                  <div className="flex flex-row justify-center">
+                    <button className="my-button" type="submit">
+                      Submit
+                    </button>
                   </div>
-                  <div className="col-span-3">
-                    <InputField
-                      className="w-full"
-                      label="Accession Number"
-                      type="number"
-                      name="accessionNumber"
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <button className="my-button col-span-3" type="submit">
-                    Submit
-                  </button>
-                </div>{" "}
+                </div>
               </form>
             </div>
           </div>

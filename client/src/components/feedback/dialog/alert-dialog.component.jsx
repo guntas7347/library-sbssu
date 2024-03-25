@@ -1,11 +1,3 @@
-import * as React from "react";
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-
 const AlertDialog = ({
   title = "Confirm?",
   content = "This action can not be undone",
@@ -32,10 +24,10 @@ const AlertDialog = ({
         {content}
         <div className="flex gap-5">
           <button className="my-button" onClick={handleDisagree}>
-            Disagree
+            {disagreeMessage}
           </button>
           <button className="my-button" onClick={handleAgree}>
-            Agree
+            {agreeMessage}
           </button>
         </div>
       </div>

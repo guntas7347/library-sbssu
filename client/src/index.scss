@@ -43,3 +43,31 @@ code {
     background-color: white;
   }
 }
+
+.page-heading {
+  @apply font-bold text-3xl;
+}
+
+.my-button {
+  color: white;
+  background-color: #202650;
+  border: 1px solid;
+  border-radius: 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  border-color: white;
+  padding: 0 10px;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.my-button:hover {
+  background-color: #907ad6;
+
+  cursor: pointer;
+}
+
+.my-button:active,
+.my-button:disabled {
+  opacity: 0.5;
+}

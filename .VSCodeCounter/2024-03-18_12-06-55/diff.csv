@@ -1,0 +1,205 @@
+"filename", "language", "JavaScript JSX", "JSON", "JavaScript", "HTML", "Markdown", "TypeScript JSX", "CSS", "comment", "blank", "total"
+"d:\Programming\Projects\library\books1-sorted.js", "JavaScript", 0, 0, -11421, 0, 0, 0, 0, 0, -2, -11423
+"d:\Programming\Projects\library\books1.js", "JavaScript", 0, 0, -49621, 0, 0, 0, 0, 0, -2, -49623
+"d:\Programming\Projects\library\client\.eslintrc.js", "JavaScript", 0, 0, -28, 0, 0, 0, 0, 0, -1, -29
+"d:\Programming\Projects\library\client\README.md", "Markdown", 0, 0, 0, 0, -38, 0, 0, 0, -33, -71
+"d:\Programming\Projects\library\client\package-lock.json", "JSON", 0, -18521, 0, 0, 0, 0, 0, 0, -1, -18522
+"d:\Programming\Projects\library\client\package.json", "JSON", 0, -50, 0, 0, 0, 0, 0, 0, -1, -51
+"d:\Programming\Projects\library\client\public\index.html", "HTML", 0, 0, 0, -21, 0, 0, 0, -23, -1, -45
+"d:\Programming\Projects\library\client\public\manifest.json", "JSON", 0, -25, 0, 0, 0, 0, 0, 0, -1, -26
+"d:\Programming\Projects\library\client\src\App.js", "JavaScript", 0, 0, -18, 0, 0, 0, 0, 0, -3, -21
+"d:\Programming\Projects\library\client\src\_codux\boards\login-page.board.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, -9, 0, 0, -2, -11
+"d:\Programming\Projects\library\client\src\components\buttons\button.component.jsx", "JavaScript JSX", -13, 0, 0, 0, 0, 0, 0, 0, -4, -17
+"d:\Programming\Projects\library\client\src\components\buttons\button.styles.css", "CSS", 0, 0, 0, 0, 0, 0, -22, 0, -4, -26
+"d:\Programming\Projects\library\client\src\components\context\snackbar.context.jsx", "JavaScript JSX", -26, 0, 0, 0, 0, 0, 0, 0, -5, -31
+"d:\Programming\Projects\library\client\src\components\feedback\backdrop\backdrop.component.jsx", "JavaScript JSX", -14, 0, 0, 0, 0, 0, 0, 0, -2, -16
+"d:\Programming\Projects\library\client\src\components\feedback\dialog\alert-dialog.component.jsx", "JavaScript JSX", -44, 0, 0, 0, 0, 0, 0, 0, -2, -46
+"d:\Programming\Projects\library\client\src\components\feedback\snackbar\snackbar-full.component.jsx", "JavaScript JSX", -34, 0, 0, 0, 0, 0, 0, 0, -6, -40
+"d:\Programming\Projects\library\client\src\components\feedback\snackbar\snackbar-old.component.jsx", "JavaScript JSX", -29, 0, 0, 0, 0, 0, 0, 0, -3, -32
+"d:\Programming\Projects\library\client\src\components\feedback\snackbar\snackbar.component.jsx", "JavaScript JSX", -32, 0, 0, 0, 0, 0, 0, -4, -10, -46
+"d:\Programming\Projects\library\client\src\components\feedback\snackbar\snackbar.styles.css", "CSS", 0, 0, 0, 0, 0, 0, -35, 0, -7, -42
+"d:\Programming\Projects\library\client\src\components\feedback\spinner\spinner.component.jsx", "JavaScript JSX", -4, 0, 0, 0, 0, 0, 0, 0, -2, -6
+"d:\Programming\Projects\library\client\src\components\feedback\spinner\spinner.styles.css", "CSS", 0, 0, 0, 0, 0, 0, -13, 0, -2, -15
+"d:\Programming\Projects\library\client\src\components\forms\hooks\useLengthTrigger\uselengthTrigger.hook.component.jsx", "JavaScript JSX", -16, 0, 0, 0, 0, 0, 0, 0, -4, -20
+"d:\Programming\Projects\library\client\src\components\forms\input-field\input-field.component.jsx", "JavaScript JSX", -23, 0, 0, 0, 0, 0, 0, 0, -4, -27
+"d:\Programming\Projects\library\client\src\components\forms\input-field\input-field.styles.css", "CSS", 0, 0, 0, 0, 0, 0, -48, 0, -6, -54
+"d:\Programming\Projects\library\client\src\components\forms\input-select\input-select.component.jsx", "JavaScript JSX", -19, 0, 0, 0, 0, 0, 0, 0, -3, -22
+"d:\Programming\Projects\library\client\src\components\forms\input-select\input-select.styles.css", "CSS", 0, 0, 0, 0, 0, 0, -34, 0, -5, -39
+"d:\Programming\Projects\library\client\src\components\forms\link-button\link-button.component.jsx", "JavaScript JSX", -10, 0, 0, 0, 0, 0, 0, 0, -3, -13
+"d:\Programming\Projects\library\client\src\components\forms\search-query\search-query.component.jsx", "JavaScript JSX", -59, 0, 0, 0, 0, 0, 0, 0, -7, -66
+"d:\Programming\Projects\library\client\src\components\forms\use-form-hook\use-form.hook.component.jsx", "JavaScript JSX", -12, 0, 0, 0, 0, 0, 0, 0, -5, -17
+"d:\Programming\Projects\library\client\src\components\modals\form-dialoge.component.jsx", "JavaScript JSX", -23, 0, 0, 0, 0, 0, 0, 0, -3, -26
+"d:\Programming\Projects\library\client\src\components\modals\modal.component.jsx", "JavaScript JSX", -51, 0, 0, 0, 0, 0, 0, 0, -5, -56
+"d:\Programming\Projects\library\client\src\components\protected-route\protected-toute.component.jsx", "JavaScript JSX", -29, 0, 0, 0, 0, 0, 0, 0, -6, -35
+"d:\Programming\Projects\library\client\src\components\table\custom-table-select.component.jsx", "JavaScript JSX", -68, 0, 0, 0, 0, 0, 0, 0, -9, -77
+"d:\Programming\Projects\library\client\src\components\table\custom-table.component.jsx", "JavaScript JSX", -38, 0, 0, 0, 0, 0, 0, 0, -1, -39
+"d:\Programming\Projects\library\client\src\components\table\spanning-table.component.jsx", "JavaScript JSX", -24, 0, 0, 0, 0, 0, 0, 0, -2, -26
+"d:\Programming\Projects\library\client\src\components\table\table.styles.css", "CSS", 0, 0, 0, 0, 0, 0, -36, 0, -5, -41
+"d:\Programming\Projects\library\client\src\dashboard\admin\components\database-form\database-form.component.admin.jsx", "JavaScript JSX", -26, 0, 0, 0, 0, 0, 0, 0, -4, -30
+"d:\Programming\Projects\library\client\src\dashboard\admin\components\database-form\database.component.admin.jsx", "JavaScript JSX", -87, 0, 0, 0, 0, 0, 0, 0, -6, -93
+"d:\Programming\Projects\library\client\src\dashboard\admin\components\navbar\navbar.component.jsx", "JavaScript JSX", -53, 0, 0, 0, 0, 0, 0, -2, -8, -63
+"d:\Programming\Projects\library\client\src\dashboard\admin\components\navbar\navbar.styles.css", "CSS", 0, 0, 0, 0, 0, 0, -79, 0, -10, -89
+"d:\Programming\Projects\library\client\src\dashboard\admin\hooks\http-requests.hooks.admin.js", "JavaScript", 0, 0, -180, 0, 0, 0, 0, -1, -42, -223
+"d:\Programming\Projects\library\client\src\dashboard\admin\hooks\useSignOut.hooks.jsx", "JavaScript JSX", -11, 0, 0, 0, 0, 0, 0, 0, -5, -16
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\database\database.pages.admin.jsx", "JavaScript JSX", -122, 0, 0, 0, 0, 0, 0, 0, -11, -133
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\database\database.routes.admin.jsx", "JavaScript JSX", -34, 0, 0, 0, 0, 0, 0, 0, -4, -38
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\database\issued-books\issued-books.database.admin.jsx", "JavaScript JSX", -87, 0, 0, 0, 0, 0, 0, 0, -7, -94
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\database\returned-books\returned-books.database.admin.jsx", "JavaScript JSX", -87, 0, 0, 0, 0, 0, 0, 0, -8, -95
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\homepage\homepage.page.admin.jsx", "JavaScript JSX", -9, 0, 0, 0, 0, 0, 0, 0, -2, -11
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\issue-book-route.admin.jsx", "JavaScript JSX", -32, 0, 0, 0, 0, 0, 0, 0, -3, -35
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\issue-new-book\issue-new-book.page.admin.jsx", "JavaScript JSX", -275, 0, 0, 0, 0, 0, 0, 0, -23, -298
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\issue-new-book\issue-new-book.styles.css", "CSS", 0, 0, 0, 0, 0, 0, -17, 0, -3, -20
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\return-issued-book\return-issued-book.page.admin.jsx", "JavaScript JSX", -160, 0, 0, 0, 0, 0, 0, -1, -13, -174
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\return-issued-book\return-issued-book.page.admin.styles.css", "CSS", 0, 0, 0, 0, 0, 0, -12, 0, -2, -14
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\search-issued-books\search-issued-books.page.admin.jsx", "JavaScript JSX", -125, 0, 0, 0, 0, 0, 0, 0, -11, -136
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\search-issued-books\search-issued-books.styles.admin.css", "CSS", 0, 0, 0, 0, 0, 0, -5, 0, -1, -6
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\search-issued-books\view-book.issue-book.page.admin.jsx", "JavaScript JSX", -70, 0, 0, 0, 0, 0, 0, 0, -8, -78
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\searh-returned-books\search-returned-books.page.admin.jsx", "JavaScript JSX", -143, 0, 0, 0, 0, 0, 0, 0, -12, -155
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\searh-returned-books\search-returned-books.styles.css", "CSS", 0, 0, 0, 0, 0, 0, -20, 0, -4, -24
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\issue-book\searh-returned-books\view-book.issue-book.page.admin.jsx", "JavaScript JSX", -71, 0, 0, 0, 0, 0, 0, 0, -8, -79
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-books\add-book\add-book.page.admin.jsx", "JavaScript JSX", -169, 0, 0, 0, 0, 0, 0, 0, -8, -177
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-books\book-accessions\add-book-accession.page.admin.jsx", "JavaScript JSX", -150, 0, 0, 0, 0, 0, 0, 0, -12, -162
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-books\manage-books.page.admin.jsx", "JavaScript JSX", -20, 0, 0, 0, 0, 0, 0, 0, -3, -23
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-books\search-books\search-books.page.admin.jsx", "JavaScript JSX", -124, 0, 0, 0, 0, 0, 0, 0, -12, -136
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-books\view-book\view-book.page.admin.jsx", "JavaScript JSX", -73, 0, 0, 0, 0, 0, 0, 0, -8, -81
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-fines\manage-fines.page.admin.jsx", "JavaScript JSX", -10, 0, 0, 0, 0, 0, 0, 0, -3, -13
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-fines\search-fines\search-fines.page.jsx", "JavaScript JSX", -83, 0, 0, 0, 0, 0, 0, 0, -7, -90
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-fines\view-fine\view-fine.page.admin.jsx", "JavaScript JSX", -99, 0, 0, 0, 0, 0, 0, 0, -13, -112
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-staff\add-staff\add-staff.page.admin.jsx", "JavaScript JSX", -19, 0, 0, 0, 0, 0, 0, 0, 5, -14
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-staff\search-staff\search-staff.page.admin.jsx", "JavaScript JSX", -14, 0, 0, 0, 0, 0, 0, 0, 1, -13
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-staff\view-staff\view-staff.page.admin.jsx", "JavaScript JSX", -11, 0, 0, 0, 0, 0, 0, 0, 0, -11
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\add-student\add-student.page.admin.jsx", "JavaScript JSX", -315, 0, 0, 0, 0, 0, 0, 0, -19, -334
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\add-student\add-student.styles.css", "CSS", 0, 0, 0, 0, 0, 0, -6, 0, -1, -7
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\approve-student\approve-student.page.admin.jsx", "JavaScript JSX", -85, 0, 0, 0, 0, 0, 0, 0, -11, -96
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\approve-student\view-applicant.page.admin.jsx", "JavaScript JSX", -118, 0, 0, 0, 0, 0, 0, 0, -9, -127
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\library-cards\add-library-card\add-library-card.page.admin.jsx", "JavaScript JSX", -127, 0, 0, 0, 0, 0, 0, 0, -10, -137
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\manage-students.page.admin.jsx", "JavaScript JSX", -31, 0, 0, 0, 0, 0, 0, 0, -3, -34
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\search-students\search-student.page.admin.jsx", "JavaScript JSX", -96, 0, 0, 0, 0, 0, 0, 0, -11, -107
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\manage-students\view-student\view-student.page.admin.jsx", "JavaScript JSX", -99, 0, 0, 0, 0, 0, 0, 0, -12, -111
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\profile\change-password\change-password.page.admin.jsx", "JavaScript JSX", -91, 0, 0, 0, 0, 0, 0, 0, -8, -99
+"d:\Programming\Projects\library\client\src\dashboard\admin\pages\profile\profile.page.admin.jsx", "JavaScript JSX", -14, 0, 0, 0, 0, 0, 0, 0, -3, -17
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\admin-routes.route.admin.jsx", "JavaScript JSX", -28, 0, 0, 0, 0, 0, 0, 0, -3, -31
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\database.routes.admin.jsx", "JavaScript JSX", -34, 0, 0, 0, 0, 0, 0, 0, -3, -37
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\issue-books.route.admin.jsx", "JavaScript JSX", -28, 0, 0, 0, 0, 0, 0, 0, -3, -31
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\manage-books.route.admin.jsx", "JavaScript JSX", -18, 0, 0, 0, 0, 0, 0, 0, -3, -21
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\manage-fines.routes.admin.jsx", "JavaScript JSX", -14, 0, 0, 0, 0, 0, 0, 0, -3, -17
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\manage-staff.route.admin.jsx", "JavaScript JSX", -16, 0, 0, 0, 0, 0, 0, 0, -3, -19
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\manage-students.route.jsx", "JavaScript JSX", -25, 0, 0, 0, 0, 0, 0, 0, -3, -28
+"d:\Programming\Projects\library\client\src\dashboard\admin\routes\profile.router.jsx", "JavaScript JSX", -12, 0, 0, 0, 0, 0, 0, 0, -3, -15
+"d:\Programming\Projects\library\client\src\dashboard\admin\settings\manage-programs\manage-programs.page.admin.jsx", "JavaScript JSX", -8, 0, 0, 0, 0, 0, 0, 0, -2, -10
+"d:\Programming\Projects\library\client\src\dashboard\applicant\applicant.page.jsx", "JavaScript JSX", -32, 0, 0, 0, 0, 0, 0, 0, -6, -38
+"d:\Programming\Projects\library\client\src\dashboard\applicant\applied-status.page.applicant.jsx", "JavaScript JSX", -83, 0, 0, 0, 0, 0, 0, 0, -5, -88
+"d:\Programming\Projects\library\client\src\dashboard\applicant\apply-student.page.applicant.jsx", "JavaScript JSX", -334, 0, 0, 0, 0, 0, 0, 0, -20, -354
+"d:\Programming\Projects\library\client\src\dashboard\dashboard.routes.jsx", "JavaScript JSX", -49, 0, 0, 0, 0, 0, 0, -3, -3, -55
+"d:\Programming\Projects\library\client\src\dashboard\http-requests.js", "JavaScript", 0, 0, -100, 0, 0, 0, 0, 0, -23, -123
+"d:\Programming\Projects\library\client\src\dashboard\login-page\forgot-password.page.jsx", "JavaScript JSX", -177, 0, 0, 0, 0, 0, 0, -1, -15, -193
+"d:\Programming\Projects\library\client\src\dashboard\login-page\login-page.page.jsx", "JavaScript JSX", -104, 0, 0, 0, 0, 0, 0, 0, -15, -119
+"d:\Programming\Projects\library\client\src\dashboard\login-page\login-page.styles.css", "CSS", 0, 0, 0, 0, 0, 0, -16, 0, -2, -18
+"d:\Programming\Projects\library\client\src\dashboard\login-page\sign-up.page.jsx", "JavaScript JSX", -168, 0, 0, 0, 0, 0, 0, -1, -11, -180
+"d:\Programming\Projects\library\client\src\dashboard\staff\components\navbar\navbar.component.jsx", "JavaScript JSX", -102, 0, 0, 0, 0, 0, 0, 0, -11, -113
+"d:\Programming\Projects\library\client\src\dashboard\staff\hooks\http-requests.hooks.admin.js", "JavaScript", 0, 0, -608, 0, 0, 0, 0, -1, -47, -656
+"d:\Programming\Projects\library\client\src\dashboard\staff\hooks\useSignOut.hooks.jsx", "JavaScript JSX", -11, 0, 0, 0, 0, 0, 0, 0, -5, -16
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\homepage\homepage.page.staff.jsx", "JavaScript JSX", -9, 0, 0, 0, 0, 0, 0, 0, -2, -11
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\issue-book-route.admin.jsx", "JavaScript JSX", -29, 0, 0, 0, 0, 0, 0, 0, -3, -32
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\issue-new-book\issue-new-book.page.staff.jsx", "JavaScript JSX", -261, 0, 0, 0, 0, 0, 0, 0, -18, -279
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\return-issued-book\return-issued-book.page.staff.jsx", "JavaScript JSX", -199, 0, 0, 0, 0, 0, 0, 0, -15, -214
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\search-issued-books\search-issued-books.page.staff.jsx", "JavaScript JSX", -154, 0, 0, 0, 0, 0, 0, 0, -12, -166
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\search-issued-books\view-book.issue-book.page.admin.jsx", "JavaScript JSX", -52, 0, 0, 0, 0, 0, 0, 0, -7, -59
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\searh-returned-books\search-returned-books.page.staff.jsx", "JavaScript JSX", -158, 0, 0, 0, 0, 0, 0, 0, -11, -169
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\searh-returned-books\view-book.issue-book.page.admin.jsx", "JavaScript JSX", -55, 0, 0, 0, 0, 0, 0, 0, -7, -62
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\issue-book\view-book\view-book.issue-book.page.staff.jsx", "JavaScript JSX", -62, 0, 0, 0, 0, 0, 0, 0, -7, -69
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-books\add-book\add-book.page.staff.jsx", "JavaScript JSX", -164, 0, 0, 0, 0, 0, 0, -12, -11, -187
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-books\book-accessions\add-book-accession.page.staff.jsx", "JavaScript JSX", -155, 0, 0, 0, 0, 0, 0, 0, -13, -168
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-books\manage-books.page.admin.jsx", "JavaScript JSX", -24, 0, 0, 0, 0, 0, 0, 0, -3, -27
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-books\search-books\search-books.page.staff.jsx", "JavaScript JSX", -105, 0, 0, 0, 0, 0, 0, 0, -11, -116
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-books\view-book\view-book.page.staff.jsx", "JavaScript JSX", -78, 0, 0, 0, 0, 0, 0, 0, -8, -86
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\add-student\add-student.page.staff.jsx", "JavaScript JSX", -186, 0, 0, 0, 0, 0, 0, -1, -11, -198
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\approve-student\approve-student.page.staff.jsx", "JavaScript JSX", -89, 0, 0, 0, 0, 0, 0, 0, -9, -98
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\approve-student\view-applicant.page.admin.jsx", "JavaScript JSX", -117, 0, 0, 0, 0, 0, 0, 0, -9, -126
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\library-cards\add-library-card\add-library-card.page.staff.jsx", "JavaScript JSX", -148, 0, 0, 0, 0, 0, 0, 0, -13, -161
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\manage-students.page.staff.jsx", "JavaScript JSX", -29, 0, 0, 0, 0, 0, 0, 0, -3, -32
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\search-students\search-student.page.staff.jsx", "JavaScript JSX", -84, 0, 0, 0, 0, 0, 0, 0, -9, -93
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\manage-students\view-student\view-student.page.staff.jsx", "JavaScript JSX", -72, 0, 0, 0, 0, 0, 0, 0, -8, -80
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\profile\change-password\change-password.page.staff.jsx", "JavaScript JSX", -88, 0, 0, 0, 0, 0, 0, 0, -8, -96
+"d:\Programming\Projects\library\client\src\dashboard\staff\pages\profile\profile.page.staff.jsx", "JavaScript JSX", -14, 0, 0, 0, 0, 0, 0, 0, -3, -17
+"d:\Programming\Projects\library\client\src\dashboard\staff\routes\issue-books.route.staff.jsx", "JavaScript JSX", -28, 0, 0, 0, 0, 0, 0, 0, -3, -31
+"d:\Programming\Projects\library\client\src\dashboard\staff\routes\manage-books.route.staff.jsx", "JavaScript JSX", -18, 0, 0, 0, 0, 0, 0, 0, -3, -21
+"d:\Programming\Projects\library\client\src\dashboard\staff\routes\manage-students.staff.jsx", "JavaScript JSX", -28, 0, 0, 0, 0, 0, 0, 0, -3, -31
+"d:\Programming\Projects\library\client\src\dashboard\staff\routes\profile.router.jsx", "JavaScript JSX", -12, 0, 0, 0, 0, 0, 0, 0, -3, -15
+"d:\Programming\Projects\library\client\src\dashboard\staff\routes\staff-routes.route.staff.jsx", "JavaScript JSX", -22, 0, 0, 0, 0, 0, 0, 0, -3, -25
+"d:\Programming\Projects\library\client\src\dashboard\student\components\navbar\navbar.component.user.jsx", "JavaScript JSX", -86, 0, 0, 0, 0, 0, 0, 0, -8, -94
+"d:\Programming\Projects\library\client\src\dashboard\student\hooks\http-requests.hooks.student.js", "JavaScript", 0, 0, -24, 0, 0, 0, 0, 0, -3, -27
+"d:\Programming\Projects\library\client\src\dashboard\student\pages\homepage\homepage.page.user.jsx", "JavaScript JSX", -9, 0, 0, 0, 0, 0, 0, 0, -2, -11
+"d:\Programming\Projects\library\client\src\dashboard\student\pages\issue-history\issue-history.page.student.jsx", "JavaScript JSX", -132, 0, 0, 0, 0, 0, 0, 0, -9, -141
+"d:\Programming\Projects\library\client\src\dashboard\student\routes\student-routes.user.jsx", "JavaScript JSX", -16, 0, 0, 0, 0, 0, 0, 0, -3, -19
+"d:\Programming\Projects\library\client\src\index.css", "CSS", 0, 0, 0, 0, 0, 0, -35, 0, -6, -41
+"d:\Programming\Projects\library\client\src\index.js", "JavaScript", 0, 0, -16, 0, 0, 0, 0, 0, -2, -18
+"d:\Programming\Projects\library\client\src\utils\functions.js", "JavaScript", 0, 0, -55, 0, 0, 0, 0, -9, -15, -79
+"d:\Programming\Projects\library\package-lock.json", "JSON", 0, -317, 0, 0, 0, 0, 0, 0, -1, -318
+"d:\Programming\Projects\library\package.json", "JSON", 0, -14, 0, 0, 0, 0, 0, 0, -1, -15
+"d:\Programming\Projects\library\server\books1-sorted.js", "JavaScript", 0, 0, -11421, 0, 0, 0, 0, 0, -2, -11423
+"d:\Programming\Projects\library\server\package-lock.json", "JSON", 0, -3272, 0, 0, 0, 0, 0, 0, -1, -3273
+"d:\Programming\Projects\library\server\package.json", "JSON", 0, -30, 0, 0, 0, 0, 0, 0, -1, -31
+"d:\Programming\Projects\library\server\src\Student Registration Detail Form.html", "HTML", 0, 0, 0, -18, 0, 0, 0, 0, -1, -19
+"d:\Programming\Projects\library\server\src\app.js", "JavaScript", 0, 0, -35, 0, 0, 0, 0, -2, -10, -47
+"d:\Programming\Projects\library\server\src\index.js", "JavaScript", 0, 0, -12, 0, 0, 0, 0, 0, -6, -18
+"d:\Programming\Projects\library\server\src\models\applications\applications.controllers.js", "JavaScript", 0, 0, -32, 0, 0, 0, 0, 0, -7, -39
+"d:\Programming\Projects\library\server\src\models\applications\applications.schema.js", "JavaScript", 0, 0, -20, 0, 0, 0, 0, 0, -3, -23
+"d:\Programming\Projects\library\server\src\models\auth\admin\aduth_admin.controllers.js", "JavaScript", 0, 0, -24, 0, 0, 0, 0, 0, -6, -30
+"d:\Programming\Projects\library\server\src\models\auth\applicant\auth_applicant.controllers.js", "JavaScript", 0, 0, -37, 0, 0, 0, 0, 0, -7, -44
+"d:\Programming\Projects\library\server\src\models\auth\auth.schema.js", "JavaScript", 0, 0, -53, 0, 0, 0, 0, 0, -7, -60
+"d:\Programming\Projects\library\server\src\models\auth\functions.js", "JavaScript", 0, 0, -24, 0, 0, 0, 0, -1, -4, -29
+"d:\Programming\Projects\library\server\src\models\auth\student\auth_student.controllers.js", "JavaScript", 0, 0, -15, 0, 0, 0, 0, 0, -5, -20
+"d:\Programming\Projects\library\server\src\models\book-accessions\book-accessions.controllers.js", "JavaScript", 0, 0, -29, 0, 0, 0, 0, 0, -6, -35
+"d:\Programming\Projects\library\server\src\models\book-accessions\book-accessions.schema.js", "JavaScript", 0, 0, -11, 0, 0, 0, 0, 0, -3, -14
+"d:\Programming\Projects\library\server\src\models\books\books.controllers.js", "JavaScript", 0, 0, -80, 0, 0, 0, 0, 0, -15, -95
+"d:\Programming\Projects\library\server\src\models\books\books.schema.js", "JavaScript", 0, 0, -18, 0, 0, 0, 0, 0, -3, -21
+"d:\Programming\Projects\library\server\src\models\fines\fines.controllers.js", "JavaScript", 0, 0, -23, 0, 0, 0, 0, 0, -9, -32
+"d:\Programming\Projects\library\server\src\models\fines\fines.schema.js", "JavaScript", 0, 0, -19, 0, 0, 0, 0, 0, -3, -22
+"d:\Programming\Projects\library\server\src\models\issue-book\issue-book.controllers.js", "JavaScript", 0, 0, -104, 0, 0, 0, 0, 0, -19, -123
+"d:\Programming\Projects\library\server\src\models\issue-book\issue-book.schema.js", "JavaScript", 0, 0, -21, 0, 0, 0, 0, 0, -3, -24
+"d:\Programming\Projects\library\server\src\models\library-cards\library-cards.controllers.js", "JavaScript", 0, 0, -29, 0, 0, 0, 0, 0, -7, -36
+"d:\Programming\Projects\library\server\src\models\library-cards\library-cards.schema.js", "JavaScript", 0, 0, -21, 0, 0, 0, 0, 0, -3, -24
+"d:\Programming\Projects\library\server\src\models\returned-book\returned-books.controllers.models.js", "JavaScript", 0, 0, -158, 0, 0, 0, 0, 0, -30, -188
+"d:\Programming\Projects\library\server\src\models\returned-book\returned-books.schema.js", "JavaScript", 0, 0, -39, 0, 0, 0, 0, 0, -3, -42
+"d:\Programming\Projects\library\server\src\models\staff\staff.controllers.js", "JavaScript", 0, 0, -11, 0, 0, 0, 0, 0, -5, -16
+"d:\Programming\Projects\library\server\src\models\staff\staff.schema.js", "JavaScript", 0, 0, -20, 0, 0, 0, 0, 0, -3, -23
+"d:\Programming\Projects\library\server\src\models\students\students.controllers.js", "JavaScript", 0, 0, -45, 0, 0, 0, 0, 0, -13, -58
+"d:\Programming\Projects\library\server\src\models\students\students.schema.js", "JavaScript", 0, 0, -17, 0, 0, 0, 0, 0, -3, -20
+"d:\Programming\Projects\library\server\src\router\admin\admin.router.js", "JavaScript", 0, 0, -13, 0, 0, 0, 0, 0, -4, -17
+"d:\Programming\Projects\library\server\src\router\admin\books\books.middlewares.admin.js", "JavaScript", 0, 0, -63, 0, 0, 0, 0, 0, -5, -68
+"d:\Programming\Projects\library\server\src\router\admin\books\books.router.admin.js", "JavaScript", 0, 0, -109, 0, 0, 0, 0, 0, -10, -119
+"d:\Programming\Projects\library\server\src\router\admin\database\database.router.admin.js", "JavaScript", 0, 0, -163, 0, 0, 0, 0, 0, -14, -177
+"d:\Programming\Projects\library\server\src\router\admin\fines\fines.middlewares.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, -1, -1
+"d:\Programming\Projects\library\server\src\router\admin\fines\fines.router.admin.js", "JavaScript", 0, 0, -55, 0, 0, 0, 0, 0, -8, -63
+"d:\Programming\Projects\library\server\src\router\admin\issue-book\issue-book.middlewares.js", "JavaScript", 0, 0, -226, 0, 0, 0, 0, -6, -16, -248
+"d:\Programming\Projects\library\server\src\router\admin\issue-book\issue-book.router.admin.js", "JavaScript", 0, 0, -107, 0, 0, 0, 0, 0, -12, -119
+"d:\Programming\Projects\library\server\src\router\admin\return-book\return-book.middlewares.js", "JavaScript", 0, 0, -156, 0, 0, 0, 0, -6, -14, -176
+"d:\Programming\Projects\library\server\src\router\admin\return-book\return-book.router.admin.js", "JavaScript", 0, 0, -84, 0, 0, 0, 0, 0, -11, -95
+"d:\Programming\Projects\library\server\src\router\admin\settings\settings.router.admin.js", "JavaScript", 0, 0, -45, 0, 0, 0, 0, 0, -6, -51
+"d:\Programming\Projects\library\server\src\router\admin\staff\staff.middlewares.js", "JavaScript", 0, 0, -37, 0, 0, 0, 0, 0, -4, -41
+"d:\Programming\Projects\library\server\src\router\admin\staff\staff.router.admin.js", "JavaScript", 0, 0, -40, 0, 0, 0, 0, 0, -6, -46
+"d:\Programming\Projects\library\server\src\router\admin\students\students.middlewares.js", "JavaScript", 0, 0, -128, 0, 0, 0, 0, -2, -11, -141
+"d:\Programming\Projects\library\server\src\router\admin\students\students.router.admin.js", "JavaScript", 0, 0, -134, 0, 0, 0, 0, 0, -15, -149
+"d:\Programming\Projects\library\server\src\router\applicant\applicant.router.js", "JavaScript", 0, 0, -41, 0, 0, 0, 0, 0, -6, -47
+"d:\Programming\Projects\library\server\src\router\auth\admin\admin.auth.middlewares.js", "JavaScript", 0, 0, -76, 0, 0, 0, 0, 0, -6, -82
+"d:\Programming\Projects\library\server\src\router\auth\admin\admin.auth.router.js", "JavaScript", 0, 0, -72, 0, 0, 0, 0, 0, -7, -79
+"d:\Programming\Projects\library\server\src\router\auth\applicants\applicants.auth.router.js", "JavaScript", 0, 0, -57, 0, 0, 0, 0, 0, -6, -63
+"d:\Programming\Projects\library\server\src\router\auth\applicants\applicants.middlewares.auth.js", "JavaScript", 0, 0, -119, 0, 0, 0, 0, -6, -16, -141
+"d:\Programming\Projects\library\server\src\router\auth\auth-secured.router.js", "JavaScript", 0, 0, -63, 0, 0, 0, 0, 0, -12, -75
+"d:\Programming\Projects\library\server\src\router\auth\auth.middlewares.js", "JavaScript", 0, 0, -32, 0, 0, 0, 0, 0, -4, -36
+"d:\Programming\Projects\library\server\src\router\auth\auth.router.js", "JavaScript", 0, 0, -18, 0, 0, 0, 0, 0, -5, -23
+"d:\Programming\Projects\library\server\src\router\auth\jwt.js", "JavaScript", 0, 0, -16, 0, 0, 0, 0, 0, -5, -21
+"d:\Programming\Projects\library\server\src\router\auth\students\students-router.auth.router.js", "JavaScript", 0, 0, -25, 0, 0, 0, 0, 0, -4, -29
+"d:\Programming\Projects\library\server\src\router\auth\students\students.auth.middlewares.js", "JavaScript", 0, 0, -19, 0, 0, 0, 0, 0, -3, -22
+"d:\Programming\Projects\library\server\src\router\router.js", "JavaScript", 0, 0, -90, 0, 0, 0, 0, 0, -15, -105
+"d:\Programming\Projects\library\server\src\router\student\issue-history\issue-history.router.student.js", "JavaScript", 0, 0, -39, 0, 0, 0, 0, 0, -5, -44
+"d:\Programming\Projects\library\server\src\secrets.js", "JavaScript", 0, 0, 0, 0, 0, 0, 0, 0, -1, -1
+"d:\Programming\Projects\library\server\src\services\email-templates.js", "JavaScript", 0, 0, -89, 0, 0, 0, 0, 0, -4, -93
+"d:\Programming\Projects\library\server\src\services\mongo-functions.js", "JavaScript", 0, 0, -15, 0, 0, 0, 0, 0, -5, -20
+"d:\Programming\Projects\library\server\src\services\mongo.js", "JavaScript", 0, 0, -36, 0, 0, 0, 0, -10, -10, -56
+"d:\Programming\Projects\library\server\src\services\nodemailer.js", "JavaScript", 0, 0, -7, 0, 0, 0, 0, 0, -3, -10
+"d:\Programming\Projects\library\server\src\utils\custom-response-codes.js", "JavaScript", 0, 0, -336, 0, 0, 0, 0, 0, -3, -339
+"d:\Programming\Projects\library\server\src\utils\excel-bulk.entry.js", "JavaScript", 0, 0, -139, 0, 0, 0, 0, -5, -16, -160
+"d:\Programming\Projects\library\server\src\utils\functions.js", "JavaScript", 0, 0, -147, 0, 0, 0, 0, -1, -30, -178
+"Total", "-", -7634, -22229, -77185, -39, -38, -9, -378, -98, -1450, -109060

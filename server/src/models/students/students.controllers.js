@@ -51,6 +51,10 @@ const addLibraryCardToStudent = async (_id, libraryCardId, session) => {
 const countStudentDocs = async (filter) =>
   await studentsCol.countDocuments(filter);
 
+const updateStudentById = async (_id, updatedDoc) => {
+  return await studentsCol.findByIdAndUpdate(_id, updatedDoc);
+};
+
 module.exports = {
   createStudent,
   findStudents,
@@ -58,4 +62,5 @@ module.exports = {
   getStudentById,
   addLibraryCardToStudent,
   countStudentDocs,
+  updateStudentById,
 };

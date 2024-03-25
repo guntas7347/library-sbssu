@@ -5,6 +5,7 @@ const {
   findBooks,
   getBookById,
   createBook,
+  updateBookById,
 } = require("../../../models/books/books.controllers");
 const {
   createBookAccession,
@@ -118,6 +119,21 @@ booksRouter.post("/count-book-accessions", async (req, res) => {
   try {
     const numberOfBookAccessions = await countBookAccessionDocs();
     return res.status(200).json(crs.BKS200CTBA(numberOfBookAccessions));
+  } catch (err) {
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+});
+
+booksRouter.post("/edit-existing-book", async (req, res) => {
+  try {
+    const bookDoc = await getBookByIsbn(req.body.isbn);
+    if (bookDoc !== null) {
+      const { isbn } = await getBookById(req.body._id, true);
+      if (bookDoc._doc.isbn !== isbn)
+        return res.status(409).json(crs.BKS409ANB());
+    }
+    await updateBookById(req.body._id, req.body);
+    return res.status(200).json(crs.BKS200EB());
   } catch (err) {
     return res.status(500).json(crs.SERR500REST(err));
   }

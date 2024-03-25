@@ -1,6 +1,10 @@
 const jwt = require("jsonwebtoken");
-
-const JWT_SECRET = "secret";
+const crypto = require("crypto");
+const {
+  JWT_SECRET,
+  CRYPTO_ENCRYPTION_KEY,
+  CRYPTO_ENCRYPTION_IV,
+} = require("../../secrets");
 
 const createJWT = (token = {}, expiry = 60 * 60) => {
   return jwt.sign(token, JWT_SECRET, { expiresIn: expiry });
@@ -17,4 +21,30 @@ const verifyJwt = (token) => {
   });
 };
 
-module.exports = { createJWT, verifyJwt };
+const encryptText = (text) => {
+  const cipher = crypto.createCipheriv(
+    "aes-256-cbc",
+    Buffer.from(CRYPTO_ENCRYPTION_KEY, "hex"),
+    Buffer.from(CRYPTO_ENCRYPTION_IV, "hex")
+  );
+  let encrypted = cipher.update(text, "utf-8", "hex");
+  encrypted += cipher.final("hex");
+  return encrypted;
+};
+
+const decrptText = (text) => {
+  try {
+    const decipher = crypto.createDecipheriv(
+      "aes-256-cbc",
+      Buffer.from(CRYPTO_ENCRYPTION_KEY, "hex"),
+      Buffer.from(CRYPTO_ENCRYPTION_IV, "hex")
+    );
+    let decrypted = decipher.update(text, "hex", "utf-8");
+    decrypted += decipher.final("utf8");
+    return decrypted;
+  } catch (error) {
+    return null;
+  }
+};
+
+module.exports = { createJWT, verifyJwt, encryptText, decrptText };

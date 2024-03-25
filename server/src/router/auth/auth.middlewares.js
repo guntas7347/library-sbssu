@@ -1,6 +1,6 @@
 const crs = require("../../utils/custom-response-codes");
 const { checkPassword } = require("../../models/auth/functions");
-const { createJWT } = require("./jwt");
+const { createJWT, encryptText } = require("./jwt");
 
 const TOKEN_EXPIRY_MINUTES = 60;
 
@@ -29,7 +29,7 @@ const setJwtCookie = async (req, res, next) => {
       path: "/",
     };
 
-    res.cookie("session", jwt, cookieOptions);
+    res.cookie("session", encryptText(jwt), cookieOptions);
 
     next();
   } catch (err) {

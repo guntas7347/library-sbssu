@@ -38,12 +38,12 @@ const SearchStudentsPage = () => {
   };
 
   return (
-    <div className="text-center">
-      <h3 className="text-4xl font-bold">Search Students</h3>
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">Search Students</h1>
       <div>
-        <div className="grid grid-cols-3 gap-5 my-5 white-container">
+        <div className="grid grid-cols-4 gap-10 my-5 bg-white p-5 rounded-3xl">
           <SearchQueriesComponent
-            className="col-span-2 gap-5"
+            className="col-span-3"
             selectFields={[
               {
                 name: "Search All Students",
@@ -78,9 +78,11 @@ const SearchStudentsPage = () => {
             onChange={handleChange}
           />
 
-          <button className="my-button" onClick={handleFetch}>
-            Submit
-          </button>
+          <div className="col-span-1 flex flex-row justify-center items-center">
+            <button className="my-button " onClick={handleFetch}>
+              Submit
+            </button>
+          </div>
         </div>
         <div>
           <CustomTable

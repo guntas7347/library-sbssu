@@ -1,4 +1,3 @@
-import "./return-issued-book.page.admin.styles.scss";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import {
@@ -11,7 +10,6 @@ import { useContext, useState } from "react";
 import { formatDate, formatTime } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
 import Spinner from "../../../../../components/feedback/spinner/spinner.component";
-import Button from "../../../../../components/buttons/button.component";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const ReturnIssuedBookPage = () => {
@@ -83,28 +81,28 @@ const ReturnIssuedBookPage = () => {
   };
 
   return (
-    <div className="returnIssuedBookPage text-center">
-      <h1 className="page-header">Return book?</h1>
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">Return book?</h1>
+      <div className="bg-white rounded-3xl p-5 grid grid-cols-2 gap-10">
+        <InputField
+          label="Accession Number"
+          name="accessionNumber"
+          type="number"
+          onChange={handleChange}
+          value={formFields.accessionNumber}
+        />
 
-      <div className="container-returnIssuedBook white-container">
-        <div>
-          <InputField
-            label="Accession Number"
-            name="accessionNumber"
-            type="number"
-            onChange={handleChange}
-            value={formFields.accessionNumber}
-          />
-        </div>
-        <div>
-          <Button onClick={() => handleFetch()} label="Seach" />
+        <div className="flex flex-row justify-center items-center">
+          <button className="my-button" onClick={handleFetch}>
+            Search
+          </button>
         </div>
       </div>
 
       {isStudentFetching &&
         (isStudentFetched() ? (
           <>
-            <div className="">
+            <div className="my-5">
               <SpanningTable
                 rows={[
                   ["Accession Number", accessionNumber],
@@ -118,7 +116,7 @@ const ReturnIssuedBookPage = () => {
                 ]}
               />
             </div>
-            <div className="container-returnIssuedBook  white-container">
+            <div className="bg-white rounded-3xl p-5 grid grid-cols-2">
               <div>
                 <InputField
                   label="Return Date"
@@ -129,8 +127,10 @@ const ReturnIssuedBookPage = () => {
                   InputLabelProps={{ shrink: true }}
                 />
               </div>
-              <div>
-                <Button onClick={() => handleCheckFine()} label="Return" />
+              <div className="flex flex-row justify-center items-center">
+                <button className="my-button" onClick={handleCheckFine}>
+                  Return
+                </button>
               </div>
             </div>
           </>

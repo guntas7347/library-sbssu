@@ -5,7 +5,7 @@ const {
 } = require("./student/issue-history/issue-history.router.student");
 const { authRouter } = require("./auth/auth.router");
 const { applicantRouter } = require("./applicant/applicant.router");
-const { verifyJwt } = require("./auth/jwt");
+const { verifyJwt, decrptText } = require("./auth/jwt");
 const { adminRouter } = require("./admin/admin.router");
 const { addNewBook } = require("../models/books/books.controllers");
 
@@ -29,7 +29,7 @@ router.use("/admin/settings", settingsRouter);
 
 const verifyJwtMiddleware = (req, res, next) => {
   try {
-    const jwt = verifyJwt(req.cookies.session);
+    const jwt = verifyJwt(decrptText(req.cookies.session));
     if (jwt === null) {
       res.cookie("session", null, { expires: new Date(0) });
       return res.status(401).json(crs.AUTH401JWT());

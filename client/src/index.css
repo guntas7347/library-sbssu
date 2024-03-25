@@ -1,0 +1,3 @@
+.page-heading {
+  @apply font-bold text-3xl;
+}

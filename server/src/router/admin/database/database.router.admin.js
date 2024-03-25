@@ -1,11 +1,12 @@
 const express = require("express");
 const crs = require("../../../utils/custom-response-codes");
-const { fetchIssuedBookById } = require("../issue-book/issue-book.middlewares");
 const {
   findReturnedBookById,
+  getReturnedBookById,
 } = require("../../../models/returned-book/returned-books.controllers.models");
 const {
   findIssuedBookById,
+  getIssuedBookById,
 } = require("../../../models/issue-book/issue-book.controllers");
 const {
   findBookAccessionById,
@@ -37,19 +38,20 @@ const databaseRouter = express.Router();
 
 databaseRouter.post("/get-issued-book", async (req, res) => {
   try {
-    const issuedBook = await findIssuedBookById(req.body._id);
+    const issuedBook = await getIssuedBookById(req.body._id);
     if (issuedBook === null) return res.status(404).json(crs.DBSF404GLOBAL());
     return res.status(200).json(crs.DBSF200ISB(issuedBook));
   } catch (err) {
     if (err.name === "CastError")
       return res.status(500).json(crs.DBSF400GLOBAL(err));
+
     return res.status(500).json(crs.SERR500REST(err));
   }
 });
 
 databaseRouter.post("/get-returned-book", async (req, res) => {
   try {
-    const returnedBookDoc = await findReturnedBookById(req.body._id);
+    const returnedBookDoc = await getReturnedBookById(req.body._id);
     if (returnedBookDoc === null)
       return res.status(404).json(crs.DBSF404GLOBAL());
     return res.status(200).json(crs.DBSF200RSB(returnedBookDoc));

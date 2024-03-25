@@ -8,20 +8,23 @@ const DatabaseForm = ({ keyProps, valueProps, onChange }) => {
 
   return (
     <>
-      <Grid item xs={3}>
-        <InputField disabled {...keyProps} />
-      </Grid>
-      <Grid item xs={8}>
-        <InputField
-          disabled={enableEdit}
-          name={valueProps.label}
-          onChange={onChange}
-          {...valueProps}
-        />
-      </Grid>
-      <Grid item xs={1}>
-        <Button onClick={handleClick}>Edit</Button>
-      </Grid>
+      {/* <InputField disabled {...keyProps} /> */}
+      <div className="grid grid-cols-10 my-5">
+        <div className="col-span-8">
+          <InputField
+            inputclassname="w-96"
+            disabled={enableEdit}
+            name={valueProps.label}
+            onChange={onChange}
+            {...valueProps}
+          />
+        </div>
+        <div className="flex flex-row justify-center items-center">
+          <button className="my-button" onClick={handleClick}>
+            Edit
+          </button>
+        </div>
+      </div>
     </>
   );
 };

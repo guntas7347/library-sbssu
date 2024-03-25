@@ -6,6 +6,7 @@ import ApproveStudentPage from "../pages/manage-students/approve-student/approve
 import AllotLibraryCardPage from "../pages/manage-students/library-cards/add-library-card/add-library-card.page.admin";
 import ViewStudentPage from "../pages/manage-students/view-student/view-student.page.admin";
 import ViewApplicantPage from "../pages/manage-students/approve-student/view-applicant.page.admin";
+import EditStudentPage from "../pages/manage-students/edit-student/edit-student.page.admin";
 
 const ManageStudentsRoute = () => {
   return (
@@ -20,6 +21,10 @@ const ManageStudentsRoute = () => {
       <Route path="/search-students/:_id" element={<ViewStudentPage />} />
       <Route path="/approve-students/" element={<ApproveStudentPage />} />
       <Route path="/approve-students/:_id" element={<ViewApplicantPage />} />
+      <Route
+        path="/search-students/:_id/edit-student/"
+        element={<EditStudentPage />}
+      />
     </Routes>
   );
 };

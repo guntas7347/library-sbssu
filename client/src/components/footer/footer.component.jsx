@@ -5,7 +5,14 @@ const Footer = () => {
     <footer className="footer">
       <p>
         Copyright &copy; 2024. Developed by{" "}
-        <a href="mailto:guntas7347@gmail.com">Guntas Singh</a>
+        <a
+          href="https://guntassandhu.com/"
+          target="_blank"
+          rel="noreferrer"
+          className="text-blue-500 underline"
+        >
+          Guntas Sandhu
+        </a>
       </p>
     </footer>
   );

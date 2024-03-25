@@ -35,7 +35,7 @@ const fetchStudentByRollNumber = async (req, res, next) => {
 
 const verifyRollNumberAvailability = async (req, res, next) => {
   try {
-    const studentDoc = await getStudentByRollNumber(req.body.rollNumber, true);
+    const studentDoc = await getStudentByRollNumber(req.body.rollNumber);
     if (studentDoc !== null) return res.status(409).json(crs.CONFL409CNS());
     next();
   } catch (err) {

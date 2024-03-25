@@ -7,8 +7,6 @@ import {
 } from "../../../hooks/http-requests.hooks.admin";
 import InputSelect from "../../../../../components/forms/input-select/input-select.component";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import Button from "../../../../../components/buttons/button.component";
-import "./add-student.styles.scss";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const AddStudentPage = () => {
@@ -98,15 +96,15 @@ const AddStudentPage = () => {
 
   return (
     <div>
-      <h2 className="text-center">Add Student</h2>
-      <div>
+      <h1 className="text-center font-bold text-3xl my-2">Add Student</h1>
+      <div className="bg-white p-5 rounded-3xl">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             setShowAlertDialog(true);
           }}
         >
-          <div className="container-add-student">
+          <div className="grid md:grid-cols-2 gap-x-28 gap-5 justify-center items-center">
             <InputField
               label="Roll Number"
               type="number"
@@ -208,7 +206,7 @@ const AddStudentPage = () => {
               }}
             />
           </div>
-          <div className="submit-button-add-student">
+          <div className="mt-5 flex flex-row justify-center">
             <button className="my-button" type="submit">
               Submit
             </button>

@@ -1,9 +1,25 @@
 import { Route, Routes } from "react-router-dom";
-import AdminRoutes from "./admin/routes/admin-routes.route.admin";
-import UserRoutes from "./student/routes/student-routes.user";
-import ApplicantHomePage from "./applicant/applicant.page";
 import ProtectedRoute from "../components/protected-route/protected-toute.component";
-import StaffRoutes from "./staff/routes/staff-routes.route.staff";
+import { Suspense, lazy } from "react";
+import Spinner from "../components/feedback/spinner/spinner.component";
+
+const AdminRoutes = lazy(() =>
+  import("./admin/routes/admin-routes.route.admin")
+);
+
+const StaffRoutes = lazy(() =>
+  import("./staff/routes/staff-routes.route.staff")
+);
+const UserRoutes = lazy(() => import("./student/routes/student-routes.user"));
+const ApplicantHomePage = lazy(() => import("./applicant/applicant.page"));
+
+const CenteredSpinner = () => {
+  return (
+    <div className="flex flex-row justify-center items-center h-screen">
+      <Spinner />
+    </div>
+  );
+};
 
 const DashboardRoutes = () => {
   return (
@@ -13,7 +29,9 @@ const DashboardRoutes = () => {
           path="/admin/*"
           element={
             <ProtectedRoute role="ADMIN">
-              <AdminRoutes />
+              <Suspense fallback={<CenteredSpinner />}>
+                <AdminRoutes />
+              </Suspense>
             </ProtectedRoute>
           }
         />
@@ -21,7 +39,9 @@ const DashboardRoutes = () => {
           path="/staff/*"
           element={
             <ProtectedRoute role="STAFF">
-              <StaffRoutes />
+              <Suspense fallback={<CenteredSpinner />}>
+                <StaffRoutes />
+              </Suspense>
             </ProtectedRoute>
           }
         />
@@ -29,7 +49,9 @@ const DashboardRoutes = () => {
           path="/student/*"
           element={
             <ProtectedRoute role="STUDENT">
-              <UserRoutes />
+              <Suspense fallback={<CenteredSpinner />}>
+                <UserRoutes />
+              </Suspense>
             </ProtectedRoute>
           }
         />
@@ -37,7 +59,9 @@ const DashboardRoutes = () => {
           path="/applicant/"
           element={
             <ProtectedRoute role="APPLICANT">
-              <ApplicantHomePage />
+              <Suspense fallback={<CenteredSpinner />}>
+                <ApplicantHomePage />
+              </Suspense>
             </ProtectedRoute>
           }
         />

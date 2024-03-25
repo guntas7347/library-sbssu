@@ -7,6 +7,7 @@ const {
   createStudent,
   findStudents,
   countStudentDocs,
+  updateStudentById,
 } = require("../../../models/students/students.controllers");
 const {
   createLibraryCard,
@@ -150,6 +151,22 @@ studentsRoute.post("/count-total-students", async (req, res) => {
   try {
     const numberOfStudentDocs = await countStudentDocs(req.body.filter);
     return res.status(200).json(crs.STU200CTS(numberOfStudentDocs));
+  } catch (err) {
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+});
+
+studentsRoute.post("/edit-existing-student", async (req, res) => {
+  try {
+    const studentDoc = await getStudentByRollNumber(req.body.rollNumber);
+    if (studentDoc !== null) {
+      const { rollNumber } = await getStudentById(req.body._id);
+      if (studentDoc._doc.rollNumber !== rollNumber)
+        return res.status(409).json(crs.CONFL409CNS());
+    }
+
+    await updateStudentById(req.body._id, req.body);
+    return res.status(200).json(crs.STU200ES());
   } catch (err) {
     return res.status(500).json(crs.SERR500REST(err));
   }

@@ -3,30 +3,26 @@ import LinkButton from "../../../../components/forms/link-button/link-button.com
 const IssueBooksPage = () => {
   const previousPath = "/dashboard/admin/issue-books";
   return (
-    <div className="text-center">
-      <h1 className="my-4 text-4xl font-bold">Issue Books</h1>
-      <LinkButton
-        to={`${previousPath}/issue-new-book`}
-        label="Issue new Book"
-      />
-      <br />
-      <br />
-      <LinkButton
-        to={`${previousPath}/return-issued-book`}
-        label="Return Issued Book"
-      />
-      <br />
-      <br />
-      <LinkButton
-        to={`${previousPath}/search-issued-books`}
-        label="Search Issued Books"
-      />
-      <br />
-      <br />
-      <LinkButton
-        to={`${previousPath}/search-returned-books`}
-        label="Search Returned Books"
-      />
+    <div>
+      <h1 className="text-center font-bold text-4xl my-5">Issue Books</h1>
+      <div className="grid grid-cols-1 gap-5 place-items-center">
+        <LinkButton
+          to={`${previousPath}/issue-new-book`}
+          label="Issue new Book"
+        />
+        <LinkButton
+          to={`${previousPath}/return-issued-book`}
+          label="Return Issued Book"
+        />
+        <LinkButton
+          to={`${previousPath}/search-issued-books`}
+          label="Search Issued Books"
+        />
+        <LinkButton
+          to={`${previousPath}/search-returned-books`}
+          label="Search Returned Books"
+        />
+      </div>
     </div>
   );
 };

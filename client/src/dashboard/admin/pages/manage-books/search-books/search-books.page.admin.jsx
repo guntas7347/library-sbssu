@@ -1,22 +1,17 @@
 import CustomTable from "../../../../../components/table/custom-table.component";
 import { fetchAllBooks } from "../../../hooks/http-requests.hooks.admin";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { sortObjectUsingKeys } from "../../../../../utils/functions";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { useNavigate } from "react-router-dom";
 import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
-import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const SearchBooksPage = () => {
   const navigate = useNavigate();
+  const { setFeedback } = useContext(SnackBarContext);
 
   const [rowData, setRowData] = useState([]);
-
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
 
   const { formFields, handleChange } = useForm({
     sortSelect: "fetchAllBooks",
@@ -27,17 +22,13 @@ const SearchBooksPage = () => {
     await fetchAllBooks(formFields)
       .then((res) => {
         if (res.length === 0) {
-          setSnackbarFeedback({
-            open: true,
-            message: "No data found",
-            severity: "error",
-          });
+          setFeedback([1, 2, "No Data Found"]);
           return;
         }
         setRowData(rowsArray(res));
       })
       .catch((err) => {
-        setSnackbarFeedback({ open: true, message: err, severity: "error" });
+        setFeedback([1, 2, err]);
       });
   };
 
@@ -78,16 +69,16 @@ const SearchBooksPage = () => {
   };
 
   const handleRowClick = (e) => {
-    navigate(`/dashboard/admin/manage-books/view-book/${e}`);
+    navigate(e);
   };
 
   return (
-    <div className="text-center">
-      <h1 className="text-4xl font-bold m-5">Search Books</h1>
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">Search Books</h1>
       <div>
-        <div className="grid grid-cols-9 gap-10 my-5 white-container">
+        <div className="grid grid-cols-4 gap-10 my-5 bg-white p-5 rounded-3xl">
           <SearchQueriesComponent
-            className="col-span-6 w-full gap-10"
+            className="col-span-3"
             selectFields={[
               {
                 name: "Search All Books",
@@ -104,10 +95,11 @@ const SearchBooksPage = () => {
             inputValue={formFields.selectValue}
             onChange={handleChange}
           />
-
-          <button className="my-button col-span-3" onClick={handleFetch}>
-            Submit
-          </button>
+          <div className="col-span-1 flex flex-row justify-center items-center">
+            <button className="my-button " onClick={handleFetch}>
+              Submit
+            </button>
+          </div>
         </div>
         <div className="">
           <CustomTable
@@ -122,12 +114,6 @@ const SearchBooksPage = () => {
             handleRowClick={handleRowClick}
           />
         </div>
-      </div>
-      <div>
-        <SnackbarFeedbackCustom
-          feedback={showSnackbarFeedback}
-          handleClose={setSnackbarFeedback}
-        />
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import SpanningTable from "../../../../../components/table/spanning-table.compon
 import { fetchBookDetails } from "../../../hooks/http-requests.hooks.admin";
 import { useParams } from "react-router-dom";
 import { formatTime } from "../../../../../utils/functions";
+import LinkButton from "../../../../../components/forms/link-button/link-button.component";
 
 const ViewBookPage = () => {
   const { _id } = useParams();
@@ -54,24 +55,25 @@ const ViewBookPage = () => {
   };
 
   return (
-    <div className="m-5">
-      <div className="text-center mb-1">
-        <h1>Book Details</h1>
-      </div>
-      <div>
-        <SpanningTable
-          rows={[
-            ["Title", title],
-            ["Author", author],
-            ["Place And Publishers", placeAndPublishers],
-            ["Publication Year", publicationYear],
-            ["Pages", pages],
-            ["Source", source],
-            ["Cost", cost],
-            ["Accession Numbers", accessionNumbers],
-            ["Book added on", formatTime(createdAt)],
-          ]}
-        />
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">Book Details</h1>
+
+      <SpanningTable
+        rows={[
+          ["Title", title],
+          ["Author", author],
+          ["Place And Publishers", placeAndPublishers],
+          ["Publication Year", publicationYear],
+          ["Pages", pages],
+          ["Source", source],
+          ["Cost", cost],
+          ["Accession Numbers", accessionNumbers],
+          ["Book added on", formatTime(createdAt)],
+        ]}
+      />
+
+      <div className="my-5">
+        <LinkButton to={`edit-book`} label="Edit Book Details" />
       </div>
     </div>
   );

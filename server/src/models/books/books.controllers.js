@@ -84,6 +84,10 @@ const addBookAccessionToBook = async (bookId, bookAccessionId, session) => {
   );
 };
 
+const updateBookById = async (_id, bookDoc) => {
+  return await booksMongo.findByIdAndUpdate(_id, bookDoc);
+};
+
 module.exports = {
   createBook,
   findBooks,
@@ -91,4 +95,5 @@ module.exports = {
   getBookById,
   getBookByIsbn,
   addBookAccessionToBook,
+  updateBookById,
 };

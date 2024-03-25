@@ -42,7 +42,6 @@ export const restCall = (url, obj, crs = [], blob = false) => {
 
         const response = await res.json();
         if (crs.includes(response.status)) {
-          console.log(response.status);
           if (response.payload === null) {
             resolve(response.message);
           } else {
@@ -66,6 +65,9 @@ export const restCall = (url, obj, crs = [], blob = false) => {
 
 export const createNewStudent = (obj) =>
   restCall("students/create-new-student", obj, ["STU201CNS"]);
+
+export const editExistingStudent = (obj) =>
+  restCall("students/edit-existing-student", obj, ["STU200ES"]);
 
 export const fetchStudentByRollNumber = (rollNumber) =>
   restCall("students/fetch-student-by-roll-number", { rollNumber }, [
@@ -108,6 +110,9 @@ export const createBookAccession = (bookAccessionDetails) =>
 
 export const fetchBookDetails = (_id) =>
   restCall("books/fetch-book-by-id", { _id }, "BKS200FBDBI");
+
+export const editExistingBook = (e) =>
+  restCall("books/edit-existing-book", e, "BKS200EB");
 
 export const fetchBookByAccessionNumber = (accessionNumber) =>
   restCall(

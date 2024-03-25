@@ -6,9 +6,6 @@ import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/
 import { fetchAllFines } from "../../../hooks/http-requests.hooks.admin";
 import { rowsArray } from "../../../../../utils/functions";
 import { useNavigate } from "react-router-dom";
-import Button from "../../../../../components/buttons/button.component";
-
-import "./search-fines.styles.scss";
 
 const SearchFinesPage = () => {
   const navigate = useNavigate();
@@ -47,10 +44,11 @@ const SearchFinesPage = () => {
   };
 
   return (
-    <div className="text-center">
-      <h1 className="page-header">Search Fines</h1>
-      <div className="container-searchFines white-container">
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">Search Fines</h1>
+      <div className="grid grid-cols-4 gap-10 my-5 bg-white p-5 rounded-3xl">
         <SearchQueriesComponent
+          className="col-span-3"
           selectFields={[
             {
               name: "Search All Fines",
@@ -62,9 +60,13 @@ const SearchFinesPage = () => {
           inputValue={formFields.selectValue}
           onChange={handleChange}
         />
-        <Button onClick={handleClick} label="Search" />
+        <div className="col-span-1 flex flex-row justify-center items-center">
+          <button className="my-button" onClick={handleClick}>
+            Search
+          </button>
+        </div>
       </div>
-      <div className="p-5">
+      <div className="">
         <CustomTable
           columns={[
             "Date",

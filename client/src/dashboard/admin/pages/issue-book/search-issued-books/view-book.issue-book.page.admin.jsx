@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import SpanningTable from "../../../../../components/table/spanning-table.component";
-import {
-  fetchIssuedBook,
-  fetchReturnedBook,
-} from "../../../hooks/http-requests.hooks.admin";
+import { fetchIssuedBook } from "../../../hooks/http-requests.hooks.admin";
 import { useParams } from "react-router-dom";
 import { formatTime } from "../../../../../utils/functions";
 import Spinner from "../../../../../components/feedback/spinner/spinner.component";
@@ -41,10 +38,11 @@ const ViewIssuedBookPage = () => {
   };
 
   return (
-    <div className="m-5">
-      <div className="text-center mb-1">
-        <h1>Issued Book Details</h1>
-      </div>
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">
+        Issued Book Details
+      </h1>
+
       {isBookFetched() ? (
         <div>
           <SpanningTable

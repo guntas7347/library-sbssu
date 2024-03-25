@@ -5,6 +5,7 @@ import App from "./App";
 
 import { SnackbarProvider } from "./components/context/snackbar.context";
 
+import "./index.css";
 import "./index.scss";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));

@@ -9,9 +9,6 @@ import InputField from "../../../../../../components/forms/input-field/input-fie
 import AlertDialog from "../../../../../../components/feedback/dialog/alert-dialog.component";
 import CustomTable from "../../../../../../components/table/custom-table.component";
 import { SnackBarContext } from "../../../../../../components/context/snackbar.context";
-import Button from "../../../../../../components/buttons/button.component";
-
-import "./add-library-card.styles.scss";
 
 const AllotLibraryCardPage = () => {
   const { setFeedback } = useContext(SnackBarContext);
@@ -52,10 +49,12 @@ const AllotLibraryCardPage = () => {
   };
 
   return (
-    <div className="">
-      <h2 className="text-center page-header">Allot Library card to Student</h2>
-      <div className="white-container">
-        <div className="search-container-addLibraryCard">
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">
+        Allot Library card to Student
+      </h1>
+      <div className="bg-white p-5 rounded-3xl">
+        <div className="flex flex-row justify-around items-center">
           <InputField
             label="Student's Roll Number"
             name="rollNumber"
@@ -65,20 +64,20 @@ const AllotLibraryCardPage = () => {
             onChange={handleChange}
           />
 
-          <Button
-            variant="contained"
-            onClick={handleFetchStudent}
-            label="Fetch Student"
-          />
+          <button className="my-button" onClick={handleFetchStudent}>
+            Fetch Student
+          </button>
         </div>
 
         {showStudentTable ? (
-          <div className="">
-            <CustomTable
-              columns={["Roll Number", "Name", "Program", "Batch"]}
-              rows={rowData}
-            />
-            <div className="submit-container-addLibraryCard">
+          <div>
+            <div className="my-10">
+              <CustomTable
+                columns={["Roll Number", "Name", "Program", "Batch"]}
+                rows={rowData}
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-5 items-center">
               <InputField
                 label="Roll Number"
                 type="number"
@@ -95,12 +94,14 @@ const AllotLibraryCardPage = () => {
                 value={cardNumber}
                 onChange={handleChange}
               />
-
-              <Button
-                onClick={() => setShowAlertDialog(true)}
-                variant="contained"
-                label="Submit"
-              />
+              <div className="flex flex-row justify-center">
+                <button
+                  onClick={() => setShowAlertDialog(true)}
+                  className="my-button"
+                >
+                  Submit
+                </button>
+              </div>
             </div>
           </div>
         ) : (

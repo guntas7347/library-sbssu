@@ -9,6 +9,12 @@ const crs = {
       "Student created successfully",
       payload
     ),
+  STU200ES: (payload = null) =>
+    createCustomResponseObject(
+      "STU200ES",
+      "Student Edited successfully",
+      payload
+    ),
   CONFL409CNS: (payload = null) =>
     createCustomResponseObject(
       "CONFL409CNS",
@@ -351,6 +357,9 @@ const crs = {
       "Number of Book Accessions fetched",
       payload
     ),
+  BKS200EB: (payload = null) =>
+    createCustomResponseObject("BKS200EB", "Book details updated", payload),
+
   STU200CTS: (payload = null) =>
     createCustomResponseObject(
       "STU200CTS",

@@ -61,10 +61,11 @@ const ViewApplicantPage = () => {
   };
 
   return (
-    <div className="text-center">
-      <h1 className="">Application Details</h1>
-
-      <div className="">
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">
+        Application Details
+      </h1>
+      <div>
         <SpanningTable
           rows={[
             ["Roll Number", rollNumber],

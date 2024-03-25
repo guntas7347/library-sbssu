@@ -90,4 +90,4 @@ const IssuedBooksDatabasePage = () => {
   );
 };
 
-export default IssuedBooksDatabasePage;
+// export default IssuedBooksDatabasePage;

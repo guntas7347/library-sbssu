@@ -10,9 +10,6 @@ import { useNavigate } from "react-router-dom";
 import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
-import "./search-issued-books.styles.admin.scss";
-import Button from "../../../../../components/buttons/button.component";
-
 const SearchIssuedBooks = () => {
   const navigate = useNavigate();
   const { setFeedback } = useContext(SnackBarContext);
@@ -66,11 +63,14 @@ const SearchIssuedBooks = () => {
   };
 
   return (
-    <div className="text-center">
-      <h1 className="page-header">Search Issued Books</h1>
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">
+        Search Issued Books
+      </h1>
       <div>
-        <div className="container-searchIssuedBooks white-container">
+        <div className="grid grid-cols-4 gap-10 my-5 bg-white p-5 rounded-3xl">
           <SearchQueriesComponent
+            className="col-span-3"
             selectFields={[
               {
                 name: "Search All Issued Books",
@@ -104,25 +104,29 @@ const SearchIssuedBooks = () => {
             inputValue={formFields.selectValue}
             onChange={handleChange}
           />
-          <Button onClick={handleFetch} label="Search" />
+          <div className="col-span-1 flex flex-row justify-center items-center">
+            <button className="my-button " onClick={handleFetch}>
+              Submit
+            </button>
+          </div>
         </div>
-        <div className="p-5">
-          <CustomTable
-            columns={[
-              "Accession Number",
-              "Book Title",
-              "Card Number",
-              "Issue Date",
-              "Student Roll Number",
-              "Student Name",
-            ]}
-            rows={rowData}
-            handleRowClick={handleRowClick}
-          />
-        </div>
-        <div className="export-button">
+        <CustomTable
+          columns={[
+            "Accession Number",
+            "Book Title",
+            "Card Number",
+            "Issue Date",
+            "Student Roll Number",
+            "Student Name",
+          ]}
+          rows={rowData}
+          handleRowClick={handleRowClick}
+        />
+        <div className="mt-5 flex flex-row justify-center items-center">
           {tableHasData() && (
-            <Button onClick={handleDownload} label="Export To Excel" />
+            <button className="my-button" onClick={handleDownload}>
+              Export To Excel
+            </button>
           )}
         </div>
       </div>

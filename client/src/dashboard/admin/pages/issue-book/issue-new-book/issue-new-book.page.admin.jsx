@@ -11,7 +11,6 @@ import InputField from "../../../../../components/forms/input-field/input-field.
 import { rowsArray } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
 import BackdropSpinner from "../../../../../components/feedback/backdrop/backdrop.component";
-import Button from "../../../../../components/buttons/button.component";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const IssueNewBookPage = () => {
@@ -127,14 +126,12 @@ const IssueNewBookPage = () => {
   };
 
   return (
-    <div className="text-center">
-      <h1 className="page-header">Issue a Book</h1>
-
-      <div className="white-container grid grid-rows-3 gap-0 items-center ">
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">Issue a Book</h1>
+      <div className="bg-white rounded-3xl p-5 grid gap-10">
         <div>
           <div className="grid grid-cols-2 gap-5">
             <InputField
-              className="w-full"
               label="Book's Accession Number"
               name="accessionNumber"
               type="text"
@@ -142,15 +139,19 @@ const IssueNewBookPage = () => {
               disabled={showBookTable}
               onChange={handleChange}
             />
-            <Button
-              disabled={showBookTable}
-              onClick={handleFetchBook}
-              label="Fetch Book"
-            />
+            <div className="flex flex-row justify-center">
+              <button
+                className="my-button w-48"
+                disabled={showBookTable}
+                onClick={handleFetchBook}
+              >
+                Fetch Book
+              </button>
+            </div>
           </div>
           <div>
             {showBookTable && (
-              <div className="m-5">
+              <div className="mt-5">
                 <CustomTableSelect
                   columns={[
                     "ISBN",
@@ -172,7 +173,6 @@ const IssueNewBookPage = () => {
         <div>
           <div className="grid grid-cols-2 gap-5">
             <InputField
-              className="w-full"
               label="Student's Roll Number"
               name="rollNumber"
               type="text"
@@ -180,15 +180,19 @@ const IssueNewBookPage = () => {
               disabled={showStudentTable}
               onChange={handleChange}
             />
-            <Button
-              disabled={showStudentTable}
-              onClick={handleFetchStuent}
-              label="Fetch Student"
-            />
+            <div className="flex flex-row justify-center">
+              <button
+                className="my-button w-48"
+                disabled={showStudentTable}
+                onClick={handleFetchStuent}
+              >
+                Fetch Student
+              </button>
+            </div>
           </div>
           <div>
             {showStudentTable && (
-              <div className="m-5">
+              <div className="mt-5">
                 <CustomTableSelect
                   columns={[
                     "Roll Number",
@@ -214,10 +218,9 @@ const IssueNewBookPage = () => {
               setShowAlertDialog(true);
             }}
           >
-            <div className="grid grid-cols-3 gap-5">
+            <div className="grid grid-cols-3 gap-5 items-center justify-center">
               <InputField
                 disabled
-                className="w-full"
                 label="Card Number"
                 name="cardNumber"
                 value={selectedCardNumber}
@@ -225,14 +228,12 @@ const IssueNewBookPage = () => {
 
               <InputField
                 disabled
-                className="w-full"
                 label="Accession Number"
                 name="accessionNumber"
                 value={selectedAccessionNumber}
               />
 
               <InputField
-                className="w-full"
                 label="Issue Date"
                 name="issueDate"
                 type="date"
@@ -242,13 +243,15 @@ const IssueNewBookPage = () => {
                 required={false}
               />
             </div>
-            <button
-              className="my-button mt-5"
-              disabled={disableIssueButton()}
-              type="submit"
-            >
-              Issue Now
-            </button>
+            <div className="mt-5 flex flex-row justify-center items-center">
+              <button
+                className="my-button"
+                disabled={disableIssueButton()}
+                type="submit"
+              >
+                Issue Now
+              </button>
+            </div>
           </form>
         </div>
       </div>

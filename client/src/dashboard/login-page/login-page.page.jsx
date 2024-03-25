@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import ReCAPTCHA from "react-google-recaptcha";
 
 import "./login-page.styles.scss";
 
@@ -15,6 +14,7 @@ import {
 
 import InputSelect from "../../components/forms/input-select/input-select.component";
 import { SnackBarContext } from "../../components/context/snackbar.context";
+import ReCaptcha from "../../components/feedback/recaptcha/recaptcha.component";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -109,10 +109,7 @@ const LoginPage = () => {
             onChange={handleChange}
           />
           <div className="flex justify-center">
-            <ReCAPTCHA
-              sitekey="6LczFYgpAAAAALk-4XyUrx0bRXOXoWLK9phbwe1O"
-              onChange={handleVerify}
-            />
+            <ReCaptcha onChange={handleVerify} />
           </div>
           <button
             disabled={!reCaptchaVerified}

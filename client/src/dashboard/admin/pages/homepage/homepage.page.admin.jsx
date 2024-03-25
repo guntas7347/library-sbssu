@@ -101,10 +101,10 @@ const Homepage = () => {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="h-96 bg-violet-300 rounded-3xl p-10">
-          <p>
+          <span>
             {temperature} C<p>Ferozepur</p>
             <p>India</p>
-          </p>
+          </span>
         </div>
         <div className="grid grid-cols-2 gap-4 text-white">
           <div className="bg-indigo-500 rounded-3xl p-10">
@@ -125,7 +125,7 @@ const Homepage = () => {
           <div className="bg-pink-400 rounded-3xl p-10">
             <p>Total Books</p>
             <p>{totalBooks}</p>
-            <p>Jai mata di🫶🏻</p>
+            <p>Books :)</p>
           </div>
         </div>
         <div className="rounded-3xl bg-white px-10 py-4 flex flex-col gap-3">

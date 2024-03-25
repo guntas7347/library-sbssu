@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 
-import "./navbar.styles.scss";
 import { useState } from "react";
 
 const NavigationBar = () => {
@@ -13,7 +12,9 @@ const NavigationBar = () => {
       <>
         <div>
           <Link to={to}>
-            <button className="menu-button">{label}</button>
+            <button className="rounded-xl w-36 h-14 hover:bg-violet-300">
+              {label}
+            </button>
           </Link>
         </div>
       </>
@@ -24,31 +25,43 @@ const NavigationBar = () => {
 
   return (
     <>
-      <div className="navbar">
+      <div
+        style={{ boxShadow: "0px 10px 21px -10px rgba(174, 161, 255, 0.75)" }}
+        className="bg-white flex flex-row items-center h-20 gap-5 px-5"
+      >
         <div
           onClick={() => {
             setShowMenu(!showMenu);
           }}
-          className="menu-bar-icon"
+          className="flex flex-row justify-center items-center hover:bg-gray-400 active:opacity-75 rounded-full h-12 w-12"
         >
           <i className="fa-solid fa-bars fa-xl"></i>
         </div>
 
-        <div className="navbar-label">
+        <div className="font-bold text-2xl">
           <label>Admin Dashboard</label>
         </div>
 
-        <div className="navbar-searchbar">
-          <i className="fa-solid fa-magnifying-glass"></i>
-          <input type="text" placeholder="Search..." />
+        <div className="relative flex flex-row justify-center items-center w-80">
+          <i className="fa-solid fa-magnifying-glass absolute left-2.5"></i>
+          <input
+            className="pl-8 pr-1 h-8 w-full"
+            type="text"
+            placeholder="Search..."
+          />
         </div>
 
-        <div className="navbar-account-icon">
+        <div className="ml-auto">
           <MenuButton label="Sign Out" to="/" />
         </div>
       </div>
 
-      <div className={`menu-bar ${showMenu && "show-menu"}`}>
+      <div
+        style={{ borderTop: "1px solid rgba(174, 161, 255, 0.75)" }}
+        className={`absolute flex flex-col gap-3 items-center bg-white z-50 h-auto pt-2 -left-40 w-40 transition-left duration-500 ${
+          showMenu && "left-0"
+        }`}
+      >
         <MenuButton label="Home" to="/dashboard/admin" />{" "}
         <MenuButton label="Profile" to="/dashboard/admin/profile" />
         <MenuButton

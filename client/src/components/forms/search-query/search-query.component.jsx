@@ -25,23 +25,20 @@ const SearchQueriesComponent = ({
 
   return (
     <div className={className}>
-      <div className="container-search-query">
+      <div className="flex flex-row items-center gap-2">
         <div>
           <InputSelect
-            className="w-full"
             fields={selectFields}
             value={selectValue}
             onChange={onChange}
             name={selectName}
+            label="Search By"
           />
         </div>
         <div
-          className={`${
-            inputFieldType === "none" && "hide-inputfield-search-query"
-          }`}
+          className={`${inputFieldType === "none" && "opacity-0 invisible"}`}
         >
           <InputField
-            className="w-full"
             label={inputLabel}
             name={inputName}
             value={inputValue}

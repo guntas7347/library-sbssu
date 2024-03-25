@@ -1,19 +1,14 @@
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { addNewBook } from "../../../hooks/http-requests.hooks.admin";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
-import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
-import Button from "../../../../../components/buttons/button.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const AddBookPage = () => {
+  const { setFeedback } = useContext(SnackBarContext);
+
   const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
 
   const { formFields, handleChange } = useForm({
     isbn: "",
@@ -45,22 +40,22 @@ const AddBookPage = () => {
     console.log(formFields);
     await addNewBook(formFields)
       .then((res) => {
-        setSnackbarFeedback([1, 1, res]);
+        setFeedback([1, 1, res]);
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
   };
 
   return (
     <div>
-      <h2 className="text-center my-4">Add New Book</h2>
-      <div className="mx-3 mx-md-4 mx-lg-5">
+      <h1 className="text-center font-bold text-3xl my-2">Add New Book</h1>
+      <div className="bg-white p-5 rounded-3xl">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             setShowAlertDialog(true);
           }}
         >
-          <div className="container-add-student">
+          <div className="grid md:grid-cols-2 gap-x-28 gap-5 justify-center items-center">
             <div>
               <InputField
                 label="Title"
@@ -152,8 +147,11 @@ const AddBookPage = () => {
               />
             </div>
           </div>
-
-          <Button fullWidth type="submit" label="Submit" />
+          <div className="mt-5 flex flex-row justify-center">
+            <button className="my-button" type="submit">
+              Submit
+            </button>
+          </div>
         </form>
       </div>
       <div>
@@ -163,10 +161,6 @@ const AddBookPage = () => {
             if (e) handleAddNewBook();
             setShowAlertDialog(false);
           }}
-        />
-        <SnackbarFeedbackCustom
-          feedback={showSnackbarFeedback}
-          handleClose={setSnackbarFeedback}
         />
       </div>
     </div>

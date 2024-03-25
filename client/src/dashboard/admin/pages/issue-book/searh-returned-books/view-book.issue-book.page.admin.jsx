@@ -39,10 +39,11 @@ const ViewReturnedBookPage = () => {
   };
 
   return (
-    <div className="m-5">
-      <div className="text-center mb-1">
-        <h1>Returned Book Details</h1>
-      </div>
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">
+        Returned Book Details
+      </h1>
+
       {isBookFetched() ? (
         <div>
           <SpanningTable

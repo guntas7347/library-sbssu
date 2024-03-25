@@ -1,4 +1,4 @@
-import InputField from "../../components/forms/input-field/input-field.component";
+// import InputField from "../../components/forms/input-field/input-field.component";
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
 import {
   compleateSignUpWithCredentials,
@@ -7,6 +7,16 @@ import {
 import { Link } from "react-router-dom";
 import { useContext, useState } from "react";
 import { SnackBarContext } from "../../components/context/snackbar.context";
+
+const InputField = (props) => {
+  const { label } = props;
+  return (
+    <div className="flex flex-col">
+      <label>{label}</label>
+      <input className="border px-1" {...props} />
+    </div>
+  );
+};
 
 const SignUpPage = () => {
   const { setFeedback } = useContext(SnackBarContext);
@@ -30,11 +40,7 @@ const SignUpPage = () => {
       await initalizeSignUpWithCredentials(formFields)
         .then((res) => {
           handleChange({ target: { name: "_id", value: res.payload } });
-          setFeedback({
-            open: true,
-            severity: "success",
-            message: res.message,
-          });
+          setFeedback([1, 1, res.message]);
           setShowOTPForm(true);
         })
         .catch((err) => setFeedback([1, 2, err]));
@@ -44,11 +50,7 @@ const SignUpPage = () => {
         _id: formFields._id,
       })
         .then((res) => {
-          setFeedback({
-            open: true,
-            severity: "success",
-            message: res.message,
-          });
+          setFeedback([1, 1, res.message]);
           setShowOTPForm(false);
           resetFormFields();
         })

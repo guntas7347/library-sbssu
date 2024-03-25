@@ -3,6 +3,7 @@ import { fetchStudentById } from "../../../hooks/http-requests.hooks.admin";
 import { useEffect, useState } from "react";
 import SpanningTable from "../../../../../components/table/spanning-table.component";
 import Spinner from "../../../../../components/feedback/spinner/spinner.component";
+import LinkButton from "../../../../../components/forms/link-button/link-button.component";
 
 const ViewStudentPage = () => {
   const { _id } = useParams();
@@ -65,8 +66,10 @@ const ViewStudentPage = () => {
   };
 
   return (
-    <div className="text-center m-5">
-      <h1 className="">Student Roll Number : {rollNumber}</h1>
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">
+        Student Roll Number : {rollNumber}
+      </h1>
       <div>
         {isBookFetched() ? (
           <SpanningTable
@@ -102,6 +105,9 @@ const ViewStudentPage = () => {
             <Spinner />
           </div>
         )}
+      </div>
+      <div className="my-5">
+        <LinkButton to={`edit-student`} label="Edit Student Details" />
       </div>
     </div>
   );

@@ -1,6 +1,4 @@
-import AlertDialog, {
-  AlertDialogBB,
-} from "../../components/feedback/dialog/alert-dialog.component";
+import AlertDialog from "../../components/feedback/dialog/alert-dialog.component";
 import { useContext, useEffect, useState } from "react";
 import { fetchSettingsAcademicPrograms } from "../admin/hooks/http-requests.hooks.admin";
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
@@ -21,12 +19,15 @@ const InputSelect = (props) => {
     <div className="flex flex-row justify-between">
       <label htmlFor="">{label}</label>
       <select
+        required
         className="border border-black px-1 w-48"
         onChange={onChange}
         defaultValue={fields[0].value}
         {...props}
       >
-        <option defaultValue>--select an option--</option>
+        <option value="" disabled>
+          --select an option--
+        </option>
         {fields.map((menuItem, index) => (
           <option key={index} value={menuItem.value}>
             {menuItem.name}
@@ -75,7 +76,8 @@ const ApplyStudentPage = () => {
   const handleSubmit = async () => {
     await createApplication(formFields)
       .then((res) => {
-        setFeedback({ open: true, severity: "success", message: res.message });
+        console.log(res);
+        setFeedback([1, 1, res.message]);
         resetFormFields();
         window.location.reload();
       })
@@ -140,6 +142,11 @@ const ApplyStudentPage = () => {
               name="rollNumber"
               value={rollNumber}
               onChange={handleChange}
+              onInput={(e) => {
+                e.target.value = Math.max(0, parseInt(e.target.value))
+                  .toString()
+                  .slice(0, 6);
+              }}
             />
             <InputSelect
               label="Batch"
