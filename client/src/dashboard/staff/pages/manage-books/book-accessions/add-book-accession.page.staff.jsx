@@ -1,28 +1,24 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
-import { Button, Grid } from "@mui/material";
-import CustomTableSelect from "../../../../../components/table/custom-table-select.component";
 import {
   createBookAccession,
   fetchBookByISBN,
-} from "../../../hooks/http-requests.hooks.admin";
-import { sortObjectUsingKeys } from "../../../../../utils/functions";
+} from "../../../hooks/http-requests.hooks.staff";
+import { rowsArray } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
+import CustomTable from "../../../../../components/table/custom-table.component";
+import { useNavigate } from "react-router-dom";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const AddBookAccessionPage = () => {
+  const navigate = useNavigate();
+
+  const { setFeedback } = useContext(SnackBarContext);
+
   const [showBookTable, setShowBookTable] = useState(false);
 
-  const [showAccessionNumberField, setShowAccessionNumberField] =
-    useState(false);
-
   const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
 
   const [rowData, setRowData] = useState([]);
 
@@ -33,85 +29,81 @@ const AddBookAccessionPage = () => {
   const { isbn } = formFields;
 
   const handleFetchBook = async () => {
-    await fetchBookByISBN(formFields).then(async (res) =>
-      setRowData(rowsArray([res]))
-    );
-    setShowBookTable(true);
-  };
-
-  const handleSelect = (_, selectedValue) => {
-    if (selectedValue !== null) {
-      setShowAccessionNumberField(selectedValue);
-    } else {
-      setShowAccessionNumberField(false);
-    }
+    await fetchBookByISBN(isbn)
+      .then(async (res) => {
+        setRowData(
+          rowsArray(
+            [res],
+            ["_id", "isbn", "title", "author", "publicationYear", "cost"]
+          )
+        );
+        setShowBookTable(true);
+      })
+      .catch((err) => {
+        setFeedback([1, 2, err]);
+      });
   };
 
   const handleCreateBookAccession = async () => {
     await createBookAccession(formFields)
       .then((res) => {
-        setSnackbarFeedback([1, 1, res]);
+        setFeedback([1, 1, res]);
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
   };
 
-  const rowsArray = (array) => {
-    return array.map((obj) => {
-      return Object.values(
-        sortObjectUsingKeys(obj, [
-          "isbn",
-          "title",
-          "author",
-          "publicationYear",
-          "cost",
-        ])
-      );
-    });
+  const handleRowClick = (e) => {
+    navigate(`/dashboard/admin/manage-books/search-books/${e}`);
   };
 
   return (
     <div>
-      <br />
-      <br />
-      <div className="m-5">
-        <Grid container spacing={4}>
-          <Grid item>
-            <InputField
-              label="Book's ISBN"
-              name="isbn"
-              type="text"
-              disabled={showBookTable}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item>
-            <Button variant="contained" onClick={handleFetchBook}>
-              Fetch Book
-            </Button>
-          </Grid>
-        </Grid>
-        {showBookTable ? (
-          <CustomTableSelect
-            columns={["ISBN", "Title", "Author", "Publication Year", "Price"]}
-            rows={rowData}
-            onSelect={handleSelect}
-            indexToSelect={0}
+      <h1 className="text-center font-bold text-3xl my-2">
+        Add Accession number to Book
+      </h1>
+      <div className="bg-white p-5 rounded-3xl">
+        <div className="flex flex-row justify-around items-center">
+          <InputField
+            label="Book's ISBN"
+            name="isbn"
+            type="text"
+            value={isbn}
+            disabled={showBookTable}
+            onChange={handleChange}
           />
-        ) : (
-          ""
-        )}
-        <br />
 
-        {showAccessionNumberField ? (
+          <button
+            className="my-button"
+            disabled={showBookTable}
+            onClick={handleFetchBook}
+          >
+            Fetch Book
+          </button>
+        </div>
+
+        {showBookTable ? (
           <div>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setShowAlertDialog(true);
-              }}
-            >
-              <Grid container spacing={2}>
-                <Grid item>
+            <div className="my-10">
+              <CustomTable
+                columns={[
+                  "ISBN",
+                  "Title",
+                  "Author",
+                  "Publication Year",
+                  "Price",
+                ]}
+                rows={rowData}
+                handleRowClick={handleRowClick}
+              />
+            </div>
+            <div className=" ">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setShowAlertDialog(true);
+                }}
+              >
+                <div className="grid grid-cols-3 gap-5 items-center">
                   <InputField
                     label="ISBN"
                     type="number"
@@ -120,44 +112,36 @@ const AddBookAccessionPage = () => {
                     disabled
                     InputLabelProps={{ shrink: true }}
                   />
-                </Grid>
-                <Grid item>
+
                   <InputField
                     label="Accession Number"
                     type="number"
                     name="accessionNumber"
                     onChange={handleChange}
                   />
-                </Grid>
-                <Grid item>
-                  <Button type="submit" variant="contained">
-                    Submit
-                  </Button>
-                </Grid>
-              </Grid>
-            </form>
+                  <div className="flex flex-row justify-center">
+                    <button className="my-button" type="submit">
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
         ) : (
           ""
         )}
+        <br />
       </div>
       <div>
         <AlertDialog
           title="Confirm?"
           content="This action can not be undone"
           open={showAlertDialog}
-          handleClick={(e, f) => {
+          handleClick={(e) => {
             if (e) handleCreateBookAccession();
             setShowAlertDialog(false);
           }}
-        />
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "info", message: "" })
-          }
         />
       </div>
     </div>

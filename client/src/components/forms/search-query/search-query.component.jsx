@@ -1,53 +1,44 @@
-import { useEffect, useState } from "react";
 import InputSelect from "../input-select/input-select.component";
 import InputField from "../input-field/input-field.component";
-import "./search-query.styles.scss";
 
-const SearchQueriesComponent = ({
-  className = "",
-  selectFields,
-  selectValue,
-  selectName = "sortSelect",
-  inputName = "sortValue",
-  inputValue,
-  onChange,
-}) => {
-  const [inputFieldType, setInputFieldType] = useState("text");
-  const [inputLabel, setInputField] = useState("Field");
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useForm } from "../use-form-hook/use-form.hook.component";
+import { createURLQuery } from "../../../utils/functions";
+
+const SearchQueriesComponent = ({ selectFields }) => {
+  const navigate = useNavigate();
+
+  const { formFields, handleChange } = useForm({ filter: "", filterValue: "" });
 
   useEffect(() => {
-    var fieldValue = selectFields.find((field) => field.value === selectValue);
-    if (!fieldValue) fieldValue = { inputField: "none", name: "none" };
-    const { inputField = "none", name } = fieldValue;
-    setInputField(name);
-    setInputFieldType(inputField);
-  });
+    const timer = setTimeout(() => {
+      if (formFields.filter !== "" || formFields.filterValue !== "") {
+        const q = createURLQuery({
+          filter: formFields.filter,
+          filterValue: formFields.filterValue,
+        });
+        navigate(`?${q}`);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [formFields]);
 
   return (
-    <div className={className}>
-      <div className="flex flex-row items-center gap-2">
-        <div>
-          <InputSelect
-            fields={selectFields}
-            value={selectValue}
-            onChange={onChange}
-            name={selectName}
-            label="Search By"
-          />
-        </div>
-        <div
-          className={`${inputFieldType === "none" && "opacity-0 invisible"}`}
-        >
-          <InputField
-            label={inputLabel}
-            name={inputName}
-            value={inputValue}
-            onChange={onChange}
-            type={inputFieldType}
-          />
-        </div>
+    <>
+      <div className="flex items-center gap-5">
+        <InputSelect
+          fields={selectFields}
+          label="Search By"
+          onChange={handleChange}
+          value={formFields.filter}
+          name="filter"
+        />
+
+        <InputField label="Value" name="filterValue" onChange={handleChange} />
       </div>
-    </div>
+    </>
   );
 };
 

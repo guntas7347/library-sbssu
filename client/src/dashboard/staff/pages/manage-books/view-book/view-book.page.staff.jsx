@@ -1,18 +1,12 @@
 import { useEffect, useState } from "react";
 import SpanningTable from "../../../../../components/table/spanning-table.component";
-import {
-  fetchAllBooks,
-  fetchBookByAccessionNumber,
-  fetchBookDetails,
-} from "../../../hooks/http-requests.hooks.admin";
+import { fetchBookDetails } from "../../../hooks/http-requests.hooks.staff";
 import { useParams } from "react-router-dom";
-import {
-  formatTime,
-  sortObjectUsingKeys,
-} from "../../../../../utils/functions";
+import { formatTime } from "../../../../../utils/functions";
+import LinkButton from "../../../../../components/forms/link-button/link-button.component";
 
 const ViewBookPage = () => {
-  const { accessionNumber } = useParams();
+  const { _id } = useParams();
 
   const [bookData, setBookData] = useState([]);
 
@@ -30,53 +24,56 @@ const ViewBookPage = () => {
 
   useEffect(() => {
     const asyncFunc = async () => {
-      await fetchBookDetails({ id: accessionNumber }).then((book) => {
-        if (book == null) {
-          return;
-        }
-        setBookData({
-          ...book,
-          accessionNumbers: mergeArrayElementsToString(book.accessionNumbers),
+      await fetchBookDetails(_id)
+        .then((book) => {
+          setBookData({
+            ...book,
+            accessionNumbers: createAccessionNumbersString(
+              book.accessionNumbers
+            ),
+          });
+        })
+        .catch((err) => {
+          setBookData({ title: "Book not found" });
         });
-      });
     };
     asyncFunc();
   }, []);
 
-  const mergeArrayElementsToString = (array = []) => {
+  const createAccessionNumbersString = (array = []) => {
     let string = "";
     let isFirst = true;
-    const numberOfAccessionNumbers = array.length;
     array.forEach((element) => {
       if (isFirst) {
-        string += `(${numberOfAccessionNumbers}) ` + element;
+        string += `(${array.length}) ` + element.accessionNumber;
         isFirst = false;
       } else {
-        string += ", " + element;
+        string += ", " + element.accessionNumber;
       }
     });
     return string;
   };
 
   return (
-    <div className="m-5">
-      <div className="text-center mb-1">
-        <h1>Book Details</h1>
-      </div>
-      <div>
-        <SpanningTable
-          rows={[
-            ["Title", title],
-            ["Author", author],
-            ["Place And Publishers", placeAndPublishers],
-            ["Publication Year", publicationYear],
-            ["Pages", pages],
-            ["Source", source],
-            ["Cost", cost],
-            ["Accession Numbers", accessionNumbers],
-            ["Book added on", formatTime(createdAt)],
-          ]}
-        />
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">Book Details</h1>
+
+      <SpanningTable
+        rows={[
+          ["Title", title],
+          ["Author", author],
+          ["Place And Publishers", placeAndPublishers],
+          ["Publication Year", publicationYear],
+          ["Pages", pages],
+          ["Source", source],
+          ["Cost", cost],
+          ["Accession Numbers", accessionNumbers],
+          ["Book added on", formatTime(createdAt)],
+        ]}
+      />
+
+      <div className="my-5">
+        <LinkButton to={`edit-book`} label="Edit Book Details" />
       </div>
     </div>
   );

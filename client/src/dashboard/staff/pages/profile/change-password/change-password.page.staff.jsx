@@ -1,16 +1,11 @@
-import { useState } from "react";
-import { Button, Grid } from "@mui/material";
+import { useContext } from "react";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
-import SnackbarFeedbackCustom from "../../../../../components/feedback/snackbar/snackbar-full.component";
 import { changePassword } from "../../../../http-requests";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const ChangePasswordPage = () => {
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
+  const { setFeedback } = useContext(SnackBarContext);
 
   const { formFields, handleChange, resetFormFields } = useForm({
     currentPassword: "",
@@ -25,68 +20,59 @@ const ChangePasswordPage = () => {
     console.log(formFields);
 
     if (newPassword !== confirmNewPassword) {
-      setSnackbarFeedback({
+      setFeedback({
         open: true,
         severity: "error",
         message: "New Password and Confirm New Password are not same",
       });
     } else {
       await changePassword(formFields)
-        .then((res) => {
+        .then(({ message }) => {
           resetFormFields();
-          setSnackbarFeedback({
+          setFeedback({
             open: true,
             severity: "success",
-            message: res,
+            message,
           });
         })
-        .catch((err) => setSnackbarFeedback([1, 2, err]));
+        .catch((err) => setFeedback([1, 2, err]));
     }
   };
 
   return (
-    <div className="text-center m-3">
-      <h5>Change your password</h5>
-      <div className="m-5">
+    <div className="text-center">
+      <h1 className="text-2xl font-bold">Change your password</h1>
+      <div className="my-5 white-container">
         <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            <Grid item>
-              <InputField
-                label="Current Password"
-                name="currentPassword"
-                onChange={handleChange}
-                value={currentPassword}
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="New Password"
-                name="newPassword"
-                onChange={handleChange}
-                value={newPassword}
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Confirm New Password"
-                name="confirmNewPassword"
-                onChange={handleChange}
-                value={confirmNewPassword}
-              />
-            </Grid>
-            <Grid item>
-              <Button variant="contained" type="submit">
-                Submit
-              </Button>
-            </Grid>
-          </Grid>
+          <div className="grid grid-cols-3 gap-5">
+            <InputField
+              label="Current Password"
+              name="currentPassword"
+              type="password"
+              onChange={handleChange}
+              value={currentPassword}
+            />
+
+            <InputField
+              label="New Password"
+              name="newPassword"
+              type="password"
+              onChange={handleChange}
+              value={newPassword}
+            />
+
+            <InputField
+              label="Confirm New Password"
+              name="confirmNewPassword"
+              type="password"
+              onChange={handleChange}
+              value={confirmNewPassword}
+            />
+          </div>
+          <button className="my-button my-5" type="submit">
+            Submit
+          </button>
         </form>
-      </div>
-      <div>
-        <SnackbarFeedbackCustom
-          showSnackbarFeedback={showSnackbarFeedback}
-          setSnackbarFeedback={setSnackbarFeedback}
-        />
       </div>
     </div>
   );

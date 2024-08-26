@@ -1,37 +1,35 @@
-import { useEffect, useState } from "react";
-import { Alert, Button, Grid, Snackbar } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import {
-  createStudent,
+  createNewStudent,
   fetchSettingsAcademicPrograms,
-} from "../../../hooks/http-requests.hooks.admin";
+} from "../../../hooks/http-requests.hooks.staff";
 import InputSelect from "../../../../../components/forms/input-select/input-select.component";
-import TransitionsModal from "../../../../../components/modals/modal.component";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const AddStudentPage = () => {
+  const { setFeedback } = useContext(SnackBarContext);
+
   const [academicPrograms, setAcademicPrograms] = useState([
-    { name: "", value: "" },
+    { name: "", value: "", branches: [{ name: "", value: "" }] },
   ]);
 
   const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
 
   const defaultFormFields = {
     rollNumber: "",
-    name: "",
+    fullName: "",
     fathersName: "",
-    gender: "male",
     dob: "",
-    program: "BTECH",
+    gender: "",
+    category: "",
+    program: "",
     specialization: "",
     batch: "",
+    email: "",
+    phoneNumber: "",
   };
 
   const { formFields, handleChange, resetFormFields } =
@@ -39,21 +37,25 @@ const AddStudentPage = () => {
 
   const {
     rollNumber,
-    name,
+    fullName,
     fathersName,
-    gender,
     dob,
+    gender,
+    category,
     program,
     specialization,
+    batch,
+    email,
+    phoneNumber,
   } = formFields;
 
   const handleSubmit = async () => {
-    await createStudent(formFields)
+    await createNewStudent(formFields)
       .then((res) => {
-        setSnackbarFeedback([1, 1, res]);
-        // resetFormFields();
+        setFeedback([1, 1, res]);
+        resetFormFields();
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
   };
 
   useEffect(() => {
@@ -65,110 +67,150 @@ const AddStudentPage = () => {
     asyncFunc();
   }, []);
 
+  const generateBatchYears = () => {
+    const array = [];
+    for (
+      let i = new Date().getFullYear();
+      i >= new Date().getFullYear() - 6;
+      i--
+    ) {
+      array.push({ name: i.toString(), value: i });
+    }
+
+    return array;
+  };
+  const generateSpecialization = () => {
+    try {
+      const selectedBranch = academicPrograms.find((obj) => {
+        return obj.value === program;
+      });
+      if (selectedBranch) {
+        if (Object.hasOwnProperty.call(selectedBranch, "branches"))
+          return selectedBranch.branches;
+        else return [{ name: "", value: "" }];
+      } else return [{ name: "", value: "" }];
+    } catch (error) {
+      return [{ name: "", value: "" }];
+    }
+  };
+
   return (
     <div>
-      <br />
-      <br />
-      <div className="m-5">
+      <h1 className="text-center font-bold text-3xl my-2">Add Student</h1>
+      <div className="bg-white p-5 rounded-3xl">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             setShowAlertDialog(true);
           }}
         >
-          <Grid container spacing={2}>
-            <Grid item>
-              <InputField
-                label="Roll Number"
-                type="number"
-                name="rollNumber"
-                InputProps={{ inputProps: {} }}
-                onChange={handleChange}
-                required
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Name"
-                type="text"
-                name="name"
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Father's Name"
-                type="text"
-                name="fathersName"
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <InputSelect
-                name="gender"
-                fields={[
-                  { name: "Male", value: "male" },
-                  { name: "Female", value: "female" },
-                  { name: "Other", value: "other" },
-                ]}
-                value={gender}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Date of Birth"
-                type="date"
-                name="dob"
-                onChange={handleChange}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item>
-              <InputSelect
-                name="program"
-                fields={academicPrograms}
-                value={program}
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Specialization"
-                type="text"
-                name="specialization"
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Batch"
-                type="number"
-                name="batch"
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Email"
-                type="text"
-                name="email"
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Phone Number"
-                type="number"
-                name="phoneNumber"
-                onChange={handleChange}
-              />
-            </Grid>
-          </Grid>
-          <br />
-          <Button type="submit" variant="contained">
-            Submit
-          </Button>
+          <div className="grid md:grid-cols-2 gap-x-28 gap-5 justify-center items-center">
+            <InputField
+              label="Roll Number"
+              type="number"
+              name="rollNumber"
+              value={rollNumber}
+              onChange={handleChange}
+            />
+
+            <InputSelect
+              label="Batch"
+              name="batch"
+              fields={generateBatchYears()}
+              value={batch}
+              onChange={handleChange}
+            />
+
+            <InputField
+              label="Name"
+              type="text"
+              name="fullName"
+              value={fullName}
+              onChange={handleChange}
+            />
+
+            <InputField
+              label="Father's Name"
+              type="text"
+              name="fathersName"
+              value={fathersName}
+              onChange={handleChange}
+            />
+
+            <InputField
+              label="Date of Birth"
+              type="date"
+              name="dob"
+              value={dob}
+              onChange={handleChange}
+            />
+
+            <InputSelect
+              label="Gender"
+              name="gender"
+              fields={[
+                { name: "Male", value: "male" },
+                { name: "Female", value: "female" },
+                { name: "Other", value: "other" },
+              ]}
+              value={gender}
+              onChange={handleChange}
+            />
+
+            <InputSelect
+              label="Category"
+              name="category"
+              fields={[
+                { name: "General", value: "general" },
+                { name: "SC/ST", value: "SCST" },
+                { name: "Other", value: "other" },
+              ]}
+              value={category}
+              onChange={handleChange}
+            />
+
+            <InputSelect
+              label="Program"
+              name="program"
+              fields={academicPrograms}
+              value={program}
+              onChange={handleChange}
+            />
+
+            <InputSelect
+              label="Specialization"
+              name="specialization"
+              fields={generateSpecialization()}
+              value={specialization}
+              onChange={handleChange}
+            />
+
+            <InputField
+              label="Email"
+              type="email"
+              name="email"
+              value={email}
+              onChange={handleChange}
+            />
+
+            <InputField
+              label="Phone Number"
+              type="number"
+              name="phoneNumber"
+              value={phoneNumber}
+              onChange={handleChange}
+              onInput={(e) => {
+                e.target.value = Math.max(0, parseInt(e.target.value))
+                  .toString()
+                  .slice(0, 10);
+              }}
+            />
+          </div>
+          <div className="mt-5 flex flex-row justify-center">
+            <button className="my-button" type="submit">
+              Submit
+            </button>
+          </div>
         </form>
       </div>
       <div>
@@ -180,14 +222,6 @@ const AddStudentPage = () => {
             if (e) handleSubmit();
             setShowAlertDialog(false);
           }}
-        />
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "info", message: "" })
-          }
         />
       </div>
     </div>

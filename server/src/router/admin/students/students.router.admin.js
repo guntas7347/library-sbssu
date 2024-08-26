@@ -1,11 +1,10 @@
 const express = require("express");
 const {
   addLibraryCardToStudent,
-
   getStudentById,
   getStudentByRollNumber,
   createStudent,
-  findStudents,
+  getStudents,
   countStudentDocs,
   updateStudentById,
 } = require("../../../models/students/students.controllers");
@@ -30,6 +29,7 @@ const {
   fetchStudentByRollNumber,
   allotLibraryCard,
   verifyRollNumberAvailability,
+  autoAssignLibraryCard,
 } = require("./students.middlewares");
 const {
   verifyEmailAvailabilityByEmail,
@@ -78,7 +78,7 @@ studentsRoute.post(
       await session.endSession();
     }
   }
-);
+); //create-new-student
 
 studentsRoute.post(
   "/fetch-student-by-roll-number",
@@ -109,10 +109,15 @@ studentsRoute.post("/fetch-all-applications", async (req, res) => {
 
 studentsRoute.post("/fetch-all-students", async (req, res) => {
   try {
-    const select = "rollNumber fullName batch program";
-    const StudentsCol = await findStudents(req.body, select);
+    const StudentsCol = await getStudents({
+      filter: req.query.filter,
+      filterValue: req.query.filterValue,
+      page: req.query.page || 1,
+    });
+    console.log(StudentsCol);
     return res.status(200).json(crs.STU200FAS(StudentsCol));
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 });
@@ -139,13 +144,16 @@ studentsRoute.post(
       return res.status(500).json(crs.SERR500REST());
     }
   }
-);
+); //fetch-one-application
 
 studentsRoute.post(
   "/process-application",
   fetchApplicationById,
-  processDecision
-);
+  processDecision,
+  async (req, res) => {
+    return res.status(200).json(crs.APP200APA());
+  }
+); //process-application
 
 studentsRoute.post("/count-total-students", async (req, res) => {
   try {

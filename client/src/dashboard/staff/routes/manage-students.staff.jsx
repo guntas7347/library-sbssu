@@ -5,7 +5,7 @@ import SearchStudentsPage from "../pages/manage-students/search-students/search-
 import ApproveStudentPage from "../pages/manage-students/approve-student/approve-student.page.staff";
 import AllotLibraryCardPage from "../pages/manage-students/library-cards/add-library-card/add-library-card.page.staff";
 import ViewStudentPage from "../pages/manage-students/view-student/view-student.page.staff";
-import ViewApplicantPage from "../pages/manage-students/approve-student/view-applicant.page.admin";
+import ViewApplicantPage from "../pages/manage-students/approve-student/view-applicant.page.staff";
 
 const ManageStudentsRoute = () => {
   return (

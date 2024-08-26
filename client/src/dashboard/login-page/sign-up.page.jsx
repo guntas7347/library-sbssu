@@ -2,9 +2,10 @@
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
 import {
   compleateSignUpWithCredentials,
+  createAuthApplicant,
   initalizeSignUpWithCredentials,
 } from "../http-requests";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { SnackBarContext } from "../../components/context/snackbar.context";
 
@@ -13,49 +14,33 @@ const InputField = (props) => {
   return (
     <div className="flex flex-col">
       <label>{label}</label>
-      <input className="border px-1" {...props} />
+      <input className=" border border-black px-1" {...props} />
     </div>
   );
 };
 
 const SignUpPage = () => {
+  const navigate = useNavigate();
+
   const { setFeedback } = useContext(SnackBarContext);
 
-  const [showOTPForm, setShowOTPForm] = useState(false);
-
-  const { formFields, handleChange, resetFormFields } = useForm({
+  const { formFields, handleChange } = useForm({
     displayName: "",
     email: "",
-    password: "",
-    otp: "",
-    _id: "",
   });
 
-  const { displayName, email, password, otp } = formFields;
+  const { displayName, email } = formFields;
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    if (!showOTPForm) {
-      await initalizeSignUpWithCredentials(formFields)
-        .then((res) => {
-          handleChange({ target: { name: "_id", value: res.payload } });
-          setFeedback([1, 1, res.message]);
-          setShowOTPForm(true);
-        })
-        .catch((err) => setFeedback([1, 2, err]));
-    } else {
-      await compleateSignUpWithCredentials({
-        otp: +formFields.otp,
-        _id: formFields._id,
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await createAuthApplicant(formFields)
+      .then((res) => {
+        setFeedback([1, 1, res.message]);
+        navigate("/");
       })
-        .then((res) => {
-          setFeedback([1, 1, res.message]);
-          setShowOTPForm(false);
-          resetFormFields();
-        })
-        .catch((err) => setFeedback([1, 2, err]));
-    }
+      .catch((err) => {
+        setFeedback([1, 2, err]);
+      });
   };
 
   return (
@@ -74,57 +59,31 @@ const SignUpPage = () => {
         <div className="self-start">
           <p className="text-xl font-bold">Create Student Account</p>
         </div>
-        <form action="" onSubmit={handleSubmit}>
-          <div className="flex flex-col justify-center items-center gap-5 w-full">
-            <InputField
-              label="Full Name"
-              name="displayName"
-              value={displayName}
-              onChange={handleChange}
-              disabled={showOTPForm}
-            />
+        <form
+          action=""
+          className="flex flex-col gap-5 min-w-64"
+          onSubmit={handleSubmit}
+        >
+          <InputField
+            label="Full Name"
+            name="displayName"
+            value={displayName}
+            onChange={handleChange}
+          />
 
-            <InputField
-              label="Email Address"
-              name="email"
-              type="email"
-              value={email}
-              onChange={handleChange}
-              disabled={showOTPForm}
-            />
-            <InputField
-              name="password"
-              label="Password"
-              type="password"
-              value={password}
-              onChange={handleChange}
-              disabled={showOTPForm}
-            />
-            {showOTPForm && (
-              <InputField
-                name="otp"
-                label="6 Digit One Time Password"
-                type="number"
-                value={otp}
-                onChange={handleChange}
-                onInput={(e) => {
-                  e.target.value = Math.max(0, parseInt(e.target.value))
-                    .toString()
-                    .slice(0, 6);
-                }}
-              />
-            )}
-            {showOTPForm ? (
-              <button className="my-button" type="submit">
-                Create Account
-              </button>
-            ) : (
-              <button className="my-button" type="submit">
-                Send OTP
-              </button>
-            )}
-          </div>
+          <InputField
+            label="Email Address"
+            name="email"
+            type="email"
+            value={email}
+            onChange={handleChange}
+          />
+
+          <button className="my-button" type="submit">
+            Create Account
+          </button>
         </form>
+
         <Link to="/">Already have an account? Login In</Link>
       </div>
     </div>

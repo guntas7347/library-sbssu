@@ -1,9 +1,14 @@
-const { createCurrentMonthDateRange } = require("../../utils/functions");
+const {
+  createCurrentMonthDateRange,
+  createDateRange,
+} = require("../../utils/functions");
 const {
   getBookAccessionIdFromBookAccessionNumber,
+  getAccession,
 } = require("../book-accessions/book-accessions.controllers");
 const {
   fetchLibraryCardIdByCardNumber,
+  getLibraryCard,
 } = require("../library-cards/library-cards.controllers");
 const issueBookMongo = require("./issue-book.schema");
 
@@ -49,41 +54,36 @@ const deleteIssuedBook = async (_id, session) => {
   return await issueBookMongo.findByIdAndDelete(_id, { session });
 };
 
-const findIssuedBooks = async (filter) => {
-  const { sortSelect, sortValue } = filter;
+const getIssuedBooks = async (queryParam) => {
+  const { filter, filterValue, page = 1 } = queryParam;
+  let totalPages = 1;
+  const pageSize = 25;
+  const skip = (page - 1) * pageSize;
 
   const query = issueBookMongo.find();
 
-  switch (sortSelect) {
-    case "issueDate":
-      query.where({ issueDate: sortValue });
+  switch (filter) {
+    case "fetchAllIssuedBooks":
+      query.where();
+      totalPages = Math.ceil((await countIssuedBookDocs()) / pageSize);
       break;
 
     case "accessionNumber":
-      const accessionNumber = await getBookAccessionIdFromBookAccessionNumber(
-        sortValue
-      );
-
-      if (accessionNumber != null) {
+      const accession = await getAccession({ accessionNumber: filterValue });
+      if (!accession) query.where({ _id: { $exists: false } });
+      else
         query.where({
-          bookAccessionId: accessionNumber._id,
+          bookAccessionId: accession._id,
         });
-      } else {
-        query.where({
-          bookAccessionId: null,
-        });
-      }
-
       break;
 
     case "cardNumber":
-      const cardNumber = await fetchLibraryCardIdByCardNumber(sortValue);
-      if (cardNumber != null) {
-        query.where({ libraryCardId: cardNumber._id });
-      } else {
-        query.where({ libraryCardId: null });
-      }
-
+      const libraryCard = await getLibraryCard({ cardNumber: filterValue });
+      if (!libraryCard) query.where({ _id: { $exists: false } });
+      else
+        query.where({
+          libraryCardId: libraryCard._id,
+        });
       break;
 
     case "currentMonth":
@@ -94,7 +94,7 @@ const findIssuedBooks = async (filter) => {
       break;
 
     case "dateRange":
-      const { startingDate, endingDate } = sortValue;
+      const { startingDate, endingDate } = createDateRange(filterValue);
       query.where({ issueDate: { $gte: startingDate, $lte: endingDate } });
       break;
 
@@ -102,7 +102,9 @@ const findIssuedBooks = async (filter) => {
       break;
   }
 
-  return await query
+  query.skip(skip).limit(pageSize);
+
+  query
     .populate({
       path: "bookAccessionId",
       populate: { path: "bookId", select: "title  -_id" },
@@ -111,6 +113,8 @@ const findIssuedBooks = async (filter) => {
       path: "libraryCardId",
       populate: { path: "studentId", select: "rollNumber fullName -_id" },
     });
+
+  return { issuedBooksArray: await query.exec(), totalPages };
 };
 
 const countIssuedBookDocs = async (filter) => {
@@ -122,6 +126,6 @@ module.exports = {
   getIssuedBookByBookAccessionId,
   getIssuedBookById,
   deleteIssuedBook,
-  findIssuedBooks,
+  getIssuedBooks,
   countIssuedBookDocs,
 };

@@ -1,31 +1,43 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   downloadAllReturnedBooks,
   fetchAllReturnedBooks,
 } from "../../../hooks/http-requests.hooks.admin";
 import CustomTable from "../../../../../components/table/custom-table.component";
-import { sortObjectUsingKeys } from "../../../../../utils/functions";
-import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
+import { processData } from "../../../../../utils/functions";
 import { useNavigate } from "react-router-dom";
 import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
+import useQueryParams from "../../../../../components/hooks/useQueryParams.hook";
+import Pagination from "../../../../../components/pagination/pagination";
 
 const SearchReturnedBooks = () => {
   const navigate = useNavigate();
 
+  const { queryString } = useQueryParams();
   const { setFeedback } = useContext(SnackBarContext);
 
   const [rowData, setRowData] = useState([]);
 
-  const { formFields, handleChange } = useForm({
-    sortSelect: "fetchAllReturnedBooks",
-    sortValue: "",
-  });
+  const [totalPages, setTotalPages] = useState(1);
 
   const handleFetch = async () => {
-    await fetchAllReturnedBooks(formFields)
+    await fetchAllReturnedBooks(queryString)
       .then((res) => {
-        setRowData(rowsArray(res));
+        setTotalPages(res.totalPages);
+        setRowData(
+          processData(res.returnedBooksArray, [
+            "_id",
+            "accessionNumber",
+            "bookTitle",
+            "cardNumber",
+            "issueDate",
+            "returnDate",
+            "rollNumber",
+            "studentName",
+            "fine",
+          ])
+        );
         if (res.length === 0) {
           setFeedback([1, 2, "No data found"]);
         }
@@ -34,40 +46,21 @@ const SearchReturnedBooks = () => {
   };
 
   const handleDownload = async () => {
-    await downloadAllReturnedBooks(formFields)
+    await downloadAllReturnedBooks(queryString)
       .then((res) => {
         setFeedback([1, 1, res]);
       })
       .catch((err) => setFeedback([1, 2, err]));
   };
 
-  const rowsArray = (array) => {
-    return array.map((obj) => {
-      return Object.values(
-        sortObjectUsingKeys(obj, [
-          "_id",
-          "accessionNumber",
-          "bookTitle",
-          "cardNumber",
-          "issueDate",
-          "returnDate",
-          "rollNumber",
-          "studentName",
-          "fine",
-        ])
-      );
-    });
-  };
-  const handleRowClick = (e) => {
-    navigate(
-      `/dashboard/admin/issue-books/search-returned-books/view-book/${e}`
-    );
-  };
-
   const tableHasData = () => {
     if (rowData.length === 0) return false;
     return true;
   };
+
+  useEffect(() => {
+    handleFetch();
+  }, [queryString]);
 
   return (
     <>
@@ -76,47 +69,31 @@ const SearchReturnedBooks = () => {
           Search Returned Books
         </h1>
         <div>
-          <div className="grid grid-cols-4 gap-10 my-5 bg-white p-5 rounded-3xl">
+          <div className="flex gap-10 justify-between my-5 bg-white p-5 rounded-3xl">
             <SearchQueriesComponent
-              className="col-span-3"
               selectFields={[
                 {
                   name: "Search All Returned Books",
                   value: "fetchAllReturnedBooks",
-                  inputField: "none",
                 },
                 {
                   name: "Accession Number",
                   value: "accessionNumber",
-                  inputField: "number",
                 },
                 {
                   name: "Library Card Number",
                   value: "cardNumber",
-                  inputField: "text",
                 },
                 {
                   name: "Current Month",
                   value: "currentMonth",
-                  inputField: "none",
                 },
                 {
                   name: "Date Range",
                   value: "dateRange",
-                  inputField: "text",
                 },
               ]}
-              selectValue={formFields.sortSelect}
-              selectName="sortSelect"
-              inputName="sortValue"
-              inputValue={formFields.selectValue}
-              onChange={handleChange}
             />
-            <div className="col-span-1 flex flex-row justify-center items-center">
-              <button className="my-button " onClick={handleFetch}>
-                Submit
-              </button>
-            </div>
           </div>
           <CustomTable
             columns={[
@@ -130,14 +107,15 @@ const SearchReturnedBooks = () => {
               "Fine",
             ]}
             rows={rowData}
-            handleRowClick={handleRowClick}
+            handleRowClick={(e) => navigate(`view-book/${e}`)}
           />
-          <div className="mt-5 flex flex-row justify-center items-center">
+          <div className="mt-5 flex flex-row gap-10 justify-center items-center">
             {tableHasData() && (
               <button className="my-button" onClick={handleDownload}>
                 Export To Excel
               </button>
             )}
+            <Pagination totalPages={totalPages} />
           </div>
         </div>
       </div>

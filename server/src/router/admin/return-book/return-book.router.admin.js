@@ -72,7 +72,7 @@ returnBookRouter.post(
   fetchReturnedBooks,
   async (req, res) => {
     try {
-      const xl = createExcel(req.cust.returnedBooks, [
+      const xl = createExcel(req.cust.returnedBooks.returnedBooksArray, [
         ["accessionNumber", "Accession Number"],
         ["bookTitle", "Book Title", 50],
         ["cardNumber", "Card Number"],

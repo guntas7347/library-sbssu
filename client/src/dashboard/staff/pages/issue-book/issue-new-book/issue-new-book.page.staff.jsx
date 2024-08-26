@@ -1,69 +1,69 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+
 import {
   fetchBookByAccessionNumber,
   fetchStudentByRollNumber,
   issueNewBook,
-} from "../../../hooks/http-requests.hooks.admin";
+} from "../../../hooks/http-requests.hooks.staff";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
-import { Button, Grid } from "@mui/material";
 import CustomTableSelect from "../../../../../components/table/custom-table-select.component";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
-import TransitionsModal from "../../../../../components/modals/modal.component";
-import { sortObjectUsingKeys } from "../../../../../utils/functions";
+import { rowsArray } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
+import BackdropSpinner from "../../../../../components/feedback/backdrop/backdrop.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const IssueNewBookPage = () => {
+  const { setFeedback } = useContext(SnackBarContext);
+
   const [showBookTable, setShowBookTable] = useState(false);
   const [showStudentTable, setShowStudentTable] = useState(false);
   const [bookRowData, setBookRowData] = useState([]);
   const [studentRowData, setStudentRowData] = useState([]);
 
-  const [selectedCardNumber, setSelectedCardNumber] = useState(null);
-  const [selectedAccessionNumber, setSelectedAccessionNumber] = useState(null);
+  const [selectedCardNumber, setSelectedCardNumber] = useState("");
+  const [selectedAccessionNumber, setSelectedAccessionNumber] = useState("");
 
   const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
+  const [showBackdropSpinner, setShowBackdropSpinner] = useState(false);
 
   const { formFields, handleChange } = useForm({
+    rollNumber: "",
+    accessionNumber: "",
     issueDate: new Date(),
   });
 
+  const { rollNumber, accessionNumber, issueDate } = formFields;
+
   const handleFetchBook = async () => {
-    setShowBookTable(true);
-    await fetchBookByAccessionNumber({
-      accessionNumber: formFields.accessionNumber,
-    })
+    await fetchBookByAccessionNumber(accessionNumber)
       .then((res) => {
+        setShowBookTable(true);
         setBookRowData(
           rowsArray(
-            [res],
+            [{ ...res, ...res.bookId }],
             ["isbn", "title", "author", "accessionNumber", "status"]
           )
         );
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
   };
 
   const handleFetchStuent = () => {
-    setShowStudentTable(true);
     fetchStudentByRollNumber(formFields.rollNumber)
       .then((res) => {
+        setShowStudentTable(true);
         setStudentRowData(
           rowsArray(addLibraryCardsValueToObject(res), [
             "rollNumber",
-            "name",
+            "fullName",
             "program",
             "cardNumber",
             "cardStatus",
           ])
         );
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
   };
 
   const addLibraryCardsValueToObject = (obj) => {
@@ -84,120 +84,133 @@ const IssueNewBookPage = () => {
       if (isChecked) {
         setSelectedCardNumber(selectedValue);
       } else {
-        setSelectedCardNumber("");
+        if (selectedCardNumber !== "") setSelectedCardNumber("");
       }
     }
     if (tableName === "booksTable") {
       if (isChecked) {
         setSelectedAccessionNumber(selectedValue);
       } else {
-        setSelectedAccessionNumber("");
+        if (selectedAccessionNumber !== "") setSelectedAccessionNumber("");
       }
     }
   };
 
-  const [modal, setModal] = useState(false);
-
   const handleIssueNewBook = async () => {
+    setShowBackdropSpinner(true);
     const issueBookDetails = {
       accessionNumber: selectedAccessionNumber,
       cardNumber: selectedCardNumber,
       issueDate: formFields.issueDate,
     };
-
     await issueNewBook(issueBookDetails)
       .then((res) => {
-        setSnackbarFeedback([1, 1, res]);
+        setFeedback([1, 1, res]);
         handleFetchBook();
         handleFetchStuent();
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
+    setShowBackdropSpinner(false);
   };
 
-  const rowsArray = (array, keysArray) => {
-    return array.map((obj) => {
-      return Object.values(sortObjectUsingKeys(obj, keysArray));
-    });
+  const yesterdayDate = () => {
+    return new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * -1)
+      .toISOString()
+      .split("T")[0];
+  };
+
+  const disableIssueButton = () => {
+    if (selectedCardNumber !== "" && selectedAccessionNumber !== "") {
+      return false;
+    } else return true;
   };
 
   return (
-    <div className="text-center m-5">
-      <h2>Issue a Book</h2>
-      <br />
-      <br />
-      <div>
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">Issue a Book</h1>
+      <div className="bg-white rounded-3xl p-5 grid gap-10">
         <div>
-          <Grid container spacing={4}>
-            <Grid item>
-              <InputField
-                label="Book's Accession Number"
-                name="accessionNumber"
-                type="text"
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <Button variant="contained" onClick={handleFetchBook}>
-                Fetch Book
-              </Button>
-            </Grid>
-          </Grid>
-          {showBookTable ? (
-            <CustomTableSelect
-              columns={[
-                "ISBN",
-                "Title",
-                "Author",
-                "Accession Number",
-                "Avalability",
-              ]}
-              rows={bookRowData}
-              onSelect={handleSelect}
-              indexToSelect={3}
-              tableName="booksTable"
+          <div className="grid grid-cols-2 gap-5">
+            <InputField
+              label="Book's Accession Number"
+              name="accessionNumber"
+              type="text"
+              value={accessionNumber}
+              disabled={showBookTable}
+              onChange={handleChange}
             />
-          ) : (
-            ""
-          )}
+            <div className="flex flex-row justify-center">
+              <button
+                className="my-button w-48"
+                disabled={showBookTable}
+                onClick={handleFetchBook}
+              >
+                Fetch Book
+              </button>
+            </div>
+          </div>
+          <div>
+            {showBookTable && (
+              <div className="mt-5">
+                <CustomTableSelect
+                  columns={[
+                    "ISBN",
+                    "Title",
+                    "Author",
+                    "Accession Number",
+                    "Avalability",
+                  ]}
+                  rows={bookRowData}
+                  onSelect={handleSelect}
+                  indexToSelect={3}
+                  tableName="booksTable"
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         <div>
-          <br />
-          <Grid container spacing={2}>
-            <Grid item>
-              <InputField
-                label="Student's Roll Number"
-                name="rollNumber"
-                type="text"
-                onChange={handleChange}
-              />
-            </Grid>
-            <Grid item>
-              <Button variant="contained" onClick={handleFetchStuent}>
-                Fetch Student
-              </Button>
-            </Grid>
-          </Grid>
-          {showStudentTable ? (
-            <CustomTableSelect
-              columns={[
-                "Roll Number",
-                "Name",
-                "Program",
-                "Card Number",
-                "Avalability",
-              ]}
-              rows={studentRowData}
-              onSelect={handleSelect}
-              indexToSelect={3}
-              tableName="studentsTable"
+          <div className="grid grid-cols-2 gap-5">
+            <InputField
+              label="Student's Roll Number"
+              name="rollNumber"
+              type="text"
+              value={rollNumber}
+              disabled={showStudentTable}
+              onChange={handleChange}
             />
-          ) : (
-            ""
-          )}
+            <div className="flex flex-row justify-center">
+              <button
+                className="my-button w-48"
+                disabled={showStudentTable}
+                onClick={handleFetchStuent}
+              >
+                Fetch Student
+              </button>
+            </div>
+          </div>
+          <div>
+            {showStudentTable && (
+              <div className="mt-5">
+                <CustomTableSelect
+                  columns={[
+                    "Roll Number",
+                    "Name",
+                    "Program",
+                    "Card Number",
+                    "Avalability",
+                  ]}
+                  rows={studentRowData}
+                  onSelect={handleSelect}
+                  indexToSelect={3}
+                  tableName="studentsTable"
+                />
+              </div>
+            )}
+          </div>
         </div>
-        <br />
-        <br />
+
         <div>
           <form
             onSubmit={(e) => {
@@ -205,71 +218,63 @@ const IssueNewBookPage = () => {
               setShowAlertDialog(true);
             }}
           >
-            <div>
-              <Grid container spacing={2}>
-                <Grid item>
-                  <InputField
-                    disabled
-                    label="Card Number"
-                    value={selectedCardNumber}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-                <Grid item>
-                  <InputField
-                    disabled
-                    label="Accession Number"
-                    value={selectedAccessionNumber}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-                <Grid item>
-                  <InputField
-                    label="Issue Date"
-                    name="issueDate"
-                    type="date"
-                    onChange={handleChange}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-              </Grid>
+            <div className="grid grid-cols-3 gap-5 items-center justify-center">
+              <InputField
+                disabled
+                label="Card Number"
+                name="cardNumber"
+                value={selectedCardNumber}
+              />
+
+              <InputField
+                disabled
+                label="Accession Number"
+                name="accessionNumber"
+                value={selectedAccessionNumber}
+              />
+
+              <InputField
+                label="Issue Date"
+                name="issueDate"
+                type="date"
+                value={issueDate}
+                onChange={handleChange}
+                max={yesterdayDate()}
+                required={false}
+              />
             </div>
-            <div className="m-5">
-              <Button variant="contained" type="submit">
+            <div className="mt-5 flex flex-row justify-center items-center">
+              <button
+                className="my-button"
+                disabled={disableIssueButton()}
+                type="submit"
+              >
                 Issue Now
-              </Button>
+              </button>
             </div>
           </form>
         </div>
-
-        {modal ? (
-          <TransitionsModal
-            title="Book Issued Successfully"
-            body="Book issuance has been successfully processed. The necessary records have been updated, and the book is now marked as issued. If you have any questions or need further assistance, please feel free to contact the library administration. Thank you.
-"
-          />
-        ) : (
-          ""
-        )}
       </div>
+
       <div>
         <AlertDialog
           title="Confirm?"
-          content="This action can not be undone"
+          content={
+            <>
+              Issue Book:- <br />
+              Accession Number: {selectedAccessionNumber} <br />
+              Library Card Number: {selectedCardNumber} <br />
+              Issue Date: {new Date(issueDate).toDateString()}
+            </>
+          }
           open={showAlertDialog}
-          handleClick={(e, f) => {
+          handleClick={(e) => {
             if (e) handleIssueNewBook();
             setShowAlertDialog(false);
           }}
         />
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "info", message: "" })
-          }
-        />
+
+        <BackdropSpinner open={showBackdropSpinner} />
       </div>
     </div>
   );

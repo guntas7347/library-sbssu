@@ -1,211 +1,171 @@
-import { Button, Grid } from "@mui/material";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import {
   fetchIssuedBookByAccessionNumber,
   issueBookFine,
   returnIssuedBook,
-} from "../../../hooks/http-requests.hooks.admin";
+} from "../../../hooks/http-requests.hooks.staff";
 import SpanningTable from "../../../../../components/table/spanning-table.component";
-import { useState } from "react";
-import { formatDate } from "../../../../../utils/functions";
+import { useContext, useState } from "react";
+import { formatDate, formatTime } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
+import Spinner from "../../../../../components/feedback/spinner/spinner.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const ReturnIssuedBookPage = () => {
-  const [showSubmitConfirmationAlertDialog, setShowAlertDialog] =
-    useState(false);
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
+  const { setFeedback } = useContext(SnackBarContext);
 
-  const [showFineAlertDialog, setShowFineAlertDialog] = useState({
-    open: false,
-    fineAmount: 0,
-  });
+  const [ShowAlertDialog, setShowAlertDialog] = useState(false);
 
+  const [isStudentFetching, setIsStudentFetching] = useState(false);
+  const [fine, setFine] = useState(false);
   const { formFields, handleChange, resetFormFields } = useForm({
     accessionNumber: "",
   });
-
-  const defaultIssuedBookDoc = {
-    title: null,
-    ISBN: "",
-    author: "",
-    accessionNumber: "",
-    libraryCard: "",
-    issueDate: "",
-    name: "",
-    program: "",
-    rollNumber: "",
-  };
-
-  const [issuedBookDoc, setIssuedBookDoc] = useState(defaultIssuedBookDoc);
-
+  const [issuedBookDoc, setIssuedBookDoc] = useState([]);
   const {
     title,
-    ISBN,
     author,
     accessionNumber,
     libraryCard,
     issueDate,
-    name,
-    program,
+    fullName,
+    issuedBy,
     rollNumber,
     _id,
   } = issuedBookDoc;
-
   const handleFetch = async () => {
-    await fetchIssuedBookByAccessionNumber({
-      accessionNumber: +formFields.accessionNumber,
-    })
+    setIsStudentFetching(true);
+    await fetchIssuedBookByAccessionNumber(+formFields.accessionNumber)
       .then((res) => {
-        setIssuedBookDoc(res);
+        setTimeout(() => {
+          setIssuedBookDoc(res);
+          console.log("triggering");
+        }, 1000);
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => {
+        setFeedback([1, 2, err]);
+        setIsStudentFetching(false);
+      });
   };
 
   const returnDate = formatDate();
 
   const handleReturnBook = async () => {
+    console.log("handleReturnBook");
     await returnIssuedBook({ _id })
       .then((res) => {
-        setSnackbarFeedback([1, 1, res]);
+        setFeedback([1, 1, res]);
+        resetFormFields();
+        setIssuedBookDoc([]);
+        setIsStudentFetching(false);
       })
       .catch((err) => {
-        setSnackbarFeedback([1, 2, err]);
+        setFeedback([1, 2, err]);
       });
   };
 
   const handleCheckFine = async () => {
+    console.log("handleCheckFine");
     await issueBookFine({ _id })
       .then(async (fine) => {
-        if (fine != null) {
-          setShowFineAlertDialog({ open: true, fineAmount: fine });
-        } else {
-          handleReturnBook();
-        }
+        if (fine != null) setFine(fine);
+        setShowAlertDialog(true);
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
   };
 
-  const handleFineDialoge = async () => {
-    await returnIssuedBook({ _id })
-      .then((res) => {
-        setSnackbarFeedback([1, 1, res]);
-      })
-      .catch((err) => {
-        setSnackbarFeedback([1, 2, err]);
-      });
+  const isStudentFetched = () => {
+    if (issuedBookDoc.length === 0) return false;
+    else return true;
   };
 
   return (
-    <div className="text-center m-5">
-      <h1>Return book?</h1>
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">Return book?</h1>
+      <div className="bg-white rounded-3xl p-5 grid grid-cols-2 gap-10">
+        <InputField
+          label="Accession Number"
+          name="accessionNumber"
+          type="number"
+          onChange={handleChange}
+          value={formFields.accessionNumber}
+        />
 
-      <div className="my-5">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setShowAlertDialog(true);
-          }}
-        >
-          <Grid container spacing={2}>
-            <Grid item>
-              <InputField
-                label="Accession Number"
-                name="accessionNumber"
-                type="number"
-                onChange={handleChange}
-                value={formFields.accessionNumber}
-              />
-            </Grid>
-            <Grid item>
-              <Button variant="contained" onClick={handleFetch}>
-                Fetch
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-        <Button onClick={() => resetFormFields()}>clear</Button>
-      </div>
-      <div>
-        <div className="mb-3">
-          <SpanningTable
-            rows={[
-              ["Accession Number", accessionNumber],
-              ["Library Card Number", libraryCard],
-              ["Issue Date", issueDate],
-              ["Book title", title],
-              ["Book Author", author],
-              ["ISBN", ISBN],
-              ["Student Name", name],
-              ["Roll Number", rollNumber],
-              ["Program", program],
-            ]}
-          />
+        <div className="flex flex-row justify-center items-center">
+          <button className="my-button" onClick={handleFetch}>
+            Search
+          </button>
         </div>
-        <div className="">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              setShowAlertDialog(true);
-            }}
-          >
-            <Grid container spacing={2}>
-              <Grid item>
+      </div>
+
+      {isStudentFetching &&
+        (isStudentFetched() ? (
+          <>
+            <div className="my-5">
+              <SpanningTable
+                rows={[
+                  ["Accession Number", accessionNumber],
+                  ["Library Card Number", libraryCard],
+                  ["Issue Date", formatTime(issueDate)],
+                  ["Issued By", issuedBy],
+                  ["Book title", title],
+                  ["Book Author", author],
+                  ["Student Name", fullName],
+                  ["Roll Number", rollNumber],
+                ]}
+              />
+            </div>
+            <div className="bg-white rounded-3xl p-5 grid grid-cols-2">
+              <div>
                 <InputField
                   label="Return Date"
                   name="returnDate"
                   value={returnDate}
                   disabled
+                  style={{ textAlign: "center" }}
                   InputLabelProps={{ shrink: true }}
                 />
-              </Grid>
-              <Grid item>
-                <Button variant="contained" type="submit">
+              </div>
+              <div className="flex flex-row justify-center items-center">
+                <button className="my-button" onClick={handleCheckFine}>
                   Return
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </div>
-      </div>
+                </button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div
+            className="d-flex justify-content-center align-items-center"
+            style={{
+              height: "50vh",
+            }}
+          >
+            <Spinner />
+          </div>
+        ))}
+
       <div>
         <AlertDialog
           title="Confirm?"
-          content="This action can not be undone"
-          open={showSubmitConfirmationAlertDialog}
-          handleClick={(e, f) => {
-            if (e) handleCheckFine();
+          content={
+            <>
+              Return Book:-
+              <br />
+              Accession Number: {accessionNumber}
+              <br />
+              Fine:{" "}
+              {fine ? <span style={{ color: "red" }}>₹{fine}</span> : "N/A"}
+            </>
+          }
+          open={ShowAlertDialog}
+          handleClick={(e) => {
+            if (e) handleReturnBook();
             setShowAlertDialog(false);
           }}
         />
-        <AlertDialog
-          title="Pay Fine"
-          content={`The issuer is subject to fine of ${showFineAlertDialog.fineAmount} for late submit`}
-          open={showFineAlertDialog.open}
-          agreeMessage="Paid"
-          disagreeMessage="Pending"
-          handleClick={(e, f) => {
-            if (e) handleFineDialoge();
-            setShowFineAlertDialog({
-              open: false,
-              fineAmount: 0,
-            });
-          }}
-        />
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "info", message: "" })
-          }
-        />
       </div>
+      {/* <SnackBar feedback={showSnackbarFeedback} /> */}
     </div>
   );
 };

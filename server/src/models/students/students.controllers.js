@@ -2,24 +2,31 @@ const { formatString } = require("../../utils/functions");
 const studentsCol = require("./students.schema");
 
 const createStudent = async (StudentDetails, session) => {
-  return await studentsCol.create([StudentDetails], { session });
+  return await studentsCol.create([StudentDetails], {
+    session,
+  });
 };
 
-const findStudents = async (filter, select) => {
-  const { sortSelect, sortValue } = filter;
+const getStudents = async (queryParam) => {
+  const { filter, filterValue, page = 1 } = queryParam;
+  let totalPages = 1;
+  const pageSize = 25;
+  const skip = (page - 1) * pageSize;
 
   const query = studentsCol.find();
-
-  switch (sortSelect) {
+  switch (filter) {
     case "fetchAllStudents":
+      query.where();
+      totalPages = Math.ceil((await countStudentDocs()) / pageSize);
       break;
 
     default:
-      query.where({ [sortSelect]: sortValue });
+      query.where({ [filter]: filterValue });
       break;
   }
-  query.select(select);
-  return await query.exec();
+
+  query.skip(skip).limit(pageSize);
+  return { studentsArray: await query.exec(), totalPages };
 };
 
 const getStudentByRollNumber = async (rollNumber, populate = false, select) => {
@@ -57,7 +64,7 @@ const updateStudentById = async (_id, updatedDoc) => {
 
 module.exports = {
   createStudent,
-  findStudents,
+  getStudents,
   getStudentByRollNumber,
   getStudentById,
   addLibraryCardToStudent,

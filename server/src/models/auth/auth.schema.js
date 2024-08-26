@@ -4,14 +4,15 @@ const Auth_Admin_Schema = mongoose.Schema({
   userName: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
-  role: { type: String, default: "ADMIN" },
+  role: { type: String, default: "STAFF" },
   createdAt: { type: Date, default: new Date() },
   staffId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "staff",
     required: true,
   },
-  resetPass: { type: Object },
+  resetCode: { type: String },
+  resetCodeTime: { type: Date },
   active: { type: Boolean, default: true },
 });
 
@@ -25,18 +26,21 @@ const Auth_Student_Schema = mongoose.Schema({
     ref: "student",
     required: true,
   },
-  resetPass: { type: Object },
+  resetCode: { type: String },
+  resetCodeTime: { type: Date },
   active: { type: Boolean, default: true },
+  role: { type: String, default: "STUDENT" },
 });
 
 const Auth_Applicant_Schema = mongoose.Schema({
   userName: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
-  otp: { type: Number, required: true },
   createdAt: { type: Date, default: new Date() },
-  resetPass: { type: Object },
+  resetCode: { type: String },
+  resetCodeTime: { type: Date },
   active: { type: Boolean, default: true },
+  role: { type: String, default: "APPLICANT" },
 });
 
 const Auth_Admin = mongoose.model(

@@ -2,7 +2,7 @@ const express = require("express");
 const {
   addBookAccessionToBook,
   getBookByIsbn,
-  findBooks,
+  getBooks,
   getBookById,
   createBook,
   updateBookById,
@@ -39,15 +39,18 @@ booksRouter.post("/add-new-book", async (req, res) => {
 
 booksRouter.post("/fetch-all-books", async (req, res) => {
   try {
-    const booksArray = await findBooks(
-      req.body,
-      "title author placeAndPublishers publicationYear accessionNumbers",
-      100,
-      true,
-      "accessionNumber -_id"
-    );
+    console.log(req.query);
+    const booksArray = await getBooks({
+      filter: req.query.filter,
+      filterValue: req.query.filterValue,
+      page: req.query.page || 1,
+    });
+
+    console.log(booksArray);
+
     return res.status(200).json(crs.BKS200FAB(booksArray));
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 });

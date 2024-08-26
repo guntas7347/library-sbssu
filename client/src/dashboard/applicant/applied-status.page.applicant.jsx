@@ -3,6 +3,7 @@ import { deleteApplication } from "../http-requests";
 import { useContext, useState } from "react";
 import AlertDialog from "../../components/feedback/dialog/alert-dialog.component";
 import { SnackBarContext } from "../../components/context/snackbar.context";
+import { Link } from "react-router-dom";
 
 const AppliedStatusPage = ({ applicationDoc }) => {
   const { setFeedback } = useContext(SnackBarContext);
@@ -58,10 +59,18 @@ const AppliedStatusPage = ({ applicationDoc }) => {
           ]}
         />
       </div>
-      <div className="my-3">
+      <div>
+        <p className="font-extrabold">
+          Incorrect Details? Withdraw your application and submit again
+        </p>
+      </div>
+      <div className="my-3 flex gap-10 items-center justify-center">
         <button className="my-button" onClick={() => setShowAlertDialog(true)}>
           Withdraw Application
         </button>
+        <Link to={"print-application"}>
+          <button className="my-button">Print Application</button>
+        </Link>
       </div>
       <div>
         <AlertDialog

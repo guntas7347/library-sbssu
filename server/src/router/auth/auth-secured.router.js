@@ -29,14 +29,17 @@ authSecured.post("/ping", async (req, res) => {
         break;
 
       case "STAFF":
+        userAuth = await getAuthAdminById(req.user.uid);
         break;
 
       case "APPLICANT":
         userAuth = await getAuthApplicantById(req.user.uid);
+
         break;
 
       case "STUDENT":
         userAuth = await getAuthStudentById(req.user.uid);
+
         break;
 
       default:
@@ -48,7 +51,7 @@ authSecured.post("/ping", async (req, res) => {
       return res.status(401).json(crs.AUTH401PING());
     }
 
-    return res.status(200).json(crs.AUTH200PING(desiredRole));
+    return res.status(200).json(crs.AUTH200PING(userAuth._doc.role));
   } catch (err) {
     console.log(err);
     return res.status(401).json(crs.AUTH401PING());

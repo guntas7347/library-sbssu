@@ -57,8 +57,7 @@ const ApplyStudentPage = () => {
     email: "",
     phoneNumber: "",
   };
-  const { formFields, handleChange, resetFormFields } =
-    useForm(defaultFormFields);
+  const { formFields, handleChange } = useForm(defaultFormFields);
   const {
     rollNumber,
     fullName,
@@ -78,7 +77,6 @@ const ApplyStudentPage = () => {
       .then((res) => {
         console.log(res);
         setFeedback([1, 1, res.message]);
-        resetFormFields();
         window.location.reload();
       })
       .catch((err) => setFeedback([1, 2, err]));

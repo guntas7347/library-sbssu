@@ -242,7 +242,7 @@ const crs = {
   AUTH200SAPP: (payload = null) =>
     createCustomResponseObject(
       "AUTH200SAPP",
-      "Please enter OTP that you recieved via your email",
+      "Password link sent to email",
       payload
     ),
   AUTH409SAPP: (payload = null) =>
@@ -273,6 +273,16 @@ const crs = {
       "Applicant Login Successful",
       payload
     ),
+  AUTH200LDPS: (payload = null) =>
+    createCustomResponseObject(
+      "AUTH200LDPS",
+      "Reset Link sent to email",
+      payload
+    ),
+  AUTH200LVFS: (payload = null) =>
+    createCustomResponseObject("AUTH200LVFS", "Enter new password", payload),
+  AUTH404LDPS: (payload = null) =>
+    createCustomResponseObject("AUTH400LDPS", "Invalid Reset Link", payload),
   APP200CNA: (payload = null) =>
     createCustomResponseObject(
       "APP200CNA",

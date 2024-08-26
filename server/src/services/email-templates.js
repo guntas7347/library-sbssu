@@ -87,6 +87,19 @@ const generateEmailTemplate = {
       },
     });
   },
+  resetPassword: (name, resetLink) => {
+    return mailGenerator.generate({
+      body: {
+        name: name,
+        intro: [
+          "You have requested a password reset for your account at Shaheed Bhagat Singh State University's Central Library.",
+          `Please click the link below to reset your password: [Reset Password](${resetLink})`,
+        ],
+        outro:
+          "If you did not request this password reset, please ignore this email or contact the Library during working hours. We'd love to help.",
+      },
+    });
+  },
 };
 
 module.exports = { generateEmailTemplate };

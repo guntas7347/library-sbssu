@@ -6,11 +6,13 @@ import {
 } from "../../../hooks/http-requests.hooks.admin";
 import SpanningTable from "../../../../../components/table/spanning-table.component";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
+import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
 
 const ViewApplicantPage = () => {
   const { _id } = useParams();
 
   const { setFeedback } = useContext(SnackBarContext);
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
 
   const [studentDoc, setStudentDoc] = useState({
     rollNumber: "",
@@ -25,6 +27,7 @@ const ViewApplicantPage = () => {
     phoneNumber: "",
   });
   const [decisionTaken, setDecisionTaken] = useState(false);
+  const [decision, setDecision] = useState("REJECT");
 
   const {
     rollNumber,
@@ -50,8 +53,7 @@ const ViewApplicantPage = () => {
     asyncFunc();
   }, []);
 
-  const handleClick = async (e) => {
-    const decision = e.target.name;
+  const handleClick = async () => {
     await processApplication({ decision, _id })
       .then((res) => {
         setFeedback([1, 1, res]);
@@ -83,16 +85,54 @@ const ViewApplicantPage = () => {
         />
       </div>
       {!decisionTaken && (
-        <div>
-          <button name="REJECT" className="my-button" onClick={handleClick}>
+        <div className="flex justify-center gap-10 mt-5">
+          <button
+            name="REJECT"
+            className="my-button"
+            onClick={() => {
+              setDecision("REJECT");
+              setShowAlertDialog(true);
+            }}
+          >
             Reject
           </button>
 
-          <button name="APPROVE" className="my-button" onClick={handleClick}>
+          <button
+            name="APPROVE"
+            className="my-button"
+            onClick={() => {
+              setDecision("APPROVE");
+              setShowAlertDialog(true);
+            }}
+          >
             Approve
           </button>
         </div>
       )}
+      <AlertDialog
+        content={
+          <>
+            <div>
+              <p>
+                Are you sure of it to{" "}
+                <span
+                  className={`${
+                    decision === "APPROVE" ? "text-green-500" : "text-red-500"
+                  } font-bold`}
+                >
+                  {decision}
+                </span>{" "}
+                the application
+              </p>
+            </div>
+          </>
+        }
+        open={showAlertDialog}
+        handleClick={(e) => {
+          if (e) handleClick();
+          setShowAlertDialog(false);
+        }}
+      />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 const {
-  getBookIdFromAccessionNumber,
+  getAccession,
 } = require("../book-accessions/book-accessions.controllers");
 
 const booksMongo = require("./books.schema");
@@ -18,50 +18,35 @@ const getBookById = async (id, populate = false) => {
   return await query.exec();
 };
 
-const findBooks = async (
-  filter = { sortSelect: "", sortValue: "" },
-  select,
-  limit = 100,
-  populate = false,
-  select_accession
-) => {
-  const { sortSelect, sortValue } = filter;
-  const query = booksMongo.find().limit(limit);
-  switch (sortSelect) {
+const getBooks = async (queryParam) => {
+  const { filter, filterValue, page = 1 } = queryParam;
+  let skip = (page - 1) * 25;
+  let totalPages = 1;
+  const query = booksMongo.find().skip(skip).limit(25);
+
+  switch (filter) {
     case "accessionNumber":
-      const accessionNumber = await getBookIdFromAccessionNumber(sortValue);
-      if (accessionNumber != null) {
+      const accessionNumber = await getAccession({
+        accessionNumber: filterValue,
+      });
+      if (accessionNumber)
         query.where({
           _id: accessionNumber.bookId,
         });
-      } else {
-        query.where({
-          _id: null,
-        });
-      }
-      break;
-
-    case "isbn":
-      query.where({ isbn: sortValue });
-      break;
-
-    case "title":
-      query.where({ title: sortValue });
+      else query.where({ _id: { $exists: false } });
       break;
 
     default:
+      totalPages = Math.ceil((await countTotalBooks()) / 25);
       break;
   }
-  query.select(select);
 
-  populate
-    ? query.populate({
-        path: "accessionNumbers",
-        select: select_accession,
-      })
-    : "";
+  query.populate("accessionNumbers");
 
-  return await query.exec();
+  return {
+    booksArray: await query.exec(),
+    totalPages,
+  };
 };
 
 const countTotalBooks = async () => {
@@ -90,7 +75,7 @@ const updateBookById = async (_id, bookDoc) => {
 
 module.exports = {
   createBook,
-  findBooks,
+  getBooks,
   countTotalBooks,
   getBookById,
   getBookByIsbn,

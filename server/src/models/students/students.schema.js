@@ -13,6 +13,7 @@ const StudentsSchema = new mongoose.Schema({
   email: { type: String, required: true },
   phoneNumber: { type: Number, required: true },
   libraryCards: [{ type: mongoose.Schema.Types.ObjectId, ref: "libraryCard" }],
+  role: { type: String, default: "STUDENT" },
   createdAt: { type: Date, default: new Date() },
 });
 

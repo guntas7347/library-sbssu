@@ -98,7 +98,7 @@ issueBookRouter.post(
   fetchIssuedBooks,
   async (req, res) => {
     try {
-      const xl = createExcel(req.cust.issuedBooks, [
+      const xl = createExcel(req.cust.issuedBooks.issuedBooksArray, [
         ["accessionNumber", "Accession Number"],
         ["bookTitle", "Book Title", 50],
         ["cardNumber", "Card Number"],

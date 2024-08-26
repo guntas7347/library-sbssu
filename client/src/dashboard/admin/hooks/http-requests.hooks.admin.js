@@ -1,5 +1,6 @@
 import fileDownload from "js-file-download";
 import { ip1, ip2, localIp } from "../../http-requests";
+import { secret } from "../../../secrets";
 
 const API_URL = `http://${localIp ? ip1 : ip2}:8080/api/admin`;
 
@@ -82,7 +83,9 @@ export const allotLibraryCardToStudent = ({ rollNumber, cardNumber }) =>
   );
 
 export const fetchAllStudents = (filter) =>
-  restCall("students/fetch-all-students", filter, ["STU200FAS"]);
+  restCall(`students/fetch-all-students?${filter && filter}`, {}, [
+    "STU200FAS",
+  ]);
 
 export const fetchAllApplications = (filter) =>
   restCall("students/fetch-all-applications", filter, "STU200FAA");
@@ -99,8 +102,8 @@ export const processApplication = (decision) =>
 export const addNewBook = (bookDetails) =>
   restCall("/books/add-new-book", bookDetails, "BKS200ANB");
 
-export const fetchAllBooks = (filter) =>
-  restCall("books/fetch-all-books", filter, "BKS200FAB");
+export const fetchAllBooks = (query) =>
+  restCall(`books/fetch-all-books?${query && query}`, {}, "BKS200FAB");
 
 export const fetchBookByISBN = (isbn) =>
   restCall("books/fetch-book-by-isbn", { isbn }, "BKS200FBBI");
@@ -148,8 +151,8 @@ export const issueBookFine = (returningBookDetails) =>
     "ISB200CIBF"
   );
 
-export const fetchAllFines = (filter) =>
-  restCall("fines/fetch-all-fines", filter, "FIN200FAF");
+export const fetchAllFines = (query) =>
+  restCall(`fines/fetch-all-fines?${query && query}`, {}, "FIN200FAF");
 
 export const fetchFineById = (_id) =>
   restCall("fines/fetch-fine-doc", { _id }, "FIN200FFBI");
@@ -157,17 +160,30 @@ export const fetchFineById = (_id) =>
 export const addRecieptNumber = (data) =>
   restCall("fines/add-reciept-number", data, "FIN200ARN");
 
-export const fetchAllIssuedBooks = (filter) =>
-  restCall("books/issue-books/fetch-all-issued-books", filter, "ISB200FAIB");
+export const fetchAllIssuedBooks = (query) =>
+  restCall(
+    `books/issue-books/fetch-all-issued-books?${query && query}`,
+    {},
+    "ISB200FAIB"
+  );
 
 export const downloadAllIssuedBooks = (filter) =>
   restCall("books/issue-books/download-all-issued-books", filter, "", true);
 
-export const fetchAllReturnedBooks = (filter) =>
-  restCall("books/return-books/fetch-all-returned-books", filter, "ISB200FARB");
+export const fetchAllReturnedBooks = (query) =>
+  restCall(
+    `books/return-books/fetch-all-returned-books?${query && query}`,
+    {},
+    "ISB200FARB"
+  );
 
-export const downloadAllReturnedBooks = (filter) =>
-  restCall("books/return-books/download-all-returned-books", filter, "", true);
+export const downloadAllReturnedBooks = (query) =>
+  restCall(
+    `books/return-books/download-all-returned-books?${query && query}`,
+    {},
+    "",
+    true
+  );
 
 export const fetchReturnedBook = (_id) =>
   restCall("books/return-books/fetch-returned-book", { _id }, "ISB200FRB");
@@ -236,8 +252,8 @@ export const fetchBookDetailsByIsbnApi = (isbn) => {
 };
 
 export const fetchWeather = async () => {
-  const API_KEY = "3dce05be7c8e1bebc039ccd19cadcc54";
-  return new Promise((resolve, reject) => {
+  const API_KEY = secret.WEATHER_API_KEY;
+  return new Promise((resolve) => {
     fetch(
       `https://api.openweathermap.org/data/2.5/weather?lat=30.914519&lon=74.652159&appid=${API_KEY}`
     )

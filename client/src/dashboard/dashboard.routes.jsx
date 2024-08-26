@@ -11,7 +11,8 @@ const StaffRoutes = lazy(() =>
   import("./staff/routes/staff-routes.route.staff")
 );
 const UserRoutes = lazy(() => import("./student/routes/student-routes.user"));
-const ApplicantHomePage = lazy(() => import("./applicant/applicant.page"));
+
+const ApplicationRouter = lazy(() => import("./applicant/router"));
 
 const CenteredSpinner = () => {
   return (
@@ -56,11 +57,11 @@ const DashboardRoutes = () => {
           }
         />
         <Route
-          path="/applicant/"
+          path="/applicant/*"
           element={
             <ProtectedRoute role="APPLICANT">
               <Suspense fallback={<CenteredSpinner />}>
-                <ApplicantHomePage />
+                <ApplicationRouter />
               </Suspense>
             </ProtectedRoute>
           }

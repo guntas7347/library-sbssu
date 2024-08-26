@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import AddBookPage from "../pages/manage-books/add-book/add-book.page.staff";
 import SearchBooksPage from "../pages/manage-books/search-books/search-books.page.staff";
 import ViewBookPage from "../pages/manage-books/view-book/view-book.page.staff";
-import ManageBooksPage from "../pages/manage-books/manage-books.page.admin";
+import ManageBooksPage from "../pages/manage-books/manage-books.page.staff";
 import AddBookAccessionPage from "../pages/manage-books/book-accessions/add-book-accession.page.staff";
 
 const ManageBooksRoute = () => {

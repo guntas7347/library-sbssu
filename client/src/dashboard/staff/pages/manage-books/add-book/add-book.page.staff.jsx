@@ -1,24 +1,16 @@
-import { Button, Grid } from "@mui/material";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
-import {
-  addNewBook,
-  fetchBookDetailsByIsbnApi,
-} from "../../../hooks/http-requests.hooks.admin";
-import useLengthTrigger from "../../../../../components/forms/hooks/useLengthTrigger/uselengthTrigger.hook.component";
-import { useState } from "react";
+import { addNewBook } from "../../../hooks/http-requests.hooks.staff";
+import { useContext, useState } from "react";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const AddBookPage = () => {
-  const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
+  const { setFeedback } = useContext(SnackBarContext);
 
-  const { formFields, handleChange, setFormFields } = useForm({
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
+
+  const { formFields, handleChange } = useForm({
     isbn: "",
     title: "",
     author: "",
@@ -31,44 +23,40 @@ const AddBookPage = () => {
     callNumber: "",
   });
 
-  const { title, author, publisher, publicationYear } = formFields;
-
-  // const handleAutoFetch = async () => {
-  //   const { title, publish_date, publishers } = await fetchBookDetailsByIsbnApi(
-  //     formFields.ISBN
-  //   );
-
-  //   setFormFields({
-  //     ...formFields,
-  //     title,
-  //     publisher: publishers[0],
-  //     publicationYear: new Date(publish_date).getFullYear(),
-  //   });
-  // };
-
-  // useLengthTrigger(formFields.ISBN, 13, handleAutoFetch);
+  const {
+    title,
+    author,
+    isbn,
+    volume,
+    pages,
+    source,
+    cost,
+    callNumber,
+    publicationYear,
+    placeAndPublishers,
+  } = formFields;
 
   const handleAddNewBook = async () => {
+    console.log(formFields);
     await addNewBook(formFields)
       .then((res) => {
-        setSnackbarFeedback([1, 1, res]);
+        setFeedback([1, 1, res]);
       })
-      .catch((err) => setSnackbarFeedback([1, 2, err]));
+      .catch((err) => setFeedback([1, 2, err]));
   };
 
   return (
     <div>
-      <br />
-      <br />
-      <div className="m-5">
+      <h1 className="text-center font-bold text-3xl my-2">Add New Book</h1>
+      <div className="bg-white p-5 rounded-3xl">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             setShowAlertDialog(true);
           }}
         >
-          <Grid container spacing={2}>
-            <Grid item>
+          <div className="grid md:grid-cols-2 gap-x-28 gap-5 justify-center items-center">
+            <div>
               <InputField
                 label="Title"
                 type="text"
@@ -76,8 +64,8 @@ const AddBookPage = () => {
                 value={title}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item>
+            </div>
+            <div>
               <InputField
                 label="Author"
                 type="text"
@@ -85,24 +73,26 @@ const AddBookPage = () => {
                 value={author}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item>
+            </div>
+            <div>
               <InputField
                 label="ISBN Number"
                 type="number"
                 name="isbn"
+                value={isbn}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item>
+            </div>
+            <div>
               <InputField
                 label="Place and Publishers"
                 type="text"
                 name="placeAndPublishers"
+                value={placeAndPublishers}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item>
+            </div>
+            <div>
               <InputField
                 label="Publication Year"
                 type="number"
@@ -110,73 +100,67 @@ const AddBookPage = () => {
                 value={publicationYear}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item>
+            </div>
+            <div>
               <InputField
                 label="Pages"
-                type="text"
+                type="number"
                 name="pages"
-                value={publisher}
+                value={pages}
                 onChange={handleChange}
               />
-            </Grid>
-
-            <Grid item>
+            </div>
+            <div>
               <InputField
                 label="Volume"
                 type="text"
                 name="volume"
+                value={volume}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item>
+            </div>
+            <div>
               <InputField
                 label="Source"
                 type="text"
                 name="source"
+                value={source}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item>
+            </div>
+            <div>
               <InputField
                 label="Price"
                 type="number"
                 name="cost"
+                value={cost}
                 onChange={handleChange}
               />
-            </Grid>
-            <Grid item>
+            </div>
+            <div>
               <InputField
                 label="Call Number"
-                type="text"
+                type="number"
                 name="callNumber"
+                value={callNumber}
                 onChange={handleChange}
               />
-            </Grid>
-          </Grid>
-          <br />
-          <Button type="submit" variant="contained">
-            Submit
-          </Button>
+            </div>
+          </div>
+          <div className="mt-5 flex flex-row justify-center">
+            <button className="my-button" type="submit">
+              Submit
+            </button>
+          </div>
         </form>
       </div>
       <div>
         <AlertDialog
-          title="Confirm?"
-          content="This action can not be undone"
           open={showAlertDialog}
           handleClick={(e) => {
             if (e) handleAddNewBook();
             setShowAlertDialog(false);
           }}
-        />
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "info", message: "" })
-          }
         />
       </div>
     </div>

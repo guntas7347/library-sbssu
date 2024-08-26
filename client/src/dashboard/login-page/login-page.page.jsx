@@ -1,11 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import "./login-page.styles.scss";
-
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
 import {
-  adminLoginWithCredentials,
   applicantLoginWithCredentials,
   signOut,
   studentLoginWithCredentials,
@@ -20,7 +17,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { setFeedback } = useContext(SnackBarContext);
 
-  const [loginType, setLoginType] = useState("ADMIN");
+  const [loginType, setLoginType] = useState("APPLICANT");
 
   const [reCaptchaVerified, setReCaptchaVerified] = useState(false);
 
@@ -33,15 +30,6 @@ const LoginPage = () => {
     event.preventDefault();
 
     switch (loginType) {
-      case "ADMIN":
-        await adminLoginWithCredentials(formFields)
-          .then((res) => {
-            if (res.payload === "ADMIN") navigate("/dashboard/admin");
-            if (res.payload === "STAFF") navigate("/dashboard/staff");
-          })
-          .catch((err) => setFeedback([1, 2, err]));
-        break;
-
       case "STUDENT":
         await studentLoginWithCredentials(formFields)
           .then(() => {
@@ -95,14 +83,14 @@ const LoginPage = () => {
         </div>
         <div className="grid gap-2 w-80">
           <input
-            className="border h-12 px-2.5"
+            className="border border-black h-12 px-2.5"
             placeholder="Email Address"
             name="email"
             type="email"
             onChange={handleChange}
           />
           <input
-            className="border h-12 px-2.5"
+            className="border border-black h-12 px-2.5"
             name="password"
             placeholder="Password"
             type="password"
@@ -112,7 +100,7 @@ const LoginPage = () => {
             <ReCaptcha onChange={handleVerify} />
           </div>
           <button
-            disabled={!reCaptchaVerified}
+            // disabled={!reCaptchaVerified}
             className="my-button"
             onClick={handleSubmit}
           >
@@ -127,13 +115,13 @@ const LoginPage = () => {
             <Link to={"/sign-up"}>Create Account</Link>
           </div>
         </div>
-        <div>
+        <div className="flex gap-5 items-center">
+          <label htmlFor="">Login as</label>
           <InputSelect
             name="Login Type"
             fields={[
-              { name: "Student", value: "STUDENT" },
-              { name: "Admin", value: "ADMIN" },
               { name: "Applicant", value: "APPLICANT" },
+              { name: "Student", value: "STUDENT" },
             ]}
             value={loginType}
             onChange={(e) => setLoginType(e.target.value)}

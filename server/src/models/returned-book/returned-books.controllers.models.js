@@ -1,10 +1,17 @@
-const { createCurrentMonthDateRange } = require("../../utils/functions");
+const {
+  createCurrentMonthDateRange,
+  createDateRange,
+} = require("../../utils/functions");
 const {
   getBookAccessionIdFromBookAccessionNumber,
+  getAccession,
 } = require("../book-accessions/book-accessions.controllers");
 const { fetchStudentById } = require("../students/students.controllers");
 const returnedBooksMongo = require("./returned-books.schema");
 const issueBookMongo = require("../issue-book/issue-book.schema");
+const {
+  getLibraryCard,
+} = require("../library-cards/library-cards.controllers");
 
 const createReturnBook = async (returningBookDetails, session) => {
   return await returnedBooksMongo.create([returningBookDetails], { session });
@@ -14,34 +21,35 @@ const updateReturnBookById = async (_id, update, session) => {
   return await returnedBooksMongo.findByIdAndUpdate(_id, update, { session });
 };
 
-const findReturnedBooks = async (filter) => {
-  const { sortSelect, sortValue } = filter;
-  let query = returnedBooksMongo.find();
+const getReturnedBooks = async (queryParam) => {
+  const { filter, filterValue, page = 1 } = queryParam;
+  let totalPages = 1;
+  const pageSize = 25;
+  const skip = (page - 1) * pageSize;
 
-  switch (sortSelect) {
-    case "fine":
-      query.where({ fine: { $ne: 0 } });
-      break;
+  const query = returnedBooksMongo.find();
 
-    case "returnDate":
-      query.where({ returnDate: sortValue });
+  switch (filter) {
+    case "fetchAllReturnedBooks":
+      query.where();
       break;
 
     case "accessionNumber":
-      const accessionNumber = await getBookAccessionIdFromBookAccessionNumber(
-        sortValue
-      );
-
-      if (accessionNumber != null) {
+      const accession = await getAccession({ accessionNumber: filterValue });
+      if (!accession) query.where({ _id: { $exists: false } });
+      else
         query.where({
-          bookAccessionId: accessionNumber._id,
+          bookAccessionId: accession._id,
         });
-      } else {
-        query.where({
-          bookAccessionId: null,
-        });
-      }
+      break;
 
+    case "cardNumber":
+      const libraryCard = await getLibraryCard({ cardNumber: filterValue });
+      if (!libraryCard) query.where({ _id: { $exists: false } });
+      else
+        query.where({
+          libraryCardId: libraryCard._id,
+        });
       break;
 
     case "currentMonth":
@@ -52,7 +60,7 @@ const findReturnedBooks = async (filter) => {
       break;
 
     case "dateRange":
-      const { startingDate, endingDate } = sortValue;
+      const { startingDate, endingDate } = createDateRange(filterValue);
       query.where({ returnDate: { $gte: startingDate, $lte: endingDate } });
       break;
 
@@ -60,7 +68,9 @@ const findReturnedBooks = async (filter) => {
       break;
   }
 
-  const results = await query
+  query.skip(skip).limit(pageSize);
+
+  query
     .populate({
       path: "bookAccessionId",
       populate: { path: "bookId", select: "title  -_id" },
@@ -71,7 +81,7 @@ const findReturnedBooks = async (filter) => {
     })
     .populate({ path: "fine", select: "amount -_id" });
 
-  return results;
+  return { returnedBooksArray: await query.exec(), totalPages };
 };
 
 const getIssueHistory = async (student_Id, filter) => {
@@ -183,7 +193,7 @@ const countReturnedBookDocs = async (filter) =>
 
 module.exports = {
   createReturnBook,
-  findReturnedBooks,
+  getReturnedBooks,
   getIssueHistory,
   getReturnedBookById,
   updateReturnBookById,

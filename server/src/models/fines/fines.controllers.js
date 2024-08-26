@@ -4,16 +4,26 @@ const createFine = async (fineDetails, session) => {
   return await finesSchema.create([fineDetails], { session });
 };
 
-const findFines = async (filter = {}, populate = false) => {
-  const { sortSelect, sortValue } = filter;
+const getFines = async (queryParam) => {
+  const { filter, filterValue, page = 1 } = queryParam;
+  let totalPages = 1;
+  const pageSize = 25;
+  const skip = (page - 1) * pageSize;
 
   const query = finesSchema.find();
 
-  if (populate) {
-    query.populate({ path: "studentId", select: "fullName rollNumber" });
+  switch (filter) {
+    case "rollNumber":
+      break;
+
+    default:
+      break;
   }
 
-  return await query.exec();
+  query.skip(skip).limit(pageSize);
+  query.populate({ path: "studentId", select: "fullName rollNumber" });
+
+  return { finesArray: await query.exec(), totalPages };
 };
 
 const getFineById = async (_id, populate = false) => {
@@ -28,4 +38,4 @@ const updateFineById = async (_id, update) => {
   return await finesSchema.findByIdAndUpdate(_id, update);
 };
 
-module.exports = { createFine, findFines, getFineById, updateFineById };
+module.exports = { createFine, getFines, getFineById, updateFineById };

@@ -1,7 +1,7 @@
 const express = require("express");
 const crs = require("../../../utils/custom-response-codes");
 const {
-  findFines,
+  getFines,
   getFineById,
   updateFineById,
 } = require("../../../models/fines/fines.controllers");
@@ -10,9 +10,13 @@ const finesRouter = express.Router();
 
 finesRouter.post("/fetch-all-fines", async (req, res) => {
   try {
-    const finesCol = await findFines({}, true);
+    const finesCol = await getFines({
+      filter: req.query.filter,
+      filterValue: req.query.filterValue,
+      page: req.query.page || 1,
+    });
 
-    const finesData = finesCol.map((fineDoc) => {
+    const finesData = finesCol.finesArray.map((fineDoc) => {
       return {
         _id: fineDoc._id,
         createdAt: new Date(fineDoc.createdAt).toDateString(),

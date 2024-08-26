@@ -1,21 +1,14 @@
+const { uuidGenerator } = require("../../../utils/functions");
 const { Auth_Applicant } = require("../auth.schema");
 const { createPasswordHash } = require("../functions");
 
-const createAuthApplicant = async (userCredentials, otp) => {
-  const { displayName, email, password } = userCredentials;
-  return await Auth_Applicant.findOneAndUpdate(
-    {
-      email,
-    },
-    {
-      userName: displayName,
-      email: email,
-      password: await createPasswordHash(password),
-      otp,
-      createdAt: new Date(),
-    },
-    { upsert: true }
-  );
+const createAuthApplicant = async (userCredentials) => {
+  const { displayName, email } = userCredentials;
+  return await Auth_Applicant.create({
+    userName: displayName,
+    email,
+    password: await createPasswordHash(uuidGenerator()),
+  });
 };
 
 const getAuthApplicantByEmail = async (email) => {
@@ -34,10 +27,20 @@ const deleteAuthApplicantById = async (_id, session) => {
   return await Auth_Applicant.findByIdAndDelete(_id, { session });
 };
 
+const getAuthApplicant = async (filter) => {
+  return await Auth_Applicant.findOne(filter);
+};
+
+const updateAuthApplicant = async (filter, update) => {
+  return await Auth_Applicant.findOneAndUpdate(filter, update);
+};
+
 module.exports = {
   createAuthApplicant,
   getAuthApplicantById,
   getAuthApplicantByEmail,
+  getAuthApplicant,
   updateAuthApplicantById,
   deleteAuthApplicantById,
+  updateAuthApplicant,
 };

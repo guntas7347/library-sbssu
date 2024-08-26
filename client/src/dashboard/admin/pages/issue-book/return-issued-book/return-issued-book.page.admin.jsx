@@ -34,6 +34,7 @@ const ReturnIssuedBookPage = () => {
     rollNumber,
     _id,
   } = issuedBookDoc;
+
   const handleFetch = async () => {
     setIsStudentFetching(true);
     await fetchIssuedBookByAccessionNumber(+formFields.accessionNumber)
@@ -52,7 +53,6 @@ const ReturnIssuedBookPage = () => {
   const returnDate = formatDate();
 
   const handleReturnBook = async () => {
-    console.log("handleReturnBook");
     await returnIssuedBook({ _id })
       .then((res) => {
         setFeedback([1, 1, res]);
@@ -66,7 +66,6 @@ const ReturnIssuedBookPage = () => {
   };
 
   const handleCheckFine = async () => {
-    console.log("handleCheckFine");
     await issueBookFine({ _id })
       .then(async (fine) => {
         if (fine != null) setFine(fine);
@@ -83,7 +82,7 @@ const ReturnIssuedBookPage = () => {
   return (
     <div>
       <h1 className="text-center font-bold text-3xl my-2">Return book?</h1>
-      <div className="bg-white rounded-3xl p-5 grid grid-cols-2 gap-10">
+      <div className="bg-white rounded-3xl p-5 flex justify-between">
         <InputField
           label="Accession Number"
           name="accessionNumber"
@@ -92,11 +91,9 @@ const ReturnIssuedBookPage = () => {
           value={formFields.accessionNumber}
         />
 
-        <div className="flex flex-row justify-center items-center">
-          <button className="my-button" onClick={handleFetch}>
-            Search
-          </button>
-        </div>
+        <button className="my-button" onClick={handleFetch}>
+          Search
+        </button>
       </div>
 
       {isStudentFetching &&
@@ -116,22 +113,19 @@ const ReturnIssuedBookPage = () => {
                 ]}
               />
             </div>
-            <div className="bg-white rounded-3xl p-5 grid grid-cols-2">
-              <div>
-                <InputField
-                  label="Return Date"
-                  name="returnDate"
-                  value={returnDate}
-                  disabled
-                  style={{ textAlign: "center" }}
-                  InputLabelProps={{ shrink: true }}
-                />
-              </div>
-              <div className="flex flex-row justify-center items-center">
-                <button className="my-button" onClick={handleCheckFine}>
-                  Return
-                </button>
-              </div>
+            <div className="bg-white rounded-3xl p-5 flex justify-between items-center">
+              <InputField
+                label="Return Date"
+                name="returnDate"
+                value={returnDate}
+                disabled
+                style={{ textAlign: "center" }}
+                InputLabelProps={{ shrink: true }}
+              />
+
+              <button className="my-button" onClick={handleCheckFine}>
+                Return
+              </button>
             </div>
           </>
         ) : (

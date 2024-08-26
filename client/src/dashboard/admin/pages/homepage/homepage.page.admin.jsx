@@ -12,8 +12,6 @@ import {
 } from "../../hooks/http-requests.hooks.admin";
 
 const Homepage = () => {
-  const [showDropdown, setShowDropdown] = useState(true);
-
   const [temperature, setTemperature] = useState("Loading...");
   const [totalIssues, setTotalIssues] = useState("Loading...");
   const [past7dayIssues, setPast7dayIssues] = useState("Loading...");
@@ -88,10 +86,10 @@ const Homepage = () => {
     <div className="">
       <div className="flex flex-row my-5 relative">
         <div className="flex-start">
-          <h1 className="text-4xl font-bold mb-2">Welcome Tejpal,</h1>
+          <h1 className="text-4xl font-bold mb-2">Welcome User,</h1>
           <span>
             All systes are running smoothly! You have{" "}
-            <a href="">3 unread alerts</a>
+            <a href="">0 unread alerts</a>
           </span>
         </div>
         <div className="ml-auto flex flex-col bg-white relative h-10 px-3 justify-center">

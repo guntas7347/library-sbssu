@@ -18,8 +18,8 @@ const stream = rfs.createStream("morgan.log", {
 
 app.use(cookieParser());
 
-app.use(morgan("combined", { stream }));
-app.use(morgan("combined"));
+// app.use(morgan("combined", { stream }));
+// app.use(morgan("combined"));
 
 app.use(
   cors({

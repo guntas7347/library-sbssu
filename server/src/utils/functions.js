@@ -1,5 +1,6 @@
 const fs = require("fs");
 var xl = require("excel4node");
+const { v4: uuidv4 } = require("uuid");
 
 // const { books1 } = require("../../books1");
 
@@ -61,7 +62,6 @@ const formatObjectValues = (object = {}, keysToIgnore = []) => {
 };
 
 const formatDate = (date = new Date()) => {
-  console.log(date);
   const yyyy = date.getFullYear();
   const mm = date.getMonth() + 1;
   const dd = date.getDate();
@@ -73,6 +73,32 @@ const createCurrentMonthDateRange = (date = new Date()) => {
   const mm = date.getMonth();
   const startingDate = formatDate(new Date(yyyy, mm, 1));
   const endingDate = formatDate(new Date(yyyy, mm + 1, 0));
+  return { startingDate, endingDate };
+};
+
+const createDateRange = (date) => {
+  const isValidDateFormat = (date) => /^\d{16}$/.test(date);
+  if (!isValidDateFormat(date))
+    return {
+      startingDate: formatDate(new Date()),
+      endingDate: formatDate(new Date()),
+    };
+
+  const startingDateYear = date.substring(0, 4);
+  const startingDateMonth = date.substring(4, 6);
+  const startingDateDay = date.substring(6, 8);
+  const EndingDateYear = date.substring(8, 12);
+  const EndingDateMonth = date.substring(12, 14);
+  const EndingDateDay = date.substring(14, 16);
+
+  const startingDate = formatDate(
+    new Date(startingDateYear, Number(startingDateMonth) - 1, startingDateDay)
+  );
+
+  const endingDate = formatDate(
+    new Date(EndingDateYear, Number(EndingDateMonth) - 1, EndingDateDay)
+  );
+
   return { startingDate, endingDate };
 };
 
@@ -165,13 +191,39 @@ const generateRandomNumber = (length = 6, exclusionArray = []) => {
   return rmn;
 };
 
+const uuidGenerator = (length = 1) => {
+  let uuid = "";
+  for (let index = 0; index < length; index++) {
+    uuid = uuid + uuidv4();
+  }
+  return uuid.replace(/-/g, "");
+};
+
+const cardNumberGenerator = (rollNo, numberOfCards = 2) => {
+  const cardNumberArray = [];
+  for (let index = 0; index < numberOfCards; index++) {
+    let numberToAdd = index + 1;
+    if (numberToAdd < 10) numberToAdd = "0" + numberToAdd.toString();
+    else numberToAdd = numberToAdd.toString();
+
+    const cardNumber = rollNo.toString() + numberToAdd;
+
+    cardNumberArray.push(cardNumber);
+  }
+
+  return cardNumberArray;
+};
+
 module.exports = {
   checkDateGap,
   createDateGap,
   formatString,
   formatObjectValues,
   createCurrentMonthDateRange,
+  createDateRange,
   createExcel,
   dateTimeString,
   generateRandomNumber,
+  uuidGenerator,
+  cardNumberGenerator,
 };

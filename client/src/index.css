@@ -1,3 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .page-heading {
   @apply font-bold text-3xl;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
+
+body {
+  margin: 0;
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f2d7f4;
+  color: black;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.display-none {
+  display: none !important;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  gap: 20px;
+}
+.admin-dashboard-body {
+  padding: 10px 50px;
+  .page-header {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 0;
+  }
+  .white-container {
+    padding: 30px;
+    border-radius: 20px;
+    background-color: white;
+  }
+}
+
+.page-heading {
+  @apply font-bold text-3xl;
+}
+
+.my-button {
+  color: white;
+  background-color: #202650;
+  border: 1px solid;
+  border-radius: 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  border-color: white;
+  padding: 0 10px;
+  font-size: 1.25rem;
+  line-height: 3rem;
+}
+
+.my-button:hover {
+  background-color: #907ad6;
+
+  cursor: pointer;
+}
+
+.my-button:active,
+.my-button:disabled {
+  opacity: 0.5;
 }

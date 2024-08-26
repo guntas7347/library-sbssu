@@ -44,9 +44,8 @@ const ApproveStudentPage = () => {
         Search Applications
       </h1>
       <div>
-        <div className="grid grid-cols-4 gap-10 my-5 bg-white p-5 rounded-3xl">
+        <div className="flex gap-10 justify-between my-5 bg-white p-5 rounded-3xl">
           <SearchQueriesComponent
-            className="col-span-3"
             selectFields={[
               {
                 name: "Roll Number",
@@ -65,11 +64,9 @@ const ApproveStudentPage = () => {
             inputValue={formFields.selectValue}
             onChange={handleChange}
           />
-          <div className="col-span-1 flex flex-row justify-center items-center">
-            <button className="my-button " onClick={handleFetch}>
-              Submit
-            </button>
-          </div>
+          <button className="my-button " onClick={handleFetch}>
+            Submit
+          </button>
         </div>
 
         <div>

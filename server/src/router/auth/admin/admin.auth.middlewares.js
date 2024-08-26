@@ -1,9 +1,13 @@
 const {
   getAuthAdminByEmail,
   updateAuthAdminById,
+  getAuthAdmin,
 } = require("../../../models/auth/admin/aduth_admin.controllers");
 const crs = require("../../../utils/custom-response-codes");
-const { generateRandomNumber } = require("../../../utils/functions");
+const {
+  generateRandomNumber,
+  uuidGenerator,
+} = require("../../../utils/functions");
 
 const verifyEmailForLogin = async (req, res, next) => {
   try {
@@ -29,6 +33,7 @@ const fetchAuthAdminByEmail = async (req, res, next) => {
     req.cust.authAdminDoc = authAdminDoc;
     next();
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 };
@@ -73,9 +78,57 @@ const verifyOtp = async (req, res, next) => {
   }
 };
 
+const createLink = async (req, res, next) => {
+  try {
+    const code = uuidGenerator(3);
+    const link = `http://localhost:3000/reset-password/admin/${code}`;
+    req.cust.code = code;
+    req.cust.link = link;
+    next();
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+};
+
+const processLink = async (req, res, next) => {
+  try {
+    await updateAuthAdminById(req.cust.authAdminDoc._id, {
+      resetCode: req.cust.code,
+      resetCodeTime: new Date(),
+    });
+    next();
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+};
+
+const verifyResetLink = async (req, res, next) => {
+  try {
+    const { type, code } = req.body;
+    if (type !== "admin") return res.status(404).json(crs.AUTH404LDPS());
+    const authAdmin = await getAuthAdmin({ resetCode: code });
+    if (authAdmin === null) return res.status(404).json(crs.AUTH404LDPS());
+    const resetCodeTime = new Date(authAdmin.resetCodeTime);
+    const timePassed =
+      (new Date().getTime() - resetCodeTime.getTime()) / 1000 / 60;
+
+    if (timePassed > 10) return res.status(404).json(crs.AUTH404LDPS());
+
+    next();
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+};
+
 module.exports = {
   verifyEmailForLogin,
   fetchAuthAdminByEmail,
   createOtp,
   verifyOtp,
+  createLink,
+  processLink,
+  verifyResetLink,
 };

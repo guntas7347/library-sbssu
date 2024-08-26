@@ -12,10 +12,8 @@ export const SnackbarProvider = ({ children }) => {
   const value = { feedback, setFeedback };
 
   useEffect(() => {
-    console.log("FEEDBACK TRIGGERED");
     if (feedback[0] !== 0 || feedback[1] !== 0 || feedback[2] !== "") {
       setTimeout(() => {
-        console.log("Closing Snackbar");
         setFeedback([0, 0, ""]);
       }, 5000);
     }
@@ -24,8 +22,8 @@ export const SnackbarProvider = ({ children }) => {
     <>
       <SnackBarContext.Provider value={value}>
         {children}
+        <SnackBar feedback={feedback} />
       </SnackBarContext.Provider>
-      <SnackBar feedback={feedback} />
     </>
   );
 };

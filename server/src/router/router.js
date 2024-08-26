@@ -30,6 +30,7 @@ router.use("/admin/settings", settingsRouter);
 const verifyJwtMiddleware = (req, res, next) => {
   try {
     const jwt = verifyJwt(decrptText(req.cookies.session));
+
     if (jwt === null) {
       res.cookie("session", null, { expires: new Date(0) });
       return res.status(401).json(crs.AUTH401JWT());
@@ -58,7 +59,9 @@ const verifyAdmin = async (req, res, next) => {
 
 const verifyStaff = async (req, res, next) => {
   try {
-    if (req.user.role === "STAFF") {
+    const { role } = await getAuthAdminById(req.user.uid);
+
+    if (role === "STAFF") {
       next();
     } else {
       return res.status(401).json(crs.STF401JWT());

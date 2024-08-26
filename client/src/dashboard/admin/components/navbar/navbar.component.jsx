@@ -12,7 +12,7 @@ const NavigationBar = () => {
       <>
         <div>
           <Link to={to}>
-            <button className="rounded-xl w-36 h-14 hover:bg-violet-300">
+            <button className="rounded-xl  h-14 hover:bg-violet-300 min-w-56">
               {label}
             </button>
           </Link>
@@ -52,14 +52,14 @@ const NavigationBar = () => {
         </div>
 
         <div className="ml-auto">
-          <MenuButton label="Sign Out" to="/" />
+          <MenuButton label="Sign Out" to="/admin" />
         </div>
       </div>
 
       <div
         style={{ borderTop: "1px solid rgba(174, 161, 255, 0.75)" }}
-        className={`absolute flex flex-col gap-3 items-center bg-white z-50 h-auto pt-2 -left-40 w-40 transition-left duration-500 ${
-          showMenu && "left-0"
+        className={`absolute flex flex-col gap-3 items-center bg-white z-50  pt-2 -left-60 w-60 transition-left min-h-screen duration-500 ${
+          showMenu && "left-1"
         }`}
       >
         <MenuButton label="Home" to="/dashboard/admin" />{" "}

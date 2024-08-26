@@ -19,7 +19,9 @@ const {
 const {
   getLibraryCardByCardNumber,
   createLibraryCard,
+  getLibraryCard,
 } = require("../../../models/library-cards/library-cards.controllers");
+const { cardNumberGenerator } = require("../../../utils/functions");
 
 const fetchStudentByRollNumber = async (req, res, next) => {
   try {
@@ -98,7 +100,6 @@ const processDecision = async (req, res, next) => {
   const session = await mongoose.startSession();
   try {
     const { applicantionDoc, applicantionDocId } = req.cust;
-    console.log(req.body.decision);
     if (req.body.decision === "REJECT") {
       await session.withTransaction(async () => {
         await deleteApplicationById(applicantionDocId, session);
@@ -106,22 +107,39 @@ const processDecision = async (req, res, next) => {
       });
       await session.commitTransaction();
       return res.status(200).json(crs.APP200RPA());
+    } else {
+      const applicantAuthDoc = await getAuthApplicantById(applicantionDocId);
+      delete applicantionDoc._doc._id;
+      delete applicantAuthDoc._doc._id;
+      await session.withTransaction(async () => {
+        const studentDoc = await createStudent(applicantionDoc._doc, session);
+        const authStudentDoc = {
+          studentId: studentDoc[0].id,
+          ...applicantAuthDoc._doc,
+        };
+        await createAuthStudent(authStudentDoc, session);
+        await deleteApplicationById(applicantionDocId, session);
+        await deleteAuthApplicantById(applicantionDocId, session);
+
+        // auto assigning library cards
+        const cardNumbers = cardNumberGenerator(applicantionDoc.rollNumber);
+        for (const cardNumber of cardNumbers) {
+          const libraryCard = await getLibraryCard({ cardNumber });
+          if (libraryCard) continue;
+          const libraryCardDoc = await createLibraryCard(
+            { cardNumber, studentId: studentDoc[0].id },
+            session
+          );
+          await addLibraryCardToStudent(
+            libraryCardDoc[0].studentId,
+            libraryCardDoc[0]._id,
+            session
+          );
+        }
+      });
+      await session.commitTransaction();
     }
-    const applicantAuthDoc = await getAuthApplicantById(applicantionDocId);
-    delete applicantionDoc._doc._id;
-    delete applicantAuthDoc._doc._id;
-    await session.withTransaction(async () => {
-      const studentDoc = await createStudent(applicantionDoc._doc, session);
-      const authStudentDoc = {
-        studentId: studentDoc[0].id,
-        ...applicantAuthDoc._doc,
-      };
-      await createAuthStudent(authStudentDoc, session);
-      await deleteApplicationById(applicantionDocId, session);
-      await deleteAuthApplicantById(applicantionDocId, session);
-    });
-    await session.commitTransaction();
-    return res.status(200).json(crs.APP200APA());
+    next();
   } catch (err) {
     console.log(err);
     if (session.inTransaction()) await session.abortTransaction();

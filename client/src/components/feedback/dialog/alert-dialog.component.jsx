@@ -19,10 +19,10 @@ const AlertDialog = ({
         !open && "hidden"
       } fixed z-50 left-0 top-0 h-full w-full bg-black bg-opacity-50 flex justify-center`}
     >
-      <div className="bg-white p-10 m-auto">
-        <h1>{title}</h1>
-        {content}
-        <div className="flex gap-5">
+      <div className="bg-white p-10 m-auto flex flex-col gap-10">
+        <h1 className="text-center text-lg font-semibold">{title}</h1>
+        <div> {content}</div>
+        <div className="flex gap-5 justify-center items-center">
           <button className="my-button" onClick={handleDisagree}>
             {disagreeMessage}
           </button>

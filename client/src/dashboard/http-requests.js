@@ -64,19 +64,11 @@ export const createAdminAuth = (userCredentials) => {
   return restCall("auth/admin/signup", userCredentials);
 };
 
-export const initalizeSignUpWithCredentials = (userCredentials) => {
+export const createAuthApplicant = (userCredentials) => {
   return restCall(
-    "auth/applicants/create-user/send-otp",
+    "auth/applicants/create-user",
     userCredentials,
     "AUTH200SAPP"
-  );
-};
-
-export const compleateSignUpWithCredentials = (userCredentials) => {
-  return restCall(
-    "auth/applicants/create-user/verify-otp",
-    userCredentials,
-    "AUTH200VAPP"
   );
 };
 
@@ -112,14 +104,32 @@ export const changePassword = (credentials) => {
   );
 };
 
-export const resetPasswordAdminSendOtp = (email) =>
-  restCall("auth/admin/reset-password-init", { email }, "AUTH200RAPI");
-
-export const resetPasswordAdminVerifyOtp = (cred) =>
-  restCall("auth/admin/reset-password-verify", cred, "AUTH200RAPV");
-
-export const resetPasswordAdmin = (cred) =>
-  restCall("auth/admin/reset-password", cred, "AUTH200RAP");
-
 export const verifyReCaptcha = (token) =>
   restCall("auth/verify-recaptcha", { token }, "AUTH200RECAPTCHA");
+
+export const resetPasswordApplicantDispatchLink = (email) =>
+  restCall("auth/applicants/dispatch-reset-link", { email }, "AUTH200LDPS");
+
+export const resetPasswordApplicantVerifyLink = (type, code) =>
+  restCall("auth/applicants/verify-reset-link", { type, code }, "AUTH200LVFS");
+
+export const resetPasswordApplicant = (password, code) =>
+  restCall("auth/applicants/reset-password", { password, code }, "AUTH200RAP");
+
+export const resetPasswordStudentDispatchLink = (email) =>
+  restCall("auth/students/dispatch-reset-link", { email }, "AUTH200LDPS");
+
+export const resetPasswordStudentVerifyLink = (type, code) =>
+  restCall("auth/students/verify-reset-link", { type, code }, "AUTH200LVFS");
+
+export const resetPasswordStudent = (password, code) =>
+  restCall("auth/students/reset-password", { password, code }, "AUTH200RAP");
+
+export const resetPasswordAdminDispatchLink = (email) =>
+  restCall("auth/admin/dispatch-reset-link", { email }, "AUTH200LDPS");
+
+export const resetPasswordAdminVerifyLink = (type, code) =>
+  restCall("auth/admin/verify-reset-link", { type, code }, "AUTH200LVFS");
+
+export const resetPasswordAdmin = (password, code) =>
+  restCall("auth/admin/reset-password", { password, code }, "AUTH200RAP");

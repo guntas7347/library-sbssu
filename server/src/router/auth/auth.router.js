@@ -1,6 +1,6 @@
 const express = require("express");
 const { applicantsAuthRouter } = require("./applicants/applicants.auth.router");
-const { studentRouter } = require("./students/students-router.auth.router");
+const { studentAuthRouter } = require("./students/students-router.auth.router");
 const { adminRouter } = require("./admin/admin.auth.router");
 const crs = require("../../utils/custom-response-codes");
 
@@ -8,7 +8,7 @@ const authRouter = express.Router();
 
 authRouter.use("/applicants", applicantsAuthRouter);
 authRouter.use("/admin", adminRouter);
-authRouter.use("/students", studentRouter);
+authRouter.use("/students", studentAuthRouter);
 
 authRouter.post("/sign-out", async (req, res) => {
   try {

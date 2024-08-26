@@ -17,7 +17,7 @@ const {
   updateReturnBookById,
   createReturnBook,
   getReturnedBookById,
-  findReturnedBooks,
+  getReturnedBooks,
 } = require("../../../models/returned-book/returned-books.controllers.models");
 const { generateEmailTemplate } = require("../../../services/email-templates");
 const { transporter } = require("../../../services/nodemailer");
@@ -112,8 +112,12 @@ const sendReturnedConfirmationEmail = async (req, res, next) => {
 
 const fetchReturnedBooks = async (req, res, next) => {
   try {
-    const returnedBooksCol = await findReturnedBooks(req.body);
-    const data = returnedBooksCol.map((returnedBook) => {
+    const returnedBooksCol = await getReturnedBooks({
+      filter: req.query.filter,
+      filterValue: req.query.filterValue,
+      page: req.query.page || 1,
+    });
+    const data = returnedBooksCol.returnedBooksArray.map((returnedBook) => {
       return {
         _id: returnedBook._id,
         issueDate: returnedBook.issueDate.toDateString(),
@@ -127,9 +131,13 @@ const fetchReturnedBooks = async (req, res, next) => {
       };
     });
     if (!req.cust) req.cust = {};
-    req.cust.returnedBooks = data;
+    req.cust.returnedBooks = {
+      returnedBooksArray: data,
+      totalPages: returnedBooksCol.totalPages,
+    };
     return next();
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 };

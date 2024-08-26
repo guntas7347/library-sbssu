@@ -1,10 +1,10 @@
+import queryString from "query-string";
+
 export const sortObjectUsingKeys = (object, keysArray) => {
   const sortedOject = {};
-
   for (var i = 0; i < keysArray.length; i++) {
     sortedOject[keysArray[i]] = object[keysArray[i]];
   }
-
   return sortedOject;
 };
 
@@ -65,14 +65,45 @@ export const rowsArray = (array = [], keysArray = []) => {
   });
 };
 
-// export const handleErrors = (statusCode, status, payload) => {
-//   switch (statusCode) {
-//     case 200:
-//       resolve(status);
+export const createURLQuery = (customParam) => {
+  const object = {};
+  Object.keys(customParam).map((key) => {
+    if (customParam[key] === "") return;
+    object[key] = customParam[key];
+  });
 
-//       break;
+  return queryString.stringify({ ...object });
+};
 
-//     default:
-//       break;
-//   }
-// };
+export const processData = (array, sortArray = []) => {
+  return array.map((obj) => {
+    return Object.values(sortObjectUsingKeys({ ...obj }, sortArray));
+  });
+};
+
+export const processDataForBooks = (array, sortArray = []) => {
+  const mergeArrayElementsToString = (array = []) => {
+    let string = "";
+    let isFirst = true;
+    array.forEach((element) => {
+      if (isFirst) {
+        string += `(${array.length}) ` + element.accessionNumber;
+        isFirst = false;
+      } else {
+        string += ", " + element.accessionNumber;
+      }
+    });
+    return string;
+  };
+  return array.map((obj) => {
+    return Object.values(
+      sortObjectUsingKeys(
+        {
+          ...obj,
+          accessionNumber: mergeArrayElementsToString(obj.accessionNumbers),
+        },
+        sortArray
+      )
+    );
+  });
+};

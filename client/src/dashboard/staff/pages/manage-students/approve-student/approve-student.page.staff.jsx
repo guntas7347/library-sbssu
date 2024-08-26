@@ -1,90 +1,80 @@
-import { Button, Grid } from "@mui/material";
-import InputSelect from "../../../../../components/forms/input-select/input-select.component";
 import CustomTable from "../../../../../components/table/custom-table.component";
-import { fetchAllApplications } from "../../../hooks/http-requests.hooks.admin";
-import InputField from "../../../../../components/forms/input-field/input-field.component";
-import { sortObjectUsingKeys } from "../../../../../utils/functions";
-import { useState } from "react";
+import { fetchAllApplications } from "../../../hooks/http-requests.hooks.staff";
+import { rowsArray } from "../../../../../utils/functions";
+import { useContext, useState } from "react";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { useNavigate } from "react-router-dom";
+import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const ApproveStudentPage = () => {
   const navigate = useNavigate();
 
+  const { setFeedback } = useContext(SnackBarContext);
+
   const [rowData, setRowData] = useState([]);
 
   const { formFields, handleChange } = useForm({
-    sortSelect: "applicationNumber",
+    sortSelect: "fetchAllApplications",
     sortValue: "",
   });
 
   const handleFetch = async () => {
     await fetchAllApplications(formFields)
-      .then((res) => setRowData(rowsArray(res)))
+      .then((res) => {
+        setRowData(
+          rowsArray(res, ["_id", "rollNumber", "fullName", "program", "batch"])
+        );
+        if (res.length === 0) {
+          setFeedback([1, 2, "No data found"]);
+        }
+      })
       .catch((err) => {
-        console.error(err);
+        setFeedback([1, 2, err]);
       });
   };
 
-  const rowsArray = (array) => {
-    return array.map((obj) => {
-      return Object.values(
-        sortObjectUsingKeys(obj, [
-          "applicationNumber",
-          "rollNumber",
-          "name",
-          "program",
-          "batch",
-        ])
-      );
-    });
-  };
-
   const handleRowClick = (e) => {
-    console.log(e);
     navigate(`/dashboard/admin/manage-students/approve-students/${e}`);
   };
 
   return (
-    <div className="text-center">
-      <h3 className="m-3">Search Applications</h3>
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">
+        Search Applications
+      </h1>
       <div>
-        <div className="mx-5 d-flex">
-          <Grid container spacing={2}>
-            <Grid item>
-              <InputSelect
-                fields={[
-                  { name: "Application Number", value: "applicationNumber" },
-                  {
-                    name: "Search All Applications",
-                    value: "fetchAllApplications",
-                  },
-                ]}
-                value={formFields.sortSelect}
-                onChange={handleChange}
-                name="sortSelect"
-              />
-            </Grid>
-            <Grid item>
-              <InputField
-                label="Value"
-                name="sortValue"
-                type="number"
-                onChange={handleChange}
-              />
-            </Grid>
-          </Grid>
-          <Button onClick={handleFetch}>Search</Button>
-        </div>
-        <div className="p-5">
-          <CustomTable
-            columns={[
-              "Application Number",
-              "Roll Number",
-              "Name",
-              "Program",
-              "Batch",
+        <div className="grid grid-cols-4 gap-10 my-5 bg-white p-5 rounded-3xl">
+          <SearchQueriesComponent
+            className="col-span-3"
+            selectFields={[
+              {
+                name: "Roll Number",
+                value: "rollNumber",
+                inputField: "number",
+              },
+              {
+                name: "Search All Applications",
+                value: "fetchAllApplications",
+                inputField: "none",
+              },
             ]}
+            selectValue={formFields.sortSelect}
+            selectName="sortSelect"
+            inputName="sortValue"
+            inputValue={formFields.selectValue}
+            onChange={handleChange}
+          />
+          <div className="col-span-1 flex flex-row justify-center items-center">
+            <button className="my-button " onClick={handleFetch}>
+              Submit
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <CustomTable
+            columns={["Roll Number", "Name", "Program", "Batch"]}
             rows={rowData}
             handleRowClick={handleRowClick}
           />

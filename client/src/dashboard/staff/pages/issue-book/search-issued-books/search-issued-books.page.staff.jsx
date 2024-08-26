@@ -1,43 +1,41 @@
-import { useState } from "react";
-import { Button, Grid } from "@mui/material";
-import { fetchAllIssuedBooks } from "../../../hooks/http-requests.hooks.admin";
-import InputSelect from "../../../../../components/forms/input-select/input-select.component";
+import { useContext, useState } from "react";
+import {
+  downloadAllIssuedBooks,
+  fetchAllIssuedBooks,
+} from "../../../hooks/http-requests.hooks.staff";
 import CustomTable from "../../../../../components/table/custom-table.component";
 import { sortObjectUsingKeys } from "../../../../../utils/functions";
-import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
-import SnackbarFeedback from "../../../../../components/feedback/snackbar/snackbar-old.component";
 import { useNavigate } from "react-router-dom";
+import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
+import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 
 const SearchIssuedBooks = () => {
   const navigate = useNavigate();
+  const { setFeedback } = useContext(SnackBarContext);
 
   const [rowData, setRowData] = useState([]);
 
-  const [showSnackbarFeedback, setSnackbarFeedback] = useState({
-    open: false,
-    message: "",
-    severity: "",
-  });
-
-  const { formFields, handleChange, setFormFields } = useForm({
+  const { formFields, handleChange } = useForm({
     sortSelect: "fetchAllIssuedBooks",
     sortValue: "",
   });
 
-  const [showDateRangeInputField, setShowDateRangeInputField] = useState(false);
-
   const handleFetch = async () => {
-    await fetchAllIssuedBooks(formFields).then((res) => {
-      setRowData(rowsArray(res));
-      if (res.length === 0) {
-        setSnackbarFeedback({
-          open: true,
-          severity: "error",
-          message: "No data Found",
-        });
-      }
-    });
+    await fetchAllIssuedBooks(formFields)
+      .then((res) => {
+        setRowData(rowsArray(res));
+        if (res.length === 0) {
+          setFeedback([1, 2, "No data found"]);
+        }
+      })
+      .catch((err) => setFeedback([1, 2, err]));
+  };
+
+  const handleDownload = async () => {
+    await downloadAllIssuedBooks(formFields)
+      .then((res) => setFeedback([1, 1, res]))
+      .catch((err) => setFeedback([1, 2, err]));
   };
 
   const rowsArray = (array) => {
@@ -59,104 +57,78 @@ const SearchIssuedBooks = () => {
     navigate(`/dashboard/staff/issue-books/search-issued-books/view-book/${e}`);
   };
 
-  const handleInputSelectChange = (event) => {
-    const { name, value } = event.target;
-    setFormFields({ sortValue: "", [name]: value });
-    if (value === "dateRange") setShowDateRangeInputField(true);
-    else setShowDateRangeInputField(false);
+  const tableHasData = () => {
+    if (rowData.length === 0) return false;
+    return true;
   };
 
-  const handleChangeForDateRange = (event) => {
-    const { name, value } = event.target;
-    setFormFields({
-      sortSelect: "dateRange",
-      sortValue: { ...formFields.sortValue, [name]: value },
-    });
-  };
   return (
-    <div className="text-center">
-      <h3 className="m-3">Search Issued Books</h3>
+    <div>
+      <h1 className="text-center font-bold text-3xl my-2">
+        Search Issued Books
+      </h1>
       <div>
-        <div className="mx-5 d-flex">
-          <Grid container spacing={2}>
-            <Grid item>
-              <InputSelect
-                fields={[
-                  {
-                    name: "Search All Issued Books",
-                    value: "fetchAllIssuedBooks",
-                  },
-                  { name: "Accession Number", value: "accessionNumber" },
-                  { name: "Library Card Number", value: "cardNumber" },
-
-                  { name: "Current Month", value: "currentMonth" },
-                  {
-                    name: "Date Range",
-                    value: "dateRange",
-                  },
-                ]}
-                value={formFields.sortSelect}
-                onChange={handleInputSelectChange}
-                name="sortSelect"
-              />
-            </Grid>
-            {showDateRangeInputField ? (
-              <>
-                <Grid item>
-                  <InputField
-                    label="Starting Date"
-                    name="startingDate"
-                    type="date"
-                    onChange={handleChangeForDateRange}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-                <Grid item>
-                  <InputField
-                    label="Ending Date"
-                    name="endingDate"
-                    type="date"
-                    onChange={handleChangeForDateRange}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-              </>
-            ) : (
-              <Grid item>
-                <InputField
-                  label="Value"
-                  name="sortValue"
-                  onChange={handleChange}
-                />
-              </Grid>
-            )}
-          </Grid>
-          <Button onClick={handleFetch}>Search</Button>
-        </div>
-        <div className="p-5">
-          <CustomTable
-            columns={[
-              "Accession Number",
-              "Book Title",
-              "Card Number",
-              "Issue Date",
-              "Student Roll Number",
-              "Student Name",
+        <div className="grid grid-cols-4 gap-10 my-5 bg-white p-5 rounded-3xl">
+          <SearchQueriesComponent
+            className="col-span-3"
+            selectFields={[
+              {
+                name: "Search All Issued Books",
+                value: "fetchAllIssuedBooks",
+                inputField: "none",
+              },
+              {
+                name: "Accession Number",
+                value: "accessionNumber",
+                inputField: "number",
+              },
+              {
+                name: "Library Card Number",
+                value: "cardNumber",
+                inputField: "text",
+              },
+              {
+                name: "Current Month",
+                value: "currentMonth",
+                inputField: "none",
+              },
+              {
+                name: "Date Range",
+                value: "dateRange",
+                inputField: "text",
+              },
             ]}
-            rows={rowData}
-            handleRowClick={handleRowClick}
+            selectValue={formFields.sortSelect}
+            selectName="sortSelect"
+            inputName="sortValue"
+            inputValue={formFields.selectValue}
+            onChange={handleChange}
           />
+          <div className="col-span-1 flex flex-row justify-center items-center">
+            <button className="my-button " onClick={handleFetch}>
+              Submit
+            </button>
+          </div>
         </div>
-      </div>
-      <div>
-        <SnackbarFeedback
-          open={showSnackbarFeedback.open}
-          message={showSnackbarFeedback.message}
-          severity={showSnackbarFeedback.severity}
-          handleClose={() =>
-            setSnackbarFeedback({ open: false, severity: "info", message: "" })
-          }
+        <CustomTable
+          columns={[
+            "Accession Number",
+            "Book Title",
+            "Card Number",
+            "Issue Date",
+            "Student Roll Number",
+            "Student Name",
+          ]}
+          rows={rowData}
+          handleRowClick={handleRowClick}
         />
+        <div className="mt-5 flex flex-row justify-center items-center">
+          {tableHasData() && (
+            <button className="my-button" onClick={handleDownload}>
+              Export To Excel
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

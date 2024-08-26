@@ -16,20 +16,11 @@ const {
   createIssueBook,
   getIssuedBookByBookAccessionId,
   getIssuedBookById,
-  deleteIssuedBook,
-  findIssuedBooks,
+  getIssuedBooks,
 } = require("../../../models/issue-book/issue-book.controllers");
 const { createDateGap, checkDateGap } = require("../../../utils/functions");
-const {
-  createReturnBook,
-  findReturnedBooks,
-  getReturnedBookById,
-  updateReturnBookById,
-  getLibraryCardFromReturnedBookById,
-} = require("../../../models/returned-book/returned-books.controllers.models");
 const { transporter } = require("../../../services/nodemailer");
 const { generateEmailTemplate } = require("../../../services/email-templates");
-const { createFine } = require("../../../models/fines/fines.controllers");
 
 const BOOK_RETURN_PERIOD_DAYS = 14;
 const FINE_PER_DAY = 1;
@@ -187,8 +178,12 @@ const calculateFine = async (req, res, next) => {
 
 const fetchIssuedBooks = async (req, res, next) => {
   try {
-    const issuedBooksCol = await findIssuedBooks(req.body);
-    const data = issuedBooksCol.map(
+    const issuedBooksCol = await getIssuedBooks({
+      filter: req.query.filter,
+      filterValue: req.query.filterValue,
+      page: req.query.page || 1,
+    });
+    const data = issuedBooksCol.issuedBooksArray.map(
       ({ bookAccessionId, libraryCardId, issueDate, _id }) => {
         return {
           _id,
@@ -202,9 +197,13 @@ const fetchIssuedBooks = async (req, res, next) => {
       }
     );
     if (!req.cust) req.cust = {};
-    req.cust.issuedBooks = data;
+    req.cust.issuedBooks = {
+      issuedBooksArray: data,
+      totalPages: issuedBooksCol.totalPages,
+    };
     return next();
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 };

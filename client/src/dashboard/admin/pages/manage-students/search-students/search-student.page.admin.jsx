@@ -1,28 +1,32 @@
 import CustomTable from "../../../../../components/table/custom-table.component";
 import { fetchAllStudents } from "../../../hooks/http-requests.hooks.admin";
-import { rowsArray } from "../../../../../utils/functions";
-import { useContext, useState } from "react";
-import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
+import { processData } from "../../../../../utils/functions";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
+import Pagination from "../../../../../components/pagination/pagination";
+import useQueryParams from "../../../../../components/hooks/useQueryParams.hook";
 
 const SearchStudentsPage = () => {
   const navigate = useNavigate();
+  const { queryString } = useQueryParams();
   const { setFeedback } = useContext(SnackBarContext);
-
   const [rowData, setRowData] = useState([]);
-
-  const { formFields, handleChange } = useForm({
-    sortSelect: "fetchAllStudents",
-    sortValue: "",
-  });
+  const [totalPages, setTotalPages] = useState(1);
 
   const handleFetch = async () => {
-    await fetchAllStudents(formFields)
+    await fetchAllStudents(queryString)
       .then((res) => {
+        setTotalPages(res.totalPages);
         setRowData(
-          rowsArray(res, ["_id", "rollNumber", "fullName", "program", "batch"])
+          processData(res.studentsArray, [
+            "_id",
+            "rollNumber",
+            "fullName",
+            "program",
+            "batch",
+          ])
         );
         if (res.length === 0) {
           setFeedback([1, 2, "No data found"]);
@@ -33,37 +37,26 @@ const SearchStudentsPage = () => {
       });
   };
 
-  const handleRowClick = (e) => {
-    navigate(`/dashboard/admin/manage-students/search-students/${e}`);
-  };
-
+  useEffect(() => {
+    handleFetch();
+  }, [queryString]);
   return (
-    <div>
+    <>
       <h1 className="text-center font-bold text-3xl my-2">Search Students</h1>
       <div>
-        <div className="grid grid-cols-4 gap-10 my-5 bg-white p-5 rounded-3xl">
+        <div className="flex gap-10 justify-between my-5 bg-white p-5 rounded-3xl">
           <SearchQueriesComponent
-            className="col-span-3"
             selectFields={[
               {
                 name: "Search All Students",
                 value: "fetchAllStudents",
-                inputField: "none",
               },
               {
                 name: "Roll Number",
                 value: "rollNumber",
-                inputField: "number",
               },
-              { name: "Date Of Birth", value: "dob", inputField: "date" },
 
-              { name: "Name", value: "name", inputField: "text" },
-              {
-                name: "Phone Number",
-                value: "phoneNumber",
-                inputField: "number",
-              },
-              { name: "Email", value: "email", inputField: "text" },
+              { name: "Name", value: "fullName", inputField: "text" },
               {
                 name: "Specialization",
                 value: "specialization",
@@ -71,28 +64,18 @@ const SearchStudentsPage = () => {
               },
               { name: "Batch", value: "batch", inputField: "number" },
             ]}
-            selectValue={formFields.sortSelect}
-            selectName="sortSelect"
-            inputName="sortValue"
-            inputValue={formFields.selectValue}
-            onChange={handleChange}
           />
-
-          <div className="col-span-1 flex flex-row justify-center items-center">
-            <button className="my-button " onClick={handleFetch}>
-              Submit
-            </button>
-          </div>
         </div>
         <div>
           <CustomTable
             columns={["Roll Number", "Name", "Program", "Batch"]}
             rows={rowData}
-            handleRowClick={handleRowClick}
+            handleRowClick={(e) => navigate(e)}
           />
         </div>
       </div>
-    </div>
+      <Pagination totalPages={totalPages} />
+    </>
   );
 };
 

@@ -29,10 +29,15 @@ const updateBookAccession = async (bookAccessionId, update, session) => {
 const countBookAccessionDocs = async () =>
   await bookAccessionsSchema.countDocuments();
 
+///
+const getAccession = async (filter) =>
+  await bookAccessionsSchema.findOne(filter);
+
 module.exports = {
   createBookAccession,
   getBookAccessionById,
   getBookAccessionByAccessionNumber,
   updateBookAccession,
   countBookAccessionDocs,
+  getAccession,
 };

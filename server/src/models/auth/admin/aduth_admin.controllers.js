@@ -21,9 +21,19 @@ const updateAuthAdminById = async (_id, update) => {
   return await Auth_Admin.findByIdAndUpdate(_id, update);
 };
 
+const getAuthAdmin = async (filter) => {
+  return await Auth_Admin.findOne(filter);
+};
+
+const updateAuthAdmin = async (filter, update) => {
+  return await Auth_Admin.findOneAndUpdate(filter, update);
+};
+
 module.exports = {
   createAuthAdmin,
   getAuthAdminByEmail,
   getAuthAdminById,
   updateAuthAdminById,
+  getAuthAdmin,
+  updateAuthAdmin,
 };

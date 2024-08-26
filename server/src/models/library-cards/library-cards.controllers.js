@@ -26,10 +26,15 @@ const updateLibraryCardById = async (_id, update, session) => {
   return await libraryCards.findByIdAndUpdate(_id, update, { session });
 };
 
+const getLibraryCard = async (filter) => {
+  return await libraryCards.findOne(filter);
+};
+
 module.exports = {
   createLibraryCard,
   getLibraryCardsByStudentId,
   getLibraryCardByCardNumber,
   getLibraryCardById,
   updateLibraryCardById,
+  getLibraryCard,
 };
