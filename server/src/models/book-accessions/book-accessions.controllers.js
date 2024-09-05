@@ -31,7 +31,22 @@ const countBookAccessionDocs = async () =>
 
 ///
 const getAccession = async (filter) =>
-  await bookAccessionsSchema.findOne(filter);
+  await bookAccessionsSchema.findOne(filter).populate("bookId");
+
+const searchAccessions = async (param) => {
+  const { search } = param;
+
+  let searchNumber = Number(search);
+  if (Number.isNaN(searchNumber)) searchNumber = 0;
+
+  const query = bookAccessionsSchema.find({
+    accessionNumber: searchNumber,
+  });
+
+  query.limit(3).populate({ path: "bookId", select: "_id title author" });
+
+  return await query.exec();
+};
 
 module.exports = {
   createBookAccession,
@@ -40,4 +55,5 @@ module.exports = {
   updateBookAccession,
   countBookAccessionDocs,
   getAccession,
+  searchAccessions,
 };

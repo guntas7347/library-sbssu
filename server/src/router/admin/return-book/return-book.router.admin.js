@@ -24,6 +24,7 @@ returnBookRouter.post("/count-returned-books", async (req, res) => {
     );
     return res.status(200).json(crs.REB200CRBD(numberOfReturnedBookDocs));
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 });
@@ -38,6 +39,7 @@ returnBookRouter.post(
     try {
       return res.status(200).json(crs.ISB200RIB());
     } catch (err) {
+      console.log(err);
       return res.status(500).json(crs.SERR500REST(err));
     }
   }
@@ -50,6 +52,7 @@ returnBookRouter.post(
     try {
       return res.status(200).json(crs.ISB200FARB(req.cust.returnedBooks));
     } catch (err) {
+      console.log(err);
       return res.status(500).json(crs.SERR500REST(err));
     }
   }
@@ -62,6 +65,7 @@ returnBookRouter.post(
     try {
       return res.status(200).json(crs.ISB200FRB(req.cust.returnedBook));
     } catch (err) {
+      console.log(err);
       return res.status(500).json(crs.SERR500REST(err));
     }
   }

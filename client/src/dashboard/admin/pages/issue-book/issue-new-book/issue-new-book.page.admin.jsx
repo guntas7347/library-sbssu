@@ -12,14 +12,16 @@ import { rowsArray } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
 import BackdropSpinner from "../../../../../components/feedback/backdrop/backdrop.component";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
+import Dialog from "../../../../../components/feedback/dialog/dialog.component";
+import QuickAddBook from "../../manage-books/add-book/quick-add";
 
 const IssueNewBookPage = () => {
   const { setFeedback } = useContext(SnackBarContext);
 
   const [showBookTable, setShowBookTable] = useState(false);
-  const [showStudentTable, setShowStudentTable] = useState(false);
+  const [showMemberTable, setShowMemberTable] = useState(false);
   const [bookRowData, setBookRowData] = useState([]);
-  const [studentRowData, setStudentRowData] = useState([]);
+  const [studentRowData, setMemberRowData] = useState([]);
 
   const [selectedCardNumber, setSelectedCardNumber] = useState("");
   const [selectedAccessionNumber, setSelectedAccessionNumber] = useState("");
@@ -27,13 +29,15 @@ const IssueNewBookPage = () => {
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [showBackdropSpinner, setShowBackdropSpinner] = useState(false);
 
+  const [showDialog, setShowDialog] = useState(false);
+
   const { formFields, handleChange } = useForm({
-    rollNumber: "",
+    membershipId: "",
     accessionNumber: "",
     issueDate: new Date(),
   });
 
-  const { rollNumber, accessionNumber, issueDate } = formFields;
+  const { membershipId, accessionNumber, issueDate } = formFields;
 
   const handleFetchBook = async () => {
     await fetchBookByAccessionNumber(accessionNumber)
@@ -50,14 +54,14 @@ const IssueNewBookPage = () => {
   };
 
   const handleFetchStuent = () => {
-    fetchStudentByRollNumber(formFields.rollNumber)
+    fetchStudentByRollNumber(formFields.membershipId)
       .then((res) => {
-        setShowStudentTable(true);
-        setStudentRowData(
+        console.log(res);
+        setShowMemberTable(true);
+        setMemberRowData(
           rowsArray(addLibraryCardsValueToObject(res), [
-            "rollNumber",
+            "membershipId",
             "fullName",
-            "program",
             "cardNumber",
             "cardStatus",
           ])
@@ -126,11 +130,11 @@ const IssueNewBookPage = () => {
   };
 
   return (
-    <div>
+    <>
       <h1 className="text-center font-bold text-3xl my-2">Issue a Book</h1>
       <div className="bg-white rounded-3xl p-5 grid gap-10">
         <div>
-          <div className="grid grid-cols-2 gap-5">
+          <div className="flex justify-between gap-5">
             <InputField
               label="Book's Accession Number"
               name="accessionNumber"
@@ -139,15 +143,20 @@ const IssueNewBookPage = () => {
               disabled={showBookTable}
               onChange={handleChange}
             />
-            <div className="flex flex-row justify-center">
-              <button
-                className="my-button w-48"
-                disabled={showBookTable}
-                onClick={handleFetchBook}
-              >
-                Fetch Book
-              </button>
-            </div>
+            <button
+              className="my-button w-48"
+              disabled={showBookTable}
+              onClick={handleFetchBook}
+            >
+              Search Book
+            </button>
+            <button
+              className="my-button w-48"
+              disabled={showBookTable}
+              onClick={() => setShowDialog(true)}
+            >
+              Quick Add Book
+            </button>
           </div>
           <div>
             {showBookTable && (
@@ -171,39 +180,37 @@ const IssueNewBookPage = () => {
         </div>
 
         <div>
-          <div className="grid grid-cols-2 gap-5">
+          <div className="flex justify-between gap-5">
             <InputField
-              label="Student's Roll Number"
-              name="rollNumber"
+              label="Membership Id"
+              name="membershipId"
               type="text"
-              value={rollNumber}
-              disabled={showStudentTable}
+              value={membershipId}
+              disabled={showMemberTable}
               onChange={handleChange}
             />
-            <div className="flex flex-row justify-center">
-              <button
-                className="my-button w-48"
-                disabled={showStudentTable}
-                onClick={handleFetchStuent}
-              >
-                Fetch Student
-              </button>
-            </div>
+            <button
+              className="my-button w-48"
+              disabled={showMemberTable}
+              onClick={handleFetchStuent}
+            >
+              Search Member
+            </button>
           </div>
           <div>
-            {showStudentTable && (
+            {showMemberTable && (
               <div className="mt-5">
                 <CustomTableSelect
                   columns={[
-                    "Roll Number",
+                    "Membership Id",
                     "Name",
-                    "Program",
+
                     "Card Number",
                     "Avalability",
                   ]}
                   rows={studentRowData}
                   onSelect={handleSelect}
-                  indexToSelect={3}
+                  indexToSelect={2}
                   tableName="studentsTable"
                 />
               </div>
@@ -276,7 +283,12 @@ const IssueNewBookPage = () => {
 
         <BackdropSpinner open={showBackdropSpinner} />
       </div>
-    </div>
+      {showDialog && (
+        <Dialog onClose={() => setShowDialog(false)}>
+          <QuickAddBook passSuccess={() => setShowDialog(false)} />
+        </Dialog>
+      )}
+    </>
   );
 };
 

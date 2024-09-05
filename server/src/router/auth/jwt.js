@@ -42,7 +42,8 @@ const decrptText = (text) => {
     let decrypted = decipher.update(text, "hex", "utf-8");
     decrypted += decipher.final("utf8");
     return decrypted;
-  } catch (error) {
+  } catch (err) {
+    console.log(err);
     return null;
   }
 };

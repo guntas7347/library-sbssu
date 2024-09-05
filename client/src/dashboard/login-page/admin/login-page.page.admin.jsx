@@ -25,16 +25,17 @@ const AdminLoginPage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     await adminLoginWithCredentials(formFields)
-      .then((res) => {
-        if (res.payload === "ADMIN") navigate("/dashboard/admin");
-        if (res.payload === "STAFF") navigate("/dashboard/staff");
+      .then(() => {
+        navigate("/dashboard/admin");
       })
       .catch((err) => setFeedback([1, 2, err]));
   };
 
   useEffect(() => {
     const asyncFunc = async () => {
-      await signOut().catch((err) => console.log(err));
+      await signOut().catch((err) => {
+        setFeedback([1, 2, err]);
+      });
     };
     asyncFunc();
   }, []);

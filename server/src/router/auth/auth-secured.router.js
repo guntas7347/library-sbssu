@@ -2,28 +2,29 @@ const express = require("express");
 const {
   getAuthAdminById,
   updateAuthAdminById,
-  getAuthAdminByEmail,
 } = require("../../models/auth/admin/aduth_admin.controllers");
 const {
   getAuthApplicantById,
 } = require("../../models/auth/applicant/auth_applicant.controllers");
-const {
-  getAuthStudentById,
-} = require("../../models/auth/student/auth_student.controllers");
+
 const crs = require("../../utils/custom-response-codes");
 const {
   checkPassword,
   createPasswordHash,
 } = require("../../models/auth/functions");
 const { generateRandomNumber } = require("../../utils/functions");
+const {
+  getAuthMember,
+} = require("../../models/auth/member/auth_member.controllers");
 
 const authSecured = express.Router();
 
 authSecured.post("/ping", async (req, res) => {
   try {
     const desiredRole = req.body.role;
+
     let userAuth = null;
-    switch (desiredRole) {
+    switch (desiredRole[0]) {
       case "ADMIN":
         userAuth = await getAuthAdminById(req.user.uid);
         break;
@@ -38,7 +39,7 @@ authSecured.post("/ping", async (req, res) => {
         break;
 
       case "STUDENT":
-        userAuth = await getAuthStudentById(req.user.uid);
+        userAuth = await getAuthMember({ _id: req.user.uid });
 
         break;
 
@@ -51,26 +52,15 @@ authSecured.post("/ping", async (req, res) => {
       return res.status(401).json(crs.AUTH401PING());
     }
 
-    return res.status(200).json(crs.AUTH200PING(userAuth._doc.role));
+    return res.status(200).json(
+      crs.AUTH200PING({
+        role: userAuth._doc.role,
+        userName: userAuth._doc.userName,
+      })
+    );
   } catch (err) {
     console.log(err);
     return res.status(401).json(crs.AUTH401PING());
-  }
-});
-
-authSecured.post("/admin/change-password", async (req, res) => {
-  try {
-    const { password } = await getAuthAdminById(req.user.uid);
-    if (!(await checkPassword(req.body.currentPassword, password)))
-      return res.status(409).json(crs.AUTH409CAP());
-
-    await updateAuthAdminById(req.user.uid, {
-      password: await createPasswordHash(req.body.newPassword),
-    });
-    return res.status(200).json(crs.AUTH200CAP());
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json(crs.SERR500REST(err));
   }
 });
 

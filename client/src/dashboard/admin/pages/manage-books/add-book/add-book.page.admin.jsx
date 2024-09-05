@@ -37,7 +37,6 @@ const AddBookPage = () => {
   } = formFields;
 
   const handleAddNewBook = async () => {
-    console.log(formFields);
     await addNewBook(formFields)
       .then((res) => {
         setFeedback([1, 1, res]);

@@ -4,8 +4,8 @@ const createLibraryCard = async (libraryCardDetails, session) => {
   return await libraryCards.create([libraryCardDetails], { session });
 };
 
-const getLibraryCardsByStudentId = async (studentId) => {
-  return await libraryCards.find({ studentId: studentId });
+const getLibraryCardsByStudentId = async (memberId) => {
+  return await libraryCards.find({ memberId: memberId });
 };
 
 const getLibraryCardByCardNumber = async (
@@ -14,7 +14,7 @@ const getLibraryCardByCardNumber = async (
   select
 ) => {
   const query = libraryCards.findOne({ cardNumber });
-  if (populate) query.populate({ path: "studentId", select });
+  if (populate) query.populate({ path: "memberId", select });
   return await query.exec();
 };
 

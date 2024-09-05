@@ -4,8 +4,8 @@ import { signOut } from "../../http-requests";
 const useSignOut = (path = "/") => {
   const navigate = useNavigate();
 
-  const handleSignOut = () => {
-    signOut();
+  const handleSignOut = async () => {
+    await signOut();
     navigate(path);
   };
 

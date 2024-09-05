@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const Auth_Admin_Schema = mongoose.Schema({
+const AUTH_ADMIN_SCHEMA = mongoose.Schema({
   userName: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
@@ -16,23 +16,23 @@ const Auth_Admin_Schema = mongoose.Schema({
   active: { type: Boolean, default: true },
 });
 
-const Auth_Student_Schema = mongoose.Schema({
+const AUTH_MEMBER_SCHEMA = mongoose.Schema({
   userName: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
-  createdAt: { type: Date, default: new Date() },
-  studentId: {
+  memberId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "student",
+    ref: "member",
     required: true,
   },
   resetCode: { type: String },
   resetCodeTime: { type: Date },
   active: { type: Boolean, default: true },
   role: { type: String, default: "STUDENT" },
+  createdAt: { type: Date, default: new Date() },
 });
 
-const Auth_Applicant_Schema = mongoose.Schema({
+const AUTH_APPLICANT_SCHEMA = mongoose.Schema({
   userName: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
@@ -43,21 +43,21 @@ const Auth_Applicant_Schema = mongoose.Schema({
   role: { type: String, default: "APPLICANT" },
 });
 
-const Auth_Admin = mongoose.model(
+const AUTH_ADMIN = mongoose.model(
   "auth_admin",
-  Auth_Admin_Schema,
+  AUTH_ADMIN_SCHEMA,
   "auth_admins"
 );
 
-const Auth_Student = mongoose.model(
-  "auth_student",
-  Auth_Student_Schema,
-  "auth_students"
+const AUTH_MEMBER = mongoose.model(
+  "auth_member",
+  AUTH_MEMBER_SCHEMA,
+  "auth_members"
 );
-const Auth_Applicant = mongoose.model(
+const AUTH_APPLICANT = mongoose.model(
   "auth_applicant",
-  Auth_Applicant_Schema,
+  AUTH_APPLICANT_SCHEMA,
   "auth_applicants"
 );
 
-module.exports = { Auth_Admin, Auth_Student, Auth_Applicant };
+module.exports = { AUTH_ADMIN, AUTH_MEMBER, AUTH_APPLICANT };

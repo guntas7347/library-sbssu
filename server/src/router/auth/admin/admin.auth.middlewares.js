@@ -1,5 +1,4 @@
 const {
-  getAuthAdminByEmail,
   updateAuthAdminById,
   getAuthAdmin,
 } = require("../../../models/auth/admin/aduth_admin.controllers");
@@ -11,7 +10,7 @@ const {
 
 const verifyEmailForLogin = async (req, res, next) => {
   try {
-    const authAdminDoc = await getAuthAdminByEmail(req.body.email);
+    const authAdminDoc = await getAuthAdmin({ email: req.body.email });
     if (authAdminDoc == null) return res.status(404).json(crs.AUTH404ADM());
     if (!req.cust) req.cust = {};
     req.cust.password = req.body.password;
@@ -27,7 +26,7 @@ const verifyEmailForLogin = async (req, res, next) => {
 
 const fetchAuthAdminByEmail = async (req, res, next) => {
   try {
-    const authAdminDoc = await getAuthAdminByEmail(req.body.email);
+    const authAdminDoc = await getAuthAdmin({ email: req.body.email });
     if (!authAdminDoc) return res.status(409).json(crs.AUTH404RAPI());
     if (!req.cust) req.cust = {};
     req.cust.authAdminDoc = authAdminDoc;
@@ -53,6 +52,7 @@ const createOtp = async (req, res, next) => {
     console.log(`One Time Password: ${otp}`);
     next();
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 };
@@ -74,6 +74,7 @@ const verifyOtp = async (req, res, next) => {
     }
     next();
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 };

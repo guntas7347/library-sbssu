@@ -5,69 +5,20 @@ const {
   createAuthApplicant,
   getAuthApplicant,
 } = require("../../../models/auth/applicant/auth_applicant.controllers");
-const {
-  getAuthStudentByEmail,
-  getAuthStudentById,
-} = require("../../../models/auth/student/auth_student.controllers");
+
+const { getMember } = require("../../../models/member/member.controllers");
 const { generateEmailTemplate } = require("../../../services/email-templates");
 const { transporter } = require("../../../services/nodemailer");
 const crs = require("../../../utils/custom-response-codes");
-const {
-  generateRandomNumber,
-  uuidGenerator,
-} = require("../../../utils/functions");
+const { uuidGenerator } = require("../../../utils/functions");
 
 const verifyEmailAvailabilityByEmail = async (req, res, next) => {
   try {
-    const authApplicantDoc = await getAuthApplicantByEmail(req.body.email);
-    const authStudentDoc = await getAuthStudentByEmail(req.body.email);
-    if (authApplicantDoc !== null)
-      if (authApplicantDoc._doc.otp === 111111)
-        return res.status(400).json(crs.AUTH409SAPP());
-    if (authStudentDoc !== null) return res.status(400).json(crs.AUTH409SAPP());
-    if (!req.cust) req.cust = {};
+    const authApplicant = await getAuthApplicant({ email: req.body.email });
+    if (authApplicant) return res.status(400).json(crs.AUTH409SAPP());
 
-    next();
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json(crs.SERR500REST(err));
-  }
-};
-
-const fetchOTPFromDatabase = async (req, res, next) => {
-  try {
-    const authApplicantDoc = await getAuthApplicantById(req.body._id);
-
-    if (authApplicantDoc === null)
-      return res.status(404).json(crs.AUTH409SAPP());
-
-    const { otp, createdAt } = authApplicantDoc;
-
-    if (!req.cust) req.cust = {};
-    req.cust.otp = otp;
-    req.cust.createdAt = createdAt;
-    next();
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json(crs.SERR500REST(err));
-  }
-};
-
-const verifyOTP = async (req, res, next) => {
-  try {
-    const otp = req.cust.otp;
-    const createdAt = req.cust.createdAt;
-
-    if (otp === 111111) return res.status(409).json(crs.AUTH409VAPP());
-
-    const otpTimeOut = (minutes = 10) => {
-      const gap = new Date().getTime() - new Date(createdAt).getTime();
-      if (gap > 1000 * 60 * minutes) return true;
-      else return false;
-    };
-
-    if (otpTimeOut(10)) return res.status(400).json(crs.AUTH403VAPP());
-    if (otp !== req.body.otp) return res.status(400).json(crs.AUTH400VAPP());
+    const member = await getMember({ email: req.body.email });
+    if (member) return res.status(400).json(crs.AUTH409SAPP());
 
     next();
   } catch (err) {
@@ -128,6 +79,7 @@ const fetchAuthApplicantByEmail = async (req, res, next) => {
 
     next();
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 };
@@ -196,8 +148,6 @@ const verifyResetLink = async (req, res, next) => {
 
 module.exports = {
   verifyEmailAvailabilityByEmail,
-  fetchOTPFromDatabase,
-  verifyOTP,
   markUserAsVerified,
   createApplicant,
   sendVerificationEmail,

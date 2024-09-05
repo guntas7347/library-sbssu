@@ -1,18 +1,21 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { signOut, verifyAuthRole } from "../../dashboard/http-requests";
+import { AuthContext } from "../context/auth.content";
 
-const ProtectedRoute = ({ redirectPath = "/", children, role }) => {
+const ProtectedRoute = ({ redirectPath = "/", children, role = [] }) => {
   const [session, setSession] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const { setUserName, setUserRole } = useContext(AuthContext);
 
   useEffect(() => {
     const asyncFunc = async () => {
       await verifyAuthRole(role)
         .then((res) => {
-          console.log(res.payload);
-
-          if (res.payload === role) {
+          if (role.includes(res.payload.role)) {
+            setUserName(res.payload.userName);
+            setUserRole(res.payload.role);
             setSession(true);
             setIsLoading(false);
           } else {
@@ -21,7 +24,8 @@ const ProtectedRoute = ({ redirectPath = "/", children, role }) => {
             setIsLoading(false);
           }
         })
-        .catch(() => {
+        .catch((err) => {
+          console.log(err);
           setIsLoading(false);
         });
     };

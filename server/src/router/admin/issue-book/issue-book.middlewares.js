@@ -3,11 +3,13 @@ const crs = require("../../../utils/custom-response-codes");
 const {
   getBookAccessionByAccessionNumber,
   updateBookAccession,
+  getAccession,
 } = require("../../../models/book-accessions/book-accessions.controllers");
 const {
   getLibraryCardByCardNumber,
   updateLibraryCardById,
   getLibraryCardById,
+  getLibraryCard,
 } = require("../../../models/library-cards/library-cards.controllers");
 const {
   getAuthAdminById,
@@ -17,6 +19,7 @@ const {
   getIssuedBookByBookAccessionId,
   getIssuedBookById,
   getIssuedBooks,
+  getIssuedBook,
 } = require("../../../models/issue-book/issue-book.controllers");
 const { createDateGap, checkDateGap } = require("../../../utils/functions");
 const { transporter } = require("../../../services/nodemailer");
@@ -37,20 +40,28 @@ const verifyBookAccessionAvailability = async (req, res, next) => {
     req.cust.bookAccessionId = _id;
     next();
   } catch (err) {
+    console.log(err);
+
     return res.status(500).json(crs.SERR500REST(err));
   }
 };
 
 const verifyLibraryCardAvailability = async (req, res, next) => {
   try {
-    const studentCard = await getLibraryCardByCardNumber(req.body.cardNumber);
-    if (studentCard === null) return res.status(404).json();
-    const { status, _id } = studentCard;
+    console.log("Hello");
+    const memberCard = await getLibraryCard({
+      cardNumber: req.body.cardNumber,
+    });
+
+    if (!memberCard) return res.status(404).json();
+    const { status, _id } = memberCard;
     if (status != "available") return res.status(409).json(crs.MDW409VLCA());
     if (!req.cust) req.cust = {};
     req.cust.libraryCardId = _id;
+
     next();
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 };
@@ -85,19 +96,15 @@ const processIssuingBook = async (req, res, next) => {
 const sendIssuedConfirmationEmail = async (req, res, next) => {
   try {
     const { accessionNumber, cardNumber, issueDate } = req.body;
-    const bookDoc = await getBookAccessionByAccessionNumber(
-      accessionNumber,
-      true,
-      "title author"
-    );
+    const bookDoc = await getAccession({ accessionNumber });
     const libraryCardDoc = await getLibraryCardByCardNumber(
       cardNumber,
       true,
       "fullName email"
     );
-    const reciepientEmail = libraryCardDoc._doc.studentId.email;
+    const reciepientEmail = libraryCardDoc._doc.memberId.email;
     const emailContent = {
-      name: libraryCardDoc._doc.studentId.name,
+      name: libraryCardDoc._doc.memberId.name,
       accessionNumber,
       issueDate: new Date(issueDate).toDateString(),
       dueDate: createDateGap(issueDate, 14).toDateString(),
@@ -120,33 +127,34 @@ const sendIssuedConfirmationEmail = async (req, res, next) => {
 
 const fetchIssuedBookByAccessionNumber = async (req, res, next) => {
   try {
-    const bookAccessionDoc = await getBookAccessionByAccessionNumber(
-      req.body.accessionNumber
-    );
-
-    if (bookAccessionDoc === null)
-      return res.status(404).json(crs.MDW404FIBBAN());
+    const bookAccessionDoc = await getAccession({
+      accessionNumber: req.body.accessionNumber,
+    });
+    if (!bookAccessionDoc) return res.status(404).json(crs.MDW404FIBBAN());
     if (bookAccessionDoc.status === "available")
       return res.status(409).json(crs.MDW409FIBBAN());
 
-    const issuedBookDoc = await getIssuedBookByBookAccessionId(
-      bookAccessionDoc._id
-    );
+    const issuedBookDoc = await getIssuedBook({
+      bookAccessionId: bookAccessionDoc._id,
+    });
 
-    const { cardNumber, studentId } = issuedBookDoc.libraryCardId;
+    const { cardNumber, memberId } = issuedBookDoc.libraryCardId;
+
     const { bookId } = issuedBookDoc.bookAccessionId;
+    console.log(issuedBookDoc, bookId);
     req.cust = {
       _id: issuedBookDoc._id,
       accessionNumber: bookAccessionDoc.accessionNumber,
       ...bookId._doc,
       libraryCard: cardNumber,
-      ...studentId._doc,
+      ...memberId._doc,
       issueDate: issuedBookDoc.issueDate,
       issuedBy: issuedBookDoc._doc.issuedBy.fullName,
     };
 
     next();
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 };
@@ -159,6 +167,7 @@ const fetchIssuedBookById = async (req, res, next) => {
     req.cust.issuedBook = issuedBook;
     next();
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 };
@@ -172,6 +181,7 @@ const calculateFine = async (req, res, next) => {
     req.cust.fine = dateGap * FINE_PER_DAY;
     next();
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 };
@@ -183,14 +193,15 @@ const fetchIssuedBooks = async (req, res, next) => {
       filterValue: req.query.filterValue,
       page: req.query.page || 1,
     });
+
     const data = issuedBooksCol.issuedBooksArray.map(
       ({ bookAccessionId, libraryCardId, issueDate, _id }) => {
         return {
           _id,
           issueDate: issueDate.toDateString(),
           cardNumber: libraryCardId.cardNumber,
-          studentName: libraryCardId.studentId.fullName,
-          rollNumber: libraryCardId.studentId.rollNumber,
+          studentName: libraryCardId.memberId.fullName,
+          rollNumber: libraryCardId.memberId.rollNumber,
           accessionNumber: bookAccessionId.accessionNumber,
           bookTitle: bookAccessionId.bookId.title,
         };
@@ -221,9 +232,10 @@ const fetchIssuedBookDocById = async (req, res, next) => {
       cardNumber: libraryCardId.cardNumber,
       issueDate: returnedBookDoc._doc.issueDate,
       issuedBy: issuer.fullName + " " + "|" + " " + issuer.idNumber,
-      rollNumber: libraryCardId.studentId.rollNumber,
-      name: libraryCardId.studentId.fullName,
+      rollNumber: libraryCardId.memberId.rollNumber,
+      name: libraryCardId.memberId.fullName,
     };
+
     if (!req.cust) req.cust = {};
     req.cust.issuedBook = issuedBook;
     next();

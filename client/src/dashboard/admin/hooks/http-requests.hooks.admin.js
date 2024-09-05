@@ -64,31 +64,34 @@ export const restCall = (url, obj, crs = [], blob = false) => {
   });
 };
 
+export const searchGlobally = (query) =>
+  restCall(`/search?${query && query}`, {}, ["SRH200GLB"]);
+
 export const createNewStudent = (obj) =>
   restCall("students/create-new-student", obj, ["STU201CNS"]);
 
 export const editExistingStudent = (obj) =>
   restCall("students/edit-existing-student", obj, ["STU200ES"]);
 
-export const fetchStudentByRollNumber = (rollNumber) =>
-  restCall("students/fetch-student-by-roll-number", { rollNumber }, [
+export const fetchStudentByRollNumber = (membershipId) =>
+  restCall("students/fetch-student-by-roll-number", { membershipId }, [
     "STU200FSBRN",
   ]);
 
-export const allotLibraryCardToStudent = ({ rollNumber, cardNumber }) =>
-  restCall(
-    "students/allot-library-card-to-student",
-    { rollNumber, cardNumber },
-    ["STU200ALCTS"]
-  );
-
-export const fetchAllStudents = (filter) =>
-  restCall(`students/fetch-all-students?${filter && filter}`, {}, [
-    "STU200FAS",
+export const allotLibraryCardToStudent = (cardDetails) =>
+  restCall("students/allot-library-card-to-student", cardDetails, [
+    "STU200ALCTS",
   ]);
 
-export const fetchAllApplications = (filter) =>
-  restCall("students/fetch-all-applications", filter, "STU200FAA");
+export const fetchAllStudents = (query) =>
+  restCall(`students/fetch-all-students?${query && query}`, {}, ["STU200FAS"]);
+
+export const fetchAllApplications = (query) =>
+  restCall(
+    `students/fetch-all-applications?${query && query}`,
+    {},
+    "STU200FAA"
+  );
 
 export const fetchOneApplication = (_id) =>
   restCall("students/fetch-one-application", { _id }, "APP200FA");
@@ -101,6 +104,9 @@ export const processApplication = (decision) =>
 
 export const addNewBook = (bookDetails) =>
   restCall("/books/add-new-book", bookDetails, "BKS200ANB");
+
+export const quickAddBook = (bookDetails) =>
+  restCall("/books/quick-add", bookDetails, "BKS200ABA");
 
 export const fetchAllBooks = (query) =>
   restCall(`books/fetch-all-books?${query && query}`, {}, "BKS200FAB");
@@ -259,9 +265,20 @@ export const fetchWeather = async () => {
     )
       .then(async (res) => {
         const weather = await res.json();
-        const { main } = weather;
-        resolve((main.temp - 273.15).toFixed(1));
+        const otherResults = weather.weather[0];
+        const result = {
+          temp: (weather.main.temp - 273.15).toFixed(1),
+          feels_like: (weather.main.feels_like - 273.15).toFixed(1),
+          description: otherResults.description,
+          icon: otherResults.icon,
+          city: weather.name,
+        };
+
+        resolve(result);
       })
-      .catch(() => resolve("Unable to Fetch"));
+      .catch((err) => {
+        console.log(err);
+        resolve("Unable to Fetch");
+      });
   });
 };

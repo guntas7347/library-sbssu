@@ -73,12 +73,32 @@ const updateBookById = async (_id, bookDoc) => {
   return await booksMongo.findByIdAndUpdate(_id, bookDoc);
 };
 
+const getBook = async (filter) => await booksMongo.findOne(filter);
+
+const searchBooks = async (param) => {
+  const { search } = param;
+
+  const query = booksMongo.find({
+    $or: [
+      {
+        title: { $regex: search, $options: "i" },
+      },
+    ],
+  });
+
+  query.limit(3).select("_id title author");
+
+  return await query.exec();
+};
+
 module.exports = {
   createBook,
+  getBook,
   getBooks,
   countTotalBooks,
   getBookById,
   getBookByIsbn,
   addBookAccessionToBook,
   updateBookById,
+  searchBooks,
 };

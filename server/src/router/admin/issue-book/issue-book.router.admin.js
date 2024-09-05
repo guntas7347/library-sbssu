@@ -15,6 +15,7 @@ const { createExcel, dateTimeString } = require("../../../utils/functions");
 const {
   countIssuedBookDocs,
 } = require("../../../models/issue-book/issue-book.controllers");
+const { adminOnly } = require("../../auth/auth.middlewares");
 
 const issueBookRouter = express.Router();
 
@@ -38,6 +39,7 @@ issueBookRouter.post(
     try {
       return res.status(200).json(crs.ISB200INB());
     } catch (err) {
+      console.log(err);
       return res.status(500).json(crs.SERR500REST(err));
     }
   }
@@ -50,6 +52,7 @@ issueBookRouter.post(
     try {
       return res.status(200).json(crs.ISB200FIBBAN(req.cust));
     } catch (err) {
+      console.log(err);
       return res.status(500).json(crs.SERR500REST(err));
     }
   }
@@ -63,6 +66,7 @@ issueBookRouter.post(
     try {
       return res.status(200).json(crs.ISB200CIBF(req.cust.fine));
     } catch (err) {
+      console.log(err);
       return res.status(500).json(crs.SERR500REST(err));
     }
   }

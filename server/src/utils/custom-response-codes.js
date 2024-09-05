@@ -3,16 +3,18 @@ const createCustomResponseObject = (status, message, payload = null) => {
 };
 
 const crs = {
+  SRH200GLB: (payload = null) =>
+    createCustomResponseObject("SRH200GLB", "Search Success", payload),
   STU201CNS: (payload = null) =>
     createCustomResponseObject(
       "STU201CNS",
-      "Student created successfully",
+      "Member created successfully",
       payload
     ),
   STU200ES: (payload = null) =>
     createCustomResponseObject(
       "STU200ES",
-      "Student Edited successfully",
+      "Member Edited successfully",
       payload
     ),
   CONFL409CNS: (payload = null) =>
@@ -30,13 +32,13 @@ const crs = {
   SERR500REST: (payload = null) =>
     createCustomResponseObject("SERR500REST", "Internal Server Error", payload),
   STU404FSBRN: (payload = null) =>
-    createCustomResponseObject("STU404FSBRN", "Student not found", payload),
+    createCustomResponseObject("STU404FSBRN", "Member not found", payload),
   STU200FSBRN: (payload = null) =>
-    createCustomResponseObject("STU200FSBRN", "Student found", payload),
+    createCustomResponseObject("STU200FSBRN", "Member found", payload),
   STU409ALCTS: (payload = null) =>
     createCustomResponseObject(
       "STU409ALCTS",
-      "Student alread has maximum number of alloted library Cards",
+      "Member alread has maximum number of alloted library Cards",
       payload
     ),
   STU4091ALCTS: (payload = null) =>
@@ -92,7 +94,7 @@ const crs = {
   ERR500JWT: (payload = null) =>
     createCustomResponseObject("ERR500JWT", "Unable to Authenticate", payload),
   STU200FAS: (payload = null) =>
-    createCustomResponseObject("STU200FAS", "Students fetched", payload),
+    createCustomResponseObject("STU200FAS", "Members fetched", payload),
   STU200FAA: (payload = null) =>
     createCustomResponseObject("STU200FAA", "Applications fetched", payload),
   BKS409ANB: (payload = null) =>
@@ -124,9 +126,9 @@ const crs = {
   BKS200FBDBI: (payload = null) =>
     createCustomResponseObject("BKS200FBDBI", "Book found", payload),
   STU404FSBI: (payload = null) =>
-    createCustomResponseObject("STU404FSBI", "Student not found", payload),
+    createCustomResponseObject("STU404FSBI", "Member not found", payload),
   STU200FSBI: (payload = null) =>
-    createCustomResponseObject("STU200FSBI", "Student found", payload),
+    createCustomResponseObject("STU200FSBI", "Member found", payload),
   BKS200FBBAN: (payload = null) =>
     createCustomResponseObject("BKS200FBBAN", "Book found", payload),
   MDW404FBBAN: (payload = null) =>
@@ -210,7 +212,7 @@ const crs = {
   DBSF200STU: (payload = null) =>
     createCustomResponseObject(
       "DBSF200STU",
-      "Student Document Fetched",
+      "Member Document Fetched",
       payload
     ),
   DBSF200APP: (payload = null) =>
@@ -230,7 +232,7 @@ const crs = {
   DBSF200AUST: (payload = null) =>
     createCustomResponseObject(
       "DBSF200AUST",
-      "Auth Student Document Fetched",
+      "Auth Member Document Fetched",
       payload
     ),
   DBSF200AUAP: (payload = null) =>
@@ -373,7 +375,7 @@ const crs = {
   STU200CTS: (payload = null) =>
     createCustomResponseObject(
       "STU200CTS",
-      "Number of Students fetched",
+      "Number of Members fetched",
       payload
     ),
   AUTH200RECAPTCHA: (payload = null) =>

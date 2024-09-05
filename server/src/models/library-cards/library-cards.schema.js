@@ -1,14 +1,15 @@
 const mongoose = require("mongoose");
 
 const LibraryCardsSchema = new mongoose.Schema({
-  studentId: {
+  memberId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "student",
+    ref: "member",
     required: true,
   },
   cardNumber: {
-    type: String,
+    type: Number,
     required: true,
+    unique: true,
   },
   status: {
     type: String,

@@ -19,8 +19,12 @@ const AddStaffPage = () => {
 
   const handleSubmit = async () => {
     await createNewStaff(formFields)
-      .then((res) => setFeedback([1, 1, res]))
-      .catch((err) => setFeedback([1, 2, err]));
+      .then((res) => {
+        setFeedback([1, 1, res]);
+      })
+      .catch((err) => {
+        setFeedback([1, 2, err]);
+      });
   };
 
   return (
@@ -35,7 +39,7 @@ const AddStaffPage = () => {
             setShowAlertDialog(true);
           }}
         >
-          <div className="grid grid-cols-3 gap-10 my-5">
+          <div className="grid grid-cols-2 gap-10 my-5">
             <InputField
               label="ID Number"
               type="number"
@@ -70,6 +74,7 @@ const AddStaffPage = () => {
 
             <InputSelect
               name="role"
+              label="Role"
               fields={[
                 { name: "Staff", value: "STAFF" },
                 { name: "Admin", value: "ADMIN" },
@@ -77,10 +82,12 @@ const AddStaffPage = () => {
               value={role}
               onChange={handleChange}
             />
-          </div>{" "}
-          <button className="my-button" type="submit">
-            Submit
-          </button>
+          </div>
+          <div className="flex justify-center">
+            <button className="my-button" type="submit">
+              Submit
+            </button>
+          </div>
         </form>
       </div>
       <div>

@@ -22,6 +22,7 @@ const AppliedStatusPage = ({ applicationDoc }) => {
     email,
     phoneNumber,
     createdAt,
+    role,
   } = applicationDoc;
 
   const handleWithdraw = async () => {
@@ -45,12 +46,13 @@ const AppliedStatusPage = ({ applicationDoc }) => {
       <div className="px-3 md:px-5 text-xs md:text-base">
         <SpanningTable
           rows={[
+            ["User Type", role],
             ["Roll Number", rollNumber],
             ["Name", fullName],
             ["Fathers Name", fathersName],
             ["Gender", gender],
             ["Date Of Birth", new Date(dob).toDateString()],
-            ["Program", program],
+            [`${role === "STUDENT" ? "Program" : "Desigination"}`, program],
             ["Specialization", specialization],
             ["Batch", batch],
             ["Email", email],

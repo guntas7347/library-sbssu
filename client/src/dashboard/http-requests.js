@@ -33,7 +33,6 @@ export const restCall = (url, obj, crs = null) => {
 
         const response = await res.json();
         if (crs.includes(response.status)) {
-          console.log(response.status);
           resolve(response);
         } else {
           logResponseToConsole(response, false);
@@ -42,7 +41,6 @@ export const restCall = (url, obj, crs = null) => {
       })
       .catch((err) => {
         console.log(err);
-
         reject("Could not connect to Server");
       });
   });

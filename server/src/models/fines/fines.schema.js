@@ -6,9 +6,9 @@ const FinesSchema = new mongoose.Schema({
     ref: "returnedBook",
     default: null,
   },
-  studentId: {
+  memberId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "student",
+    ref: "member",
     default: null,
   },
   remark: { type: String, default: "none" },

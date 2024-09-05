@@ -2,8 +2,6 @@ const express = require("express");
 const crs = require("../../../utils/custom-response-codes");
 const {
   verifyEmailAvailabilityByEmail,
-  fetchOTPFromDatabase,
-  verifyOTP,
   markUserAsVerified,
   createApplicant,
   sendVerificationEmail,

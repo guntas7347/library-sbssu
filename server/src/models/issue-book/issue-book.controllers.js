@@ -16,16 +16,16 @@ const createIssueBook = async (issueBookDetails, session) => {
   return await issueBookMongo.create([issueBookDetails], { session });
 };
 
-const getIssuedBookByBookAccessionId = async (bookAccessionId) => {
+const getIssuedBook = async (filter) => {
   return await issueBookMongo
-    .findOne({ bookAccessionId })
+    .findOne(filter)
     .populate({
       path: "bookAccessionId",
       populate: { path: "bookId", select: "title author -_id" },
     })
     .populate({
       path: "libraryCardId",
-      populate: { path: "studentId", select: "rollNumber fullName -_id" },
+      populate: { path: "memberId", select: "rollNumber fullName -_id" },
     })
     .populate({
       path: "issuedBy",
@@ -42,7 +42,7 @@ const getIssuedBookById = async (_id, populate = false) => {
       })
       .populate({
         path: "libraryCardId",
-        populate: { path: "studentId", select: "rollNumber fullName -_id" },
+        populate: { path: "memberId", select: "rollNumber fullName -_id" },
       })
       .populate({ path: "issuedBy", select: "idNumber fullName -_id" });
   }
@@ -111,7 +111,7 @@ const getIssuedBooks = async (queryParam) => {
     })
     .populate({
       path: "libraryCardId",
-      populate: { path: "studentId", select: "rollNumber fullName -_id" },
+      populate: { path: "memberId", select: "rollNumber fullName -_id" },
     });
 
   return { issuedBooksArray: await query.exec(), totalPages };
@@ -123,7 +123,7 @@ const countIssuedBookDocs = async (filter) => {
 
 module.exports = {
   createIssueBook,
-  getIssuedBookByBookAccessionId,
+  getIssuedBook,
   getIssuedBookById,
   deleteIssuedBook,
   getIssuedBooks,

@@ -199,19 +199,28 @@ const uuidGenerator = (length = 1) => {
   return uuid.replace(/-/g, "");
 };
 
-const cardNumberGenerator = (rollNo, numberOfCards = 2) => {
+const cardNumberGenerator = (membershipId, numberOfCards = 2) => {
   const cardNumberArray = [];
   for (let index = 0; index < numberOfCards; index++) {
     let numberToAdd = index + 1;
     if (numberToAdd < 10) numberToAdd = "0" + numberToAdd.toString();
     else numberToAdd = numberToAdd.toString();
 
-    const cardNumber = rollNo.toString() + numberToAdd;
+    const cardNumber = membershipId.toString() + numberToAdd;
 
     cardNumberArray.push(cardNumber);
   }
 
   return cardNumberArray;
+};
+
+const generateMembershipId = (previousId = 200000) => {
+  const previousIdYear = Number(previousId.toString().substring(0, 2));
+  const currentYear = Number(
+    new Date().getFullYear().toString().substring(2, 4)
+  );
+  if (currentYear > previousIdYear) return currentYear * 10000 + 1;
+  else return previousId + 1;
 };
 
 module.exports = {
@@ -226,4 +235,5 @@ module.exports = {
   generateRandomNumber,
   uuidGenerator,
   cardNumberGenerator,
+  generateMembershipId,
 };

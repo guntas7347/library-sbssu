@@ -33,12 +33,12 @@ const ViewBookPage = () => {
             ),
           });
         })
-        .catch((err) => {
+        .catch(() => {
           setBookData({ title: "Book not found" });
         });
     };
     asyncFunc();
-  }, []);
+  }, [_id]);
 
   const createAccessionNumbersString = (array = []) => {
     let string = "";

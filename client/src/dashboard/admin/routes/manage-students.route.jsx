@@ -1,28 +1,28 @@
 import { Route, Routes } from "react-router-dom";
-import ManageStudentsPage from "../pages/manage-students/manage-students.page.admin";
-import AddStudentPage from "../pages/manage-students/add-student/add-student.page.admin";
-import SearchStudentsPage from "../pages/manage-students/search-students/search-student.page.admin";
-import ApproveStudentPage from "../pages/manage-students/approve-student/approve-student.page.admin";
-import AllotLibraryCardPage from "../pages/manage-students/library-cards/add-library-card/add-library-card.page.admin";
-import ViewStudentPage from "../pages/manage-students/view-student/view-student.page.admin";
-import ViewApplicantPage from "../pages/manage-students/approve-student/view-applicant.page.admin";
-import EditStudentPage from "../pages/manage-students/edit-student/edit-student.page.admin";
+import ManageStudentsPage from "../pages/manage-members/manage-members.page.admin";
+import AddStudentPage from "../pages/manage-members/add-member/add-member.page.admin";
+import SearchStudentsPage from "../pages/manage-members/search-members/search-members.page.admin";
+import ApproveStudentPage from "../pages/manage-members/approve-member/approve-member.page.admin";
+import AllotLibraryCardPage from "../pages/manage-members/library-cards/add-library-card/add-library-card.page.admin";
+import ViewStudentPage from "../pages/manage-members/view-member/view-member.page.admin";
+import ViewApplicantPage from "../pages/manage-members/approve-member/view-applicant.page.admin";
+import EditStudentPage from "../pages/manage-members/edit-member/edit-member.page.admin";
 
 const ManageStudentsRoute = () => {
   return (
     <Routes>
       <Route index element={<ManageStudentsPage />} />
-      <Route path="/add-student/" element={<AddStudentPage />} />{" "}
+      <Route path="/add-member/" element={<AddStudentPage />} />{" "}
       <Route
-        path="/add-student/add-student-card/"
+        path="/add-member/add-member-card/"
         element={<AllotLibraryCardPage />}
       />
-      <Route path="/search-students/" element={<SearchStudentsPage />} />
-      <Route path="/search-students/:_id" element={<ViewStudentPage />} />
-      <Route path="/approve-students/" element={<ApproveStudentPage />} />
-      <Route path="/approve-students/:_id" element={<ViewApplicantPage />} />
+      <Route path="/search-members/" element={<SearchStudentsPage />} />
+      <Route path="/search-members/:_id" element={<ViewStudentPage />} />
+      <Route path="/approve-members/" element={<ApproveStudentPage />} />
+      <Route path="/approve-members/:_id" element={<ViewApplicantPage />} />
       <Route
-        path="/search-students/:_id/edit-student/"
+        path="/search-members/:_id/edit-member/"
         element={<EditStudentPage />}
       />
     </Routes>

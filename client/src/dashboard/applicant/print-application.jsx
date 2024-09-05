@@ -35,6 +35,7 @@ const PrintApplicationPage = () => {
     email,
     phoneNumber,
     createdAt,
+    role,
   } = application;
 
   const handlePrint = useReactToPrint({
@@ -77,12 +78,16 @@ const PrintApplicationPage = () => {
             <div className="flex items-center justify-center mt-5">
               <SpanningTable
                 rows={[
+                  ["User Type", role],
                   ["Roll Number", rollNumber],
                   ["Name", fullName],
                   ["Fathers Name", fathersName],
                   ["Gender", gender],
                   ["Date Of Birth", new Date(dob).toDateString()],
-                  ["Program", program],
+                  [
+                    `${role === "STUDENT" ? "Program" : "Desigination"}`,
+                    program,
+                  ],
                   ["Specialization", specialization],
                   ["Batch", batch],
                   ["Email", email],
@@ -99,7 +104,7 @@ const PrintApplicationPage = () => {
               </div>
               <div className="w-48">
                 <hr className="w-full border-black" />
-                <p>HOD {specialization}</p>
+                {role === "STUDENT" ? <p>HOD {specialization}</p> : <p>HOD</p>}
               </div>
             </div>
 

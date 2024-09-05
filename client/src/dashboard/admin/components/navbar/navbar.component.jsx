@@ -1,11 +1,14 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
+import GlobalSearchBar from "../global-search/global-search";
+import { AuthContext } from "../../../../components/context/auth.content";
 
 const NavigationBar = () => {
-  //////
-
+  const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
+
+  const { userRole } = useContext(AuthContext);
 
   const MenuButton = ({ to, label }) => {
     return (
@@ -20,8 +23,6 @@ const NavigationBar = () => {
       </>
     );
   };
-
-  /////
 
   return (
     <>
@@ -38,17 +39,15 @@ const NavigationBar = () => {
           <i className="fa-solid fa-bars fa-xl"></i>
         </div>
 
-        <div className="font-bold text-2xl">
-          <label>Admin Dashboard</label>
+        <div
+          className="font-bold text-2xl"
+          onClick={() => navigate("/dashboard/admin")}
+        >
+          <label className="cursor-pointer">{userRole} Dashboard</label>
         </div>
 
-        <div className="relative flex flex-row justify-center items-center w-80">
-          <i className="fa-solid fa-magnifying-glass absolute left-2.5"></i>
-          <input
-            className="pl-8 pr-1 h-8 w-full"
-            type="text"
-            placeholder="Search..."
-          />
+        <div className="w-96">
+          <GlobalSearchBar />
         </div>
 
         <div className="ml-auto">
@@ -62,7 +61,7 @@ const NavigationBar = () => {
           showMenu && "left-1"
         }`}
       >
-        <MenuButton label="Home" to="/dashboard/admin" />{" "}
+        <MenuButton label="Home" to="/dashboard/admin" />
         <MenuButton label="Profile" to="/dashboard/admin/profile" />
         <MenuButton
           label="Issue / Return Books"
@@ -71,8 +70,8 @@ const NavigationBar = () => {
         <MenuButton label="Manage Fine" to="/dashboard/admin/manage-fines" />
         <MenuButton label="Manage Books" to="/dashboard/admin/manage-books" />
         <MenuButton
-          label="Manage Students"
-          to="/dashboard/admin/manage-students"
+          label="Manage Members"
+          to="/dashboard/admin/manage-members"
         />
         <MenuButton label="Manage Staff" to="/dashboard/admin/manage-staff" />
         <MenuButton label="Database (BETA)" to="/dashboard/admin/database" />

@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import "./snackbar.styles.css";
 
 const SnackBar = ({ feedback }) => {
-  /// feedback = [ {open}, {severity}, {message} ]
-
   const [feedbackArray, setFeedbackArray] = useState([0, 0, ""]);
 
   const handleOpen = () => {
@@ -27,13 +25,9 @@ const SnackBar = ({ feedback }) => {
     setFeedbackArray(feedback);
   }, [feedback]);
 
-  // setTimeout(() => {
-  //   setFeedbackArray([0, feedbackArray[1], feedbackArray[2]]);
-  // }, 5000);
-
   return (
     <div
-      className={`snackbar bg-${handleSeverity()} ${
+      className={`snackbar z-50 bg-${handleSeverity()} ${
         handleOpen() && "pop-snackbar"
       }`}
     >

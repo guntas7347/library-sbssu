@@ -19,7 +19,7 @@ const {
 } = require("../../../models/books/books.controllers");
 const {
   fetchStudentById,
-} = require("../../../models/students/students.controllers");
+} = require("../../../models/member/member.controllers");
 const {
   findApplicationById,
 } = require("../../../models/applications/applications.controllers");

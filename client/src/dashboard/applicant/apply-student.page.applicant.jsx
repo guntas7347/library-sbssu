@@ -54,8 +54,8 @@ const ApplyStudentPage = () => {
     program: "",
     specialization: "",
     batch: "",
-    email: "",
     phoneNumber: "",
+    role: "STUDENT",
   };
   const { formFields, handleChange } = useForm(defaultFormFields);
   const {
@@ -68,8 +68,8 @@ const ApplyStudentPage = () => {
     program,
     specialization,
     batch,
-    email,
     phoneNumber,
+    role,
   } = formFields;
 
   const handleSubmit = async () => {
@@ -134,12 +134,24 @@ const ApplyStudentPage = () => {
           }}
         >
           <div className="grid md:grid-cols-2 gap-x-10 gap-5 justify-center items-center">
+            <InputSelect
+              label="User Type"
+              name="role"
+              fields={[
+                { name: "Student", value: "STUDENT" },
+                { name: "Teacher", value: "TEACHER" },
+                { name: "Other", value: "OTHER" },
+              ]}
+              value={role}
+              onChange={handleChange}
+            />
             <InputField
               label="Roll Number"
               type="number"
               name="rollNumber"
               value={rollNumber}
               onChange={handleChange}
+              required={false}
               onInput={(e) => {
                 e.target.value = Math.max(0, parseInt(e.target.value))
                   .toString()
@@ -196,27 +208,42 @@ const ApplyStudentPage = () => {
               value={category}
               onChange={handleChange}
             />
-            <InputSelect
-              label="Program"
-              name="program"
-              fields={academicPrograms}
-              value={program}
-              onChange={handleChange}
-            />
-            <InputSelect
-              label="Specialization"
-              name="specialization"
-              fields={generateSpecialization()}
-              value={specialization}
-              onChange={handleChange}
-            />
-            <InputField
-              label="Email"
-              type="email"
-              name="email"
-              value={email}
-              onChange={handleChange}
-            />
+            {role === "STUDENT" ? (
+              <>
+                <InputSelect
+                  label="Program"
+                  name="program"
+                  fields={academicPrograms}
+                  value={program}
+                  onChange={handleChange}
+                />
+                <InputSelect
+                  label="Specialization"
+                  name="specialization"
+                  fields={generateSpecialization()}
+                  value={specialization}
+                  onChange={handleChange}
+                />
+              </>
+            ) : (
+              <>
+                <InputSelect
+                  label="Desigination"
+                  name="program"
+                  fields={[{ name: "Professor", value: "Professor" }]}
+                  value={program}
+                  onChange={handleChange}
+                />
+                <InputField
+                  label="Specialization"
+                  name="specialization"
+                  type="text"
+                  value={specialization}
+                  onChange={handleChange}
+                />
+              </>
+            )}
+
             <InputField
               label="Phone Number"
               type="number"

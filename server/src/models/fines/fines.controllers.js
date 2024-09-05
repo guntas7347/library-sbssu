@@ -21,7 +21,7 @@ const getFines = async (queryParam) => {
   }
 
   query.skip(skip).limit(pageSize);
-  query.populate({ path: "studentId", select: "fullName rollNumber" });
+  query.populate({ path: "memberId", select: "fullName rollNumber" });
 
   return { finesArray: await query.exec(), totalPages };
 };
@@ -29,7 +29,7 @@ const getFines = async (queryParam) => {
 const getFineById = async (_id, populate = false) => {
   const query = finesSchema.findById(_id);
   if (populate) {
-    query.populate({ path: "studentId" }).populate({ path: "returnedBookId" });
+    query.populate({ path: "memberId" }).populate({ path: "returnedBookId" });
   }
   return await query.exec();
 };

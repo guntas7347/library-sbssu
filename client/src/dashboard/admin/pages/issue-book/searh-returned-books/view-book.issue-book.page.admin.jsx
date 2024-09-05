@@ -56,8 +56,8 @@ const ViewReturnedBookPage = () => {
               ["Issued By", issuedBy],
               ["Return Date", formatTime(returnDate)],
               ["Returned By", returnedBy],
-              ["Student Roll Number", rollNumber],
-              ["Student Name", name],
+              ["Roll Number", rollNumber],
+              ["Member Name", name],
               ["Fine", fine === "Null" ? "Null" : `₹${fine}`],
             ]}
           />

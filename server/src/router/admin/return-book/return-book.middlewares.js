@@ -37,13 +37,13 @@ const processReturningBook = async (req, res, next) => {
     let returnedBookDoc = null;
     await session.withTransaction(async () => {
       returnedBookDoc = await createReturnBook(returningBookDetails, session);
-      const { studentId } = await getLibraryCardById(libraryCardId);
+      const { memberId } = await getLibraryCardById(libraryCardId);
       if (req.cust.fine > 0) {
         const fineDoc = await createFine({
           returnedBookId: returnedBookDoc[0]._id,
           amount: req.cust.fine,
           category: "Late Fees",
-          studentId,
+          memberId,
         });
 
         updateReturnBookById(
@@ -84,12 +84,12 @@ const sendReturnedConfirmationEmail = async (req, res, next) => {
     );
     const { bookAccessionId, libraryCardId } = returnedBookDoc._doc;
     const { bookId } = bookAccessionId;
-    const { studentId } = libraryCardId;
+    const { memberId } = libraryCardId;
     const emailContent = {
       issueDate: new Date(returnedBookDoc._doc.issueDate).toDateString(),
       returnDate: new Date(returnedBookDoc._doc.returnDate).toDateString(),
       fine: "₹" + returnedBookDoc._doc.fine,
-      name: studentId.fullName,
+      name: memberId.fullName,
       title: bookId.title,
       author: bookId.author,
       cardNumber: libraryCardId.cardNumber,
@@ -122,10 +122,10 @@ const fetchReturnedBooks = async (req, res, next) => {
         _id: returnedBook._id,
         issueDate: returnedBook.issueDate.toDateString(),
         returnDate: returnedBook.returnDate.toDateString(),
-        fine: returnedBook.fine ? returnedBook.fine.amount : "Null",
+        fine: returnedBook.fine ? returnedBook.fine.amount : "None",
         cardNumber: returnedBook.libraryCardId.cardNumber,
-        studentName: returnedBook.libraryCardId.studentId.fullName,
-        rollNumber: returnedBook.libraryCardId.studentId.rollNumber,
+        studentName: returnedBook.libraryCardId.memberId.fullName,
+        rollNumber: returnedBook.libraryCardId.memberId.rollNumber,
         accessionNumber: returnedBook.bookAccessionId.accessionNumber,
         bookTitle: returnedBook.bookAccessionId.bookId.title,
       };
@@ -160,17 +160,20 @@ const fetchReturnedBookDocById = async (req, res, next) => {
       issuedBy: issuer.fullName + " " + "|" + " " + issuer.idNumber,
       returnDate: returnedBookDoc._doc.returnDate,
       returnedBy: returner.fullName + " " + "|" + " " + returner.idNumber,
-      rollNumber: libraryCardId.studentId.fullName,
-      name: libraryCardId.studentId.rollNumber,
+      rollNumber: libraryCardId.memberId.rollNumber,
+      name: libraryCardId.memberId.fullName,
       fine: returnedBookDoc._doc.fine
         ? returnedBookDoc._doc.fine.amount
         : "Null",
     };
 
+    console.log(returnedBook);
+
     if (!req.cust) req.cust = {};
     req.cust.returnedBook = returnedBook;
     next();
   } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 };

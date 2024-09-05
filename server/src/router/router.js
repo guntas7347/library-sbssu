@@ -11,15 +11,11 @@ const { addNewBook } = require("../models/books/books.controllers");
 
 const mongoose = require("mongoose");
 const crs = require("../utils/custom-response-codes");
-const {
-  getAuthApplicantById,
-} = require("../models/auth/applicant/auth_applicant.controllers");
+
 const {
   getAuthAdminById,
 } = require("../models/auth/admin/aduth_admin.controllers");
-const {
-  getAuthStudentById,
-} = require("../models/auth/student/auth_student.controllers");
+
 const { authSecured } = require("./auth/auth-secured.router");
 
 const router = express.Router();
@@ -46,25 +42,11 @@ const verifyJwtMiddleware = (req, res, next) => {
 const verifyAdmin = async (req, res, next) => {
   try {
     const { role } = await getAuthAdminById(req.user.uid);
-    if (role === "ADMIN") {
+    req.user.role = role;
+    if (role === "ADMIN" || role === "STAFF") {
       next();
     } else {
       return res.status(401).json(crs.ADM401JWT());
-    }
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(crs.ERR500JWT(error));
-  }
-};
-
-const verifyStaff = async (req, res, next) => {
-  try {
-    const { role } = await getAuthAdminById(req.user.uid);
-
-    if (role === "STAFF") {
-      next();
-    } else {
-      return res.status(401).json(crs.STF401JWT());
     }
   } catch (error) {
     console.log(error);
@@ -77,8 +59,6 @@ router.use(verifyJwtMiddleware);
 router.use("/auth-secured", authSecured);
 
 router.use("/admin", verifyAdmin, adminRouter);
-
-router.use("/staff", verifyStaff, adminRouter);
 
 router.use("/student/issue-history", issueHistoryRouter);
 

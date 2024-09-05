@@ -37,4 +37,16 @@ const setJwtCookie = async (req, res, next) => {
     return res.status(500).json(crs.SERR500REST(err));
   }
 };
-module.exports = { verifyPassword, setJwtCookie };
+
+const adminOnly = (req, res, next) => {
+  try {
+    if (req.user.role === "ADMIN") {
+      next();
+    } else return res.status(401).json(crs.ADM401JWT());
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(crs.ERR500JWT(error));
+  }
+};
+
+module.exports = { verifyPassword, setJwtCookie, adminOnly };

@@ -21,8 +21,8 @@ issueHistoryRouter.post("/fetch-issued-history", async (req, res) => {
           returnDate,
           fine,
           cardNumber: libraryCardId.cardNumber,
-          studentName: libraryCardId.studentId.name,
-          rollNumber: libraryCardId.studentId.rollNumber,
+          studentName: libraryCardId.memberId.name,
+          rollNumber: libraryCardId.memberId.rollNumber,
           accessionNumber: bookAccessionId.accessionNumber,
           bookTitle: bookAccessionId.bookId.title,
         };

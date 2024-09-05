@@ -7,14 +7,17 @@ import { SnackbarProvider } from "./components/context/snackbar.context";
 
 import "./index.css";
 import "./index.scss";
+import { AuthProvider } from "./components/context/auth.content";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <SnackbarProvider>
-        <App />
-      </SnackbarProvider>
+      <AuthProvider>
+        <SnackbarProvider>
+          <App />
+        </SnackbarProvider>
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

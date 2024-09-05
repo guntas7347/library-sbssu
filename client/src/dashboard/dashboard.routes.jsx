@@ -7,9 +7,6 @@ const AdminRoutes = lazy(() =>
   import("./admin/routes/admin-routes.route.admin")
 );
 
-const StaffRoutes = lazy(() =>
-  import("./staff/routes/staff-routes.route.staff")
-);
 const UserRoutes = lazy(() => import("./student/routes/student-routes.user"));
 
 const ApplicationRouter = lazy(() => import("./applicant/router"));
@@ -29,27 +26,18 @@ const DashboardRoutes = () => {
         <Route
           path="/admin/*"
           element={
-            <ProtectedRoute role="ADMIN">
+            <ProtectedRoute role={["ADMIN", "STAFF"]}>
               <Suspense fallback={<CenteredSpinner />}>
                 <AdminRoutes />
               </Suspense>
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/staff/*"
-          element={
-            <ProtectedRoute role="STAFF">
-              <Suspense fallback={<CenteredSpinner />}>
-                <StaffRoutes />
-              </Suspense>
-            </ProtectedRoute>
-          }
-        />
+
         <Route
           path="/student/*"
           element={
-            <ProtectedRoute role="STUDENT">
+            <ProtectedRoute role={["STUDENT"]}>
               <Suspense fallback={<CenteredSpinner />}>
                 <UserRoutes />
               </Suspense>
@@ -59,7 +47,7 @@ const DashboardRoutes = () => {
         <Route
           path="/applicant/*"
           element={
-            <ProtectedRoute role="APPLICANT">
+            <ProtectedRoute role={["APPLICANT"]}>
               <Suspense fallback={<CenteredSpinner />}>
                 <ApplicationRouter />
               </Suspense>

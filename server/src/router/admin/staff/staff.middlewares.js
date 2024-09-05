@@ -1,17 +1,18 @@
 const { default: mongoose } = require("mongoose");
 const {
-  getAuthAdminByEmail,
   createAuthAdmin,
+  getAuthAdmin,
 } = require("../../../models/auth/admin/aduth_admin.controllers");
 const { createNewStaff } = require("../../../models/staff/staff.controllers");
 const crs = require("../../../utils/custom-response-codes");
 
 const verifyEmailAvailability = async (req, res, next) => {
   try {
-    const authAdmin = await getAuthAdminByEmail(req.body.email);
+    const authAdmin = await getAuthAdmin({ email: req.body.email });
     if (authAdmin !== null) return res.status(409).json(crs.AUTH409AADM());
     next();
-  } catch (error) {
+  } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST());
   }
 };

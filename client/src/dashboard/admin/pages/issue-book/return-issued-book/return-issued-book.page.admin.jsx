@@ -41,7 +41,7 @@ const ReturnIssuedBookPage = () => {
       .then((res) => {
         setTimeout(() => {
           setIssuedBookDoc(res);
-          console.log("triggering");
+          console.log(res);
         }, 1000);
       })
       .catch((err) => {
@@ -108,7 +108,7 @@ const ReturnIssuedBookPage = () => {
                   ["Issued By", issuedBy],
                   ["Book title", title],
                   ["Book Author", author],
-                  ["Student Name", fullName],
+                  ["Member Name", fullName],
                   ["Roll Number", rollNumber],
                 ]}
               />

@@ -131,3 +131,5 @@ dist
 
 # custom files
 secrets.js
+.VSCodeCounter/
+misc/

@@ -3,15 +3,14 @@ const {
   createDateRange,
 } = require("../../utils/functions");
 const {
-  getBookAccessionIdFromBookAccessionNumber,
   getAccession,
 } = require("../book-accessions/book-accessions.controllers");
-const { fetchStudentById } = require("../students/students.controllers");
 const returnedBooksMongo = require("./returned-books.schema");
 const issueBookMongo = require("../issue-book/issue-book.schema");
 const {
   getLibraryCard,
 } = require("../library-cards/library-cards.controllers");
+const { getMemberById } = require("../member/member.controllers");
 
 const createReturnBook = async (returningBookDetails, session) => {
   return await returnedBooksMongo.create([returningBookDetails], { session });
@@ -77,7 +76,7 @@ const getReturnedBooks = async (queryParam) => {
     })
     .populate({
       path: "libraryCardId",
-      populate: { path: "studentId", select: "rollNumber fullName -_id" },
+      populate: { path: "memberId", select: "rollNumber fullName -_id" },
     })
     .populate({ path: "fine", select: "amount -_id" });
 
@@ -85,7 +84,7 @@ const getReturnedBooks = async (queryParam) => {
 };
 
 const getIssueHistory = async (student_Id, filter) => {
-  const studentDoc = await fetchStudentById(student_Id);
+  const studentDoc = await getMemberById(student_Id);
 
   if (studentDoc === null) {
     return [];
@@ -154,7 +153,7 @@ const getIssueHistory = async (student_Id, filter) => {
     })
     .populate({
       path: "libraryCardId",
-      populate: { path: "studentId", select: "rollNumber name -_id" },
+      populate: { path: "memberId", select: "rollNumber name -_id" },
     });
   query2
     .populate({
@@ -163,27 +162,27 @@ const getIssueHistory = async (student_Id, filter) => {
     })
     .populate({
       path: "libraryCardId",
-      populate: { path: "studentId", select: "rollNumber name -_id" },
+      populate: { path: "memberId", select: "rollNumber name -_id" },
     });
 
   return [...(await query1.exec()), ...(await query2.exec())];
 };
 
-const getReturnedBookById = async (_id, populate = false) => {
+const getReturnedBookById = async (_id) => {
   const query = returnedBooksMongo.findById(_id);
-  if (populate)
-    query
-      .populate({
-        path: "bookAccessionId",
-        populate: { path: "bookId", select: "title author -_id" },
-      })
-      .populate({
-        path: "libraryCardId",
-        populate: { path: "studentId", select: "rollNumber fullName -_id" },
-      })
-      .populate({ path: "issuedBy", select: "idNumber fullName -_id" })
-      .populate({ path: "returnedBy", select: "idNumber fullName -_id" })
-      .populate({ path: "fine", select: "amount -_id" });
+
+  query
+    .populate({
+      path: "bookAccessionId",
+      populate: { path: "bookId", select: "title author -_id" },
+    })
+    .populate({
+      path: "libraryCardId",
+      populate: { path: "memberId", select: "rollNumber fullName -_id" },
+    })
+    .populate({ path: "issuedBy", select: "idNumber fullName -_id" })
+    .populate({ path: "returnedBy", select: "idNumber fullName -_id" })
+    .populate({ path: "fine", select: "amount -_id" });
 
   return await query.exec();
 };

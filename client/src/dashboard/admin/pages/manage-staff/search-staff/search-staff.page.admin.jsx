@@ -2,22 +2,21 @@ import InputSelect from "../../../../../components/forms/input-select/input-sele
 import CustomTable from "../../../../../components/table/custom-table.component";
 import { fetchAllStaff } from "../../../hooks/http-requests.hooks.admin";
 import { sortObjectUsingKeys } from "../../../../../utils/functions";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { useNavigate } from "react-router-dom";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
+import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
+import useQueryParams from "../../../../../components/hooks/useQueryParams.hook";
 
 const SearchStaffPage = () => {
   const navigate = useNavigate();
 
+  const { queryString } = useQueryParams();
+
   const { setFeedback } = useContext(SnackBarContext);
 
   const [rowData, setRowData] = useState([]);
-
-  const { formFields, handleChange } = useForm({
-    sortSelect: "fetchAllStaff",
-    sortValue: "",
-  });
 
   const handleFetch = async () => {
     await fetchAllStaff()
@@ -35,31 +34,27 @@ const SearchStaffPage = () => {
     });
   };
 
-  const handleRowClick = (e) => {
-    navigate(`/dashboard/admin/manage-staff/search-staff/view-staff/${e}`);
-  };
+  useEffect(() => {
+    handleFetch();
+  }, [queryString]);
 
   return (
     <div className="text-center">
       <h1 className="text-3xl font-bold m-5">Search Staff</h1>
       <div>
-        <div className="bg-white p-7 grid grid-cols-2 gap-5 my-5 rounded-3xl">
-          <InputSelect
-            fields={[{ name: "Search All Staff", value: "fetchAllStaff" }]}
-            value={formFields.sortSelect}
-            onChange={handleChange}
-            name="sortSelect"
+        <div className="flex  justify-between my-5 bg-white p-5 rounded-3xl">
+          <SearchQueriesComponent
+            selectFields={[
+              { name: "Search All Staff", value: "fetchAllStaff" },
+            ]}
           />
-
-          <button className="my-button" onClick={handleFetch}>
-            Search
-          </button>
         </div>
+
         <div className="">
           <CustomTable
             columns={["ID Number", "Name", "Role"]}
             rows={rowData}
-            handleRowClick={handleRowClick}
+            handleRowClick={(e) => navigate(`view-staff/${e}`)}
           />
         </div>
       </div>
