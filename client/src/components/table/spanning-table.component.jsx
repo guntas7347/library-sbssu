@@ -1,4 +1,4 @@
-const SpanningTable = ({ rows }) => {
+const SpanningTable = ({ rows, imgUrl = null }) => {
   return (
     <table>
       <tbody>
@@ -15,6 +15,14 @@ const SpanningTable = ({ rows }) => {
             </tr>
           );
         })}
+        {imgUrl && (
+          <tr>
+            <td className="text-left w-96">Image</td>
+            <td>
+              <img className="w-52 h-52" src={imgUrl} alt="image" />
+            </td>
+          </tr>
+        )}
       </tbody>
     </table>
   );

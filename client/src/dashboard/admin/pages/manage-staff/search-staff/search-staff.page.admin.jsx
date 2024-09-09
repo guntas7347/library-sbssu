@@ -1,7 +1,10 @@
 import InputSelect from "../../../../../components/forms/input-select/input-select.component";
 import CustomTable from "../../../../../components/table/custom-table.component";
 import { fetchAllStaff } from "../../../hooks/http-requests.hooks.admin";
-import { sortObjectUsingKeys } from "../../../../../utils/functions";
+import {
+  processData,
+  sortObjectUsingKeys,
+} from "../../../../../utils/functions";
 import { useContext, useEffect, useState } from "react";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { useNavigate } from "react-router-dom";
@@ -20,18 +23,12 @@ const SearchStaffPage = () => {
 
   const handleFetch = async () => {
     await fetchAllStaff()
-      .then((res) => setRowData(rowsArray(res)))
+      .then((res) =>
+        setRowData(processData(res, ["_id", "idNumber", "fullName", "level"]))
+      )
       .catch((err) => {
         setFeedback([1, 2, err]);
       });
-  };
-
-  const rowsArray = (array) => {
-    return array.map((obj) => {
-      return Object.values(
-        sortObjectUsingKeys(obj, ["_id", "idNumber", "fullName", "role"])
-      );
-    });
   };
 
   useEffect(() => {
@@ -52,9 +49,9 @@ const SearchStaffPage = () => {
 
         <div className="">
           <CustomTable
-            columns={["ID Number", "Name", "Role"]}
+            columns={["ID Number", "Name", "Level"]}
             rows={rowData}
-            handleRowClick={(e) => navigate(`view-staff/${e}`)}
+            handleRowClick={(e) => navigate(e)}
           />
         </div>
       </div>

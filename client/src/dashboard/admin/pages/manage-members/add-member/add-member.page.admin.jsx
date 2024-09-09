@@ -30,7 +30,7 @@ const AddStudentPage = () => {
     batch: "",
     email: "",
     phoneNumber: "",
-    role: "STUDENT",
+    role: "STUDENT UG",
   };
 
   const { formFields, handleChange, resetFormFields } =
@@ -98,7 +98,7 @@ const AddStudentPage = () => {
 
   return (
     <div>
-      <h1 className="text-center font-bold text-3xl my-2">Add Student</h1>
+      <h1 className="text-center font-bold text-3xl my-2">Add Member</h1>
       <div className="bg-white p-5 rounded-3xl">
         <form
           onSubmit={(e) => {
@@ -106,18 +106,20 @@ const AddStudentPage = () => {
             setShowAlertDialog(true);
           }}
         >
-          <div className="grid md:grid-cols-2 gap-x-28 gap-5 justify-center items-center">
+          <div className="grid md:grid-cols-2 gap-x-10 gap-5 justify-center items-center">
             <InputSelect
               label="User Type"
               name="role"
               fields={[
-                { name: "Student", value: "STUDENT" },
-                { name: "Teacher", value: "TEACHER" },
-                { name: "Other", value: "OTHER" },
+                { name: "STUDENT UG", value: "STUDENT UG" },
+                { name: "STUDENT PG", value: "STUDENT PG" },
+                { name: "TEACHER REGULAR", value: "TEACHER REGULAR" },
+                { name: "TEACHER ADHOC", value: "TEACHER ADHOC" },
+                { name: "NON TEACHING STAFF", value: "NON TEACHING STAFF" },
               ]}
               value={role}
               onChange={handleChange}
-            />{" "}
+            />
             <InputField
               label="Roll Number"
               type="number"
@@ -125,6 +127,11 @@ const AddStudentPage = () => {
               value={rollNumber}
               onChange={handleChange}
               required={false}
+              onInput={(e) => {
+                e.target.value = Math.max(0, parseInt(e.target.value))
+                  .toString()
+                  .slice(0, 6);
+              }}
             />
             <InputSelect
               label="Batch"
@@ -176,7 +183,7 @@ const AddStudentPage = () => {
               value={category}
               onChange={handleChange}
             />
-            {role === "STUDENT" ? (
+            {role === "STUDENT UG" || role === "STUDENT PG" ? (
               <>
                 <InputSelect
                   label="Program"
@@ -231,8 +238,8 @@ const AddStudentPage = () => {
               }}
             />
           </div>
-          <div className="mt-5 flex flex-row justify-center">
-            <button className="my-button" type="submit">
+          <div className="mt-5">
+            <button className="my-button " type="submit">
               Submit
             </button>
           </div>

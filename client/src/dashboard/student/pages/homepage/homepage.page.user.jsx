@@ -1,8 +1,9 @@
 const Homepage = () => {
   return (
-    <div className="text-center">
-      <h1 className="my-5">Shaheed Bhagat Singh State University</h1>
-      <h2>Library Portal</h2>
+    <div className="text-center flex h-screen items-center justify-center">
+      <h1 className="text-6xl font-bold">
+        Student Portal will be launched soon
+      </h1>
     </div>
   );
 };

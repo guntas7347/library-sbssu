@@ -33,16 +33,14 @@ const ReturnIssuedBookPage = () => {
     issuedBy,
     rollNumber,
     _id,
+    imgUrl,
   } = issuedBookDoc;
 
   const handleFetch = async () => {
     setIsStudentFetching(true);
     await fetchIssuedBookByAccessionNumber(+formFields.accessionNumber)
       .then((res) => {
-        setTimeout(() => {
-          setIssuedBookDoc(res);
-          console.log(res);
-        }, 1000);
+        setIssuedBookDoc(res);
       })
       .catch((err) => {
         setFeedback([1, 2, err]);
@@ -111,6 +109,7 @@ const ReturnIssuedBookPage = () => {
                   ["Member Name", fullName],
                   ["Roll Number", rollNumber],
                 ]}
+                imgUrl={imgUrl}
               />
             </div>
             <div className="bg-white rounded-3xl p-5 flex justify-between items-center">

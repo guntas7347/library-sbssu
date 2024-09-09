@@ -19,7 +19,6 @@ const SearchStudentsPage = () => {
     await fetchAllStudents(queryString)
       .then((res) => {
         setTotalPages(res.totalPages);
-        console.log(res.studentsArray);
         setRowData(
           processData(res.studentsArray, [
             "_id",

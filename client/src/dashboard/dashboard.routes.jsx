@@ -26,7 +26,7 @@ const DashboardRoutes = () => {
         <Route
           path="/admin/*"
           element={
-            <ProtectedRoute role={["ADMIN", "STAFF"]}>
+            <ProtectedRoute role={["STAFF"]}>
               <Suspense fallback={<CenteredSpinner />}>
                 <AdminRoutes />
               </Suspense>

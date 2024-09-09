@@ -8,7 +8,7 @@ const NavigationBar = () => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
 
-  const { userRole } = useContext(AuthContext);
+  // const { userRole } = useContext(AuthContext);
 
   const MenuButton = ({ to, label }) => {
     return (
@@ -43,7 +43,7 @@ const NavigationBar = () => {
           className="font-bold text-2xl"
           onClick={() => navigate("/dashboard/admin")}
         >
-          <label className="cursor-pointer">{userRole} Dashboard</label>
+          <label className="cursor-pointer">Staff Dashboard</label>
         </div>
 
         <div className="w-96">

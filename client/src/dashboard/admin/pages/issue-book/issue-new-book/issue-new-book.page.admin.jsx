@@ -10,7 +10,6 @@ import CustomTableSelect from "../../../../../components/table/custom-table-sele
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { rowsArray } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
-import BackdropSpinner from "../../../../../components/feedback/backdrop/backdrop.component";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 import Dialog from "../../../../../components/feedback/dialog/dialog.component";
 import QuickAddBook from "../../manage-books/add-book/quick-add";
@@ -23,11 +22,12 @@ const IssueNewBookPage = () => {
   const [bookRowData, setBookRowData] = useState([]);
   const [studentRowData, setMemberRowData] = useState([]);
 
+  const [imgUrl, setImgUrl] = useState(null);
+
   const [selectedCardNumber, setSelectedCardNumber] = useState("");
   const [selectedAccessionNumber, setSelectedAccessionNumber] = useState("");
 
   const [showAlertDialog, setShowAlertDialog] = useState(false);
-  const [showBackdropSpinner, setShowBackdropSpinner] = useState(false);
 
   const [showDialog, setShowDialog] = useState(false);
 
@@ -56,8 +56,8 @@ const IssueNewBookPage = () => {
   const handleFetchStuent = () => {
     fetchStudentByRollNumber(formFields.membershipId)
       .then((res) => {
-        console.log(res);
         setShowMemberTable(true);
+        setImgUrl(res.imgUrl);
         setMemberRowData(
           rowsArray(addLibraryCardsValueToObject(res), [
             "membershipId",
@@ -101,7 +101,6 @@ const IssueNewBookPage = () => {
   };
 
   const handleIssueNewBook = async () => {
-    setShowBackdropSpinner(true);
     const issueBookDetails = {
       accessionNumber: selectedAccessionNumber,
       cardNumber: selectedCardNumber,
@@ -114,7 +113,6 @@ const IssueNewBookPage = () => {
         handleFetchStuent();
       })
       .catch((err) => setFeedback([1, 2, err]));
-    setShowBackdropSpinner(false);
   };
 
   const yesterdayDate = () => {
@@ -204,7 +202,6 @@ const IssueNewBookPage = () => {
                   columns={[
                     "Membership Id",
                     "Name",
-
                     "Card Number",
                     "Avalability",
                   ]}
@@ -212,6 +209,7 @@ const IssueNewBookPage = () => {
                   onSelect={handleSelect}
                   indexToSelect={2}
                   tableName="studentsTable"
+                  imgUrl={imgUrl}
                 />
               </div>
             )}
@@ -280,8 +278,6 @@ const IssueNewBookPage = () => {
             setShowAlertDialog(false);
           }}
         />
-
-        <BackdropSpinner open={showBackdropSpinner} />
       </div>
       {showDialog && (
         <Dialog onClose={() => setShowDialog(false)}>

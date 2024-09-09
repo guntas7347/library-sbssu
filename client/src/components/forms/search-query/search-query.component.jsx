@@ -5,19 +5,28 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useForm } from "../use-form-hook/use-form.hook.component";
 import { createURLQuery } from "../../../utils/functions";
+import useQueryParams from "../../hooks/useQueryParams.hook";
 
 const SearchQueriesComponent = ({ selectFields }) => {
   const navigate = useNavigate();
 
-  const { formFields, handleChange } = useForm({ filter: "", filterValue: "" });
+  const { queryString } = useQueryParams();
+
+  const { formFields, handleChange } = useForm({
+    filter: selectFields[0].value,
+    filterValue: "",
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
       if (formFields.filter !== "" || formFields.filterValue !== "") {
-        const q = createURLQuery({
-          filter: formFields.filter,
-          filterValue: formFields.filterValue,
-        });
+        const q = createURLQuery(
+          {
+            filter: formFields.filter,
+            filterValue: formFields.filterValue,
+          },
+          queryString
+        );
         navigate(`?${q}`);
       }
     }, 1000);

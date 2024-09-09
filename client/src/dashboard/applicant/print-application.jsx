@@ -36,6 +36,7 @@ const PrintApplicationPage = () => {
     phoneNumber,
     createdAt,
     role,
+    imgUrl,
   } = application;
 
   const handlePrint = useReactToPrint({
@@ -76,25 +77,34 @@ const PrintApplicationPage = () => {
             </div>
 
             <div className="flex items-center justify-center mt-5">
-              <SpanningTable
-                rows={[
-                  ["User Type", role],
-                  ["Roll Number", rollNumber],
-                  ["Name", fullName],
-                  ["Fathers Name", fathersName],
-                  ["Gender", gender],
-                  ["Date Of Birth", new Date(dob).toDateString()],
-                  [
-                    `${role === "STUDENT" ? "Program" : "Desigination"}`,
-                    program,
-                  ],
-                  ["Specialization", specialization],
-                  ["Batch", batch],
-                  ["Email", email],
-                  ["Phone Number", phoneNumber],
-                  ["Application Date", new Date(createdAt).toDateString()],
-                ]}
-              />
+              <div>
+                <SpanningTable
+                  rows={[
+                    ["User Type", role],
+                    ["Roll Number", rollNumber],
+                    ["Name", fullName],
+                    ["Fathers Name", fathersName],
+                    ["Gender", gender],
+                    ["Date Of Birth", new Date(dob).toDateString()],
+                    [
+                      `${
+                        role === "STUDENT UG" || role === "STUDENT PG"
+                          ? "Program"
+                          : "Desigination"
+                      }`,
+                      program,
+                    ],
+                    ["Specialization", specialization],
+                    ["Batch", batch],
+                    ["Email", email],
+                    ["Phone Number", phoneNumber],
+                    ["Application Date", new Date(createdAt).toDateString()],
+                  ]}
+                />
+              </div>
+              <div className="w-[33%]">
+                <img className="border border-black" src={imgUrl} alt="image" />
+              </div>
             </div>
 
             <div className="flex justify-between mt-32 font-bold">

@@ -25,6 +25,7 @@ const ViewApplicantPage = () => {
     batch: "",
     email: "",
     phoneNumber: "",
+    imgUrl: "",
   });
   const [decisionTaken, setDecisionTaken] = useState(false);
   const [decision, setDecision] = useState("REJECT");
@@ -42,6 +43,7 @@ const ViewApplicantPage = () => {
     phoneNumber,
     createdAt,
     role,
+    imgUrl,
   } = studentDoc;
   useEffect(() => {
     const asyncFunc = async () => {
@@ -60,8 +62,6 @@ const ViewApplicantPage = () => {
       })
       .catch((err) => setFeedback([1, 2, err]));
   };
-
-  console.log(rollNumber);
 
   return (
     <div>
@@ -91,6 +91,7 @@ const ViewApplicantPage = () => {
             ["Phone Number", phoneNumber],
             ["Application Date", new Date(createdAt).toDateString()],
           ]}
+          imgUrl={imgUrl}
         />
       </div>
       {!decisionTaken && (

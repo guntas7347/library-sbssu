@@ -1,14 +1,12 @@
-import { Button, Grid } from "@mui/material";
 import InputField from "../../../../components/forms/input-field/input-field.component";
 import { useState } from "react";
 
-const DatabaseForm = ({ keyProps, valueProps, onChange }) => {
+const DatabaseForm = ({ valueProps, onChange }) => {
   const [enableEdit, setEnableEdit] = useState(true);
   const handleClick = () => setEnableEdit(!enableEdit);
 
   return (
     <>
-      {/* <InputField disabled {...keyProps} /> */}
       <div className="grid grid-cols-10 my-5">
         <div className="col-span-8">
           <InputField

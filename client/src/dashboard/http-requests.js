@@ -1,9 +1,10 @@
 export const localIp = true;
 
 export const ip1 = "localhost";
-export const ip2 = "https://9f4f-38-137-46-9.ngrok-free.app/";
+export const ip2 = "192.168.1.9";
 
-const API_URL = `http://${localIp ? ip1 : ip2}:8080/api`;
+const API_URL_old = `http://${localIp ? ip1 : ip2}:8080/api`;
+const API_URL = "/api";
 
 const logResponseToConsole = ({ status, message, payload }, success = true) =>
   success
@@ -94,14 +95,6 @@ export const signOut = () => {
   return restCall("auth/sign-out", {}, "AUTH200SOUT");
 };
 
-export const changePassword = (credentials) => {
-  return restCall(
-    "auth-secured/admin/change-password",
-    credentials,
-    "AUTH200CAP"
-  );
-};
-
 export const verifyReCaptcha = (token) =>
   restCall("auth/verify-recaptcha", { token }, "AUTH200RECAPTCHA");
 
@@ -131,3 +124,7 @@ export const resetPasswordAdminVerifyLink = (type, code) =>
 
 export const resetPasswordAdmin = (password, code) =>
   restCall("auth/admin/reset-password", { password, code }, "AUTH200RAP");
+
+export const deleteImageFromCloud = (imageData) => {
+  return restCall("upload/delete-image", imageData, "ULD200DELIMG");
+};

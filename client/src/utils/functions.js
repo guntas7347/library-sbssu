@@ -56,6 +56,7 @@ const options = {
   minute: "2-digit",
   second: "2-digit",
 };
+
 export const formatTime = (dateString) =>
   new Date(dateString).toLocaleString("en-US", options);
 
@@ -65,14 +66,56 @@ export const rowsArray = (array = [], keysArray = []) => {
   });
 };
 
-export const createURLQuery = (customParam) => {
+export const createURLQuery = (customParam, currentQueryString) => {
   const object = {};
   Object.keys(customParam).map((key) => {
     if (customParam[key] === "") return;
     object[key] = customParam[key];
   });
 
-  return queryString.stringify({ ...object });
+  return queryString.stringify({
+    ...queryString.parse(currentQueryString),
+    ...object,
+  });
+};
+
+export const getCroppedImg = (image, crop) => {
+  const canvas = document.createElement("canvas");
+
+  // Calculate the scale between the displayed image and the original image size
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
+
+  // Adjust canvas size to match the crop size in the original image's resolution
+  canvas.width = crop.width * scaleX;
+  canvas.height = crop.height * scaleY;
+
+  const ctx = canvas.getContext("2d");
+
+  if (ctx) {
+    // Draw the cropped portion of the image onto the canvas at full resolution
+    ctx.drawImage(
+      image,
+      crop.x * scaleX, // Crop starting x coordinate
+      crop.y * scaleY, // Crop starting y coordinate
+      crop.width * scaleX, // Crop width in original resolution
+      crop.height * scaleY, // Crop height in original resolution
+      0, // Canvas starting x coordinate
+      0, // Canvas starting y coordinate
+      canvas.width, // Canvas width (full resolution)
+      canvas.height // Canvas height (full resolution)
+    );
+  }
+
+  return new Promise((resolve) => {
+    canvas.toBlob(
+      (blob) => {
+        resolve(blob);
+      },
+      "image/jpeg",
+      1.0 // Set quality to 1.0 for maximum quality
+    );
+  });
 };
 
 export const processData = (array, sortArray = []) => {

@@ -9,6 +9,7 @@ import InputField from "../../../../../../components/forms/input-field/input-fie
 import AlertDialog from "../../../../../../components/feedback/dialog/alert-dialog.component";
 import CustomTable from "../../../../../../components/table/custom-table.component";
 import { SnackBarContext } from "../../../../../../components/context/snackbar.context";
+import InputSelect from "../../../../../../components/forms/input-select/input-select.component";
 
 const AllotLibraryCardPage = () => {
   const { setFeedback } = useContext(SnackBarContext);
@@ -22,9 +23,10 @@ const AllotLibraryCardPage = () => {
   const { formFields, handleChange } = useForm({
     membershipId: "",
     cardNumber: "",
+    category: "GENERAL",
   });
 
-  const { membershipId, cardNumber } = formFields;
+  const { membershipId, cardNumber, category } = formFields;
 
   const handleFetchMember = async () => {
     await fetchStudentByRollNumber(Number(membershipId))
@@ -61,11 +63,15 @@ const AllotLibraryCardPage = () => {
             name="membershipId"
             type="number"
             value={membershipId}
-            // disabled={showMemberTable}
+            disabled={showMemberTable}
             onChange={handleChange}
           />
 
-          <button className="my-button" onClick={handleFetchMember}>
+          <button
+            className="my-button"
+            disabled={showMemberTable}
+            onClick={handleFetchMember}
+          >
             Fetch Member
           </button>
         </div>
@@ -94,7 +100,16 @@ const AllotLibraryCardPage = () => {
                 value={cardNumber}
                 onChange={handleChange}
               />
-
+              <InputSelect
+                label="Category"
+                name="category"
+                fields={[
+                  { name: "GENERAL", value: "GENERAL" },
+                  { name: "BOOK BANK", value: "BOOK BANK" },
+                ]}
+                value={category}
+                onChange={handleChange}
+              />
               <button
                 onClick={() => setShowAlertDialog(true)}
                 className="my-button ml-auto"

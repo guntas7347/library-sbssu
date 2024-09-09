@@ -22,6 +22,7 @@ const ViewStudentPage = () => {
     email,
     phoneNumber,
     libraryCards,
+    imgUrl,
   } = studentDoc;
 
   useEffect(() => {
@@ -94,6 +95,7 @@ const ViewStudentPage = () => {
               ["Phone Number", phoneNumber],
               ["Library Cards", libraryCards],
             ]}
+            imgUrl={imgUrl}
           />
         ) : (
           <div
@@ -107,7 +109,7 @@ const ViewStudentPage = () => {
         )}
       </div>
       <div className="my-5">
-        <LinkButton to={`edit-student`} label="Edit Student Details" />
+        <LinkButton to={`edit-member`} label="Edit Member Details" />
       </div>
     </div>
   );

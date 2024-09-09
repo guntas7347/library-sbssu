@@ -1,23 +1,29 @@
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
 import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
-import { useContext, useState } from "react";
-import { createNewStaff } from "../../../hooks/http-requests.hooks.admin";
+import { useContext, useEffect, useState } from "react";
+import {
+  editStaff,
+  fetchStaffById,
+} from "../../../hooks/http-requests.hooks.admin";
 import InputSelect from "../../../../../components/forms/input-select/input-select.component";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
+import { useParams } from "react-router-dom";
 
-const AddStaffPage = () => {
+const EditStaffPage = () => {
+  const { _id } = useParams();
+
   const { setFeedback } = useContext(SnackBarContext);
 
   const [showAlertDialog, setShowAlertDialog] = useState(false);
 
-  const { formFields, handleChange } = useForm({
+  const { formFields, handleChange, setFormFields } = useForm({
     fullName: "",
   });
-  const { idNumber, fullName, email, password, level } = formFields;
+  const { idNumber, fullName, email, level } = formFields;
 
   const handleSubmit = async () => {
-    await createNewStaff(formFields)
+    await editStaff(_id, formFields)
       .then((res) => {
         setFeedback([1, 1, res]);
       })
@@ -26,11 +32,20 @@ const AddStaffPage = () => {
       });
   };
 
+  useEffect(() => {
+    const asyncFunc = async () => {
+      await fetchStaffById(_id)
+        .then((res) => setFormFields(res))
+        .catch((err) => {
+          setFeedback([1, 2, err]);
+        });
+    };
+    asyncFunc();
+  }, []);
+
   return (
     <div>
-      <h1 className="text-2xl font-bold my-5 text-center">
-        Add new staff member
-      </h1>
+      <h1 className="text-2xl font-bold my-5 text-center">Edit Staff Member</h1>
       <div className="bg-white p-10">
         <form
           onSubmit={(e) => {
@@ -60,14 +75,6 @@ const AddStaffPage = () => {
               type="text"
               name="email"
               value={email}
-              onChange={handleChange}
-            />
-
-            <InputField
-              label="Password"
-              type="text"
-              name="password"
-              value={password}
               onChange={handleChange}
             />
 
@@ -108,4 +115,4 @@ const AddStaffPage = () => {
   );
 };
 
-export default AddStaffPage;
+export default EditStaffPage;

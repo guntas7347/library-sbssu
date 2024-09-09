@@ -1,29 +1,50 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useQueryParams from "../hooks/useQueryParams.hook";
 import { useForm } from "../forms/use-form-hook/use-form.hook.component";
+import { createURLQuery } from "../../utils/functions";
 
 const Pagination = ({ totalPages = 1 }) => {
   const navigate = useNavigate();
-  const { params } = useQueryParams();
+  const { queryString, params } = useQueryParams();
+
   const pageNumber = Number(params.page) || 1;
-  const { formFields, handleChange } = useForm({ pageNumber });
+  const { formFields, handleChange, setFormFields } = useForm({
+    pageNumber: params.page ? Number(params.page) : 1,
+  });
+
+  const handlePreviousPage = () => {
+    setFormFields({ pageNumber: formFields.pageNumber - 1 });
+    const q = createURLQuery({ page: formFields.pageNumber - 1 }, queryString);
+    navigate(`?${q}`);
+  };
+  const handleNextPage = () => {
+    setFormFields({ pageNumber: formFields.pageNumber + 1 });
+
+    const q = createURLQuery({ page: formFields.pageNumber + 1 }, queryString);
+    navigate(`?${q}`);
+  };
+
+  const handleJumpPage = () => {
+    const q = createURLQuery({ page: formFields.pageNumber }, queryString);
+    navigate(`?${q}`);
+  };
 
   return (
     <div className="flex gap-10 justify-center items-center my-2">
       <button
         className="my-button"
-        onClick={() => navigate(`?page=${pageNumber - 1}`)}
+        onClick={handlePreviousPage}
         disabled={pageNumber < 2}
       >
         Prev
       </button>
       <p className="bg-custom-dark-blue p-3 text-white rounded min-w-12 text-center disabled">
-        {pageNumber}
+        {pageNumber} of {totalPages}
       </p>
       <button
         className="my-button"
-        onClick={() => navigate(`?page=${pageNumber + 1}`)}
+        onClick={handleNextPage}
         disabled={pageNumber >= totalPages}
       >
         Next
@@ -37,11 +58,12 @@ const Pagination = ({ totalPages = 1 }) => {
           max={totalPages}
           onChange={handleChange}
           name="pageNumber"
+          onInput={(e) => {
+            e.target.value =
+              e.target.value > totalPages ? totalPages : e.target.value;
+          }}
         />
-        <button
-          className="my-button"
-          onClick={() => navigate(`?page=${formFields.pageNumber}`)}
-        >
+        <button className="my-button" onClick={handleJumpPage}>
           Jump
         </button>
       </div>

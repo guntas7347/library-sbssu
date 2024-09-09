@@ -2,7 +2,8 @@ import fileDownload from "js-file-download";
 import { ip1, ip2, localIp } from "../../http-requests";
 import { secret } from "../../../secrets";
 
-const API_URL = `http://${localIp ? ip1 : ip2}:8080/api/admin`;
+const API_URL_old = `http://${localIp ? ip1 : ip2}:8080/api/admin`;
+const API_URL = "/api/admin";
 
 const logResponseToConsole = ({ status, message, payload }, success = true) =>
   success
@@ -205,6 +206,12 @@ export const fetchAllStaff = (filter) =>
 
 export const fetchStaffById = (_id) =>
   restCall("staff/fetch-staff-by-id", { _id }, ["STF200FSBI"]);
+
+export const fetchProfile = () =>
+  restCall("staff/fetch-profile", {}, ["STF200FSBI"]);
+
+export const editStaff = (_id, update) =>
+  restCall("staff/edit-staff", { _id, update }, ["STF201ESDI"]);
 
 export const db_fetchIssuedBookDoc = (_id) =>
   restCall("database/get-issued-book", { _id }, "DBSF200ISB");

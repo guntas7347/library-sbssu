@@ -67,7 +67,7 @@ const GlobalSearchBar = () => {
                       <ResultBar
                         result={result.fullName}
                         img={"user"}
-                        path={`/manage-students/search-students/${result._id}`}
+                        path={`/manage-members/search-members/${result._id}`}
                       />
                     </div>
                   );

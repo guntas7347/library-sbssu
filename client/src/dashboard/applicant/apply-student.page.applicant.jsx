@@ -4,6 +4,7 @@ import { fetchSettingsAcademicPrograms } from "../admin/hooks/http-requests.hook
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
 import { createApplication } from "../http-requests";
 import { SnackBarContext } from "../../components/context/snackbar.context";
+import ImageUploader from "../../components/forms/image-upload/image-upload";
 
 const InputField = (props) => {
   return (
@@ -55,7 +56,8 @@ const ApplyStudentPage = () => {
     specialization: "",
     batch: "",
     phoneNumber: "",
-    role: "STUDENT",
+    role: "STUDENT UG",
+    imgUrl: "",
   };
   const { formFields, handleChange } = useForm(defaultFormFields);
   const {
@@ -138,9 +140,11 @@ const ApplyStudentPage = () => {
               label="User Type"
               name="role"
               fields={[
-                { name: "Student", value: "STUDENT" },
-                { name: "Teacher", value: "TEACHER" },
-                { name: "Other", value: "OTHER" },
+                { name: "STUDENT UG", value: "STUDENT UG" },
+                { name: "STUDENT PG", value: "STUDENT PG" },
+                { name: "TEACHER REGULAR", value: "TEACHER REGULAR" },
+                { name: "TEACHER ADHOC", value: "TEACHER ADHOC" },
+                { name: "NON TEACHING STAFF", value: "NON TEACHING STAFF" },
               ]}
               value={role}
               onChange={handleChange}
@@ -208,7 +212,7 @@ const ApplyStudentPage = () => {
               value={category}
               onChange={handleChange}
             />
-            {role === "STUDENT" ? (
+            {role === "STUDENT UG" || role === "STUDENT PG" ? (
               <>
                 <InputSelect
                   label="Program"
@@ -243,7 +247,6 @@ const ApplyStudentPage = () => {
                 />
               </>
             )}
-
             <InputField
               label="Phone Number"
               type="number"
@@ -256,7 +259,10 @@ const ApplyStudentPage = () => {
                   .slice(0, 10);
               }}
             />
+
+            <ImageUploader onChange={handleChange} />
           </div>
+
           <div className="mt-5">
             <button className="my-button " type="submit">
               Submit
