@@ -1,6 +1,5 @@
 const express = require("express");
 const {
-  addLibraryCardToMember,
   getMemberById,
   getMemberByRollNumber,
   createMember,
@@ -9,15 +8,10 @@ const {
   updateMemberById,
 } = require("../../../models/member/member.controllers");
 const {
-  createLibraryCard,
-} = require("../../../models/library-cards/library-cards.controllers");
-const {
   formatObjectValues,
   uuidGenerator,
-  cardNumberGenerator,
 } = require("../../../utils/functions");
 const {
-  getApplicationById,
   findApplications,
 } = require("../../../models/applications/applications.controllers");
 
@@ -37,25 +31,20 @@ const {
   createAuthMember,
 } = require("../../../models/auth/member/auth_member.controllers");
 const { createPasswordHash } = require("../../../models/auth/functions");
+const { authorisationLevel } = require("../../auth/auth.middlewares");
 
 const memberRoute = express.Router();
 
 memberRoute.post(
   "/create-new-student",
+  authorisationLevel(4),
   verifyRollNumberAvailability,
   verifyEmailAvailabilityByEmail,
   async (req, res) => {
     const session = await mongoose.startSession();
     try {
-      const formatedData = formatObjectValues(req.body, [
-        "gender",
-        "specialization",
-        "program",
-        "email",
-      ]);
-
       await session.withTransaction(async () => {
-        const memberDoc = await createMember(formatedData, session);
+        const memberDoc = await createMember(req.body, session);
         const { _id, email, fullName } = memberDoc[0];
         const authMemberDoc = {
           memberId: _id,
@@ -63,15 +52,16 @@ memberRoute.post(
           userName: fullName,
           password: await createPasswordHash(uuidGenerator()),
         };
-        await createAuthMember(authMemberDoc, session);
+        const authDoc = await createAuthMember(authMemberDoc, session);
+        await updateMemberById(memberDoc[0].id, { authId: authDoc[0].id });
       });
       await session.commitTransaction();
       return res.status(201).json(crs.STU201CNS());
     } catch (err) {
       console.log(err);
+      if (session.inTransaction()) await session.abortTransaction();
       if (err.name === "ValidationError")
         return res.status(422).json(crs.MONGO422CNS());
-      if (session.inTransaction()) await session.abortTransaction();
       return res.status(500).json(crs.SERR500REST(err));
     } finally {
       await session.endSession();
@@ -81,6 +71,7 @@ memberRoute.post(
 
 memberRoute.post(
   "/fetch-student-by-roll-number",
+  authorisationLevel(1),
   fetchStudentByMembershipId,
   async (req, res) => {
     try {
@@ -94,52 +85,67 @@ memberRoute.post(
 
 memberRoute.post(
   "/allot-library-card-to-student",
+  authorisationLevel(4),
   fetchStudentByMembershipId,
   allotLibraryCard
 );
 
-memberRoute.post("/fetch-all-applications", async (req, res) => {
-  try {
-    const ApplicantCol = await findApplications(req.body);
-    return res.status(200).json(crs.STU200FAA(ApplicantCol));
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json(crs.SERR500REST(err));
+memberRoute.post(
+  "/fetch-all-applications",
+  authorisationLevel(2),
+  async (req, res) => {
+    try {
+      const ApplicantCol = await findApplications(req.body);
+      return res.status(200).json(crs.STU200FAA(ApplicantCol));
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json(crs.SERR500REST(err));
+    }
   }
-});
+);
 
-memberRoute.post("/fetch-all-students", async (req, res) => {
-  try {
-    const members = await getMembers({
-      filter: req.query.filter,
-      filterValue: req.query.filterValue,
-      page: req.query.page || 1,
-    });
-    return res.status(200).json(crs.STU200FAS(members));
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json(crs.SERR500REST(err));
+memberRoute.post(
+  "/fetch-all-students",
+  authorisationLevel(2),
+  async (req, res) => {
+    try {
+      const members = await getMembers({
+        filter: req.query.filter,
+        filterValue: req.query.filterValue,
+        page: req.query.page || 1,
+      });
+      return res.status(200).json(crs.STU200FAS(members));
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json(crs.SERR500REST(err));
+    }
   }
-});
+);
 
-memberRoute.post("/fetch-student-by-id", async (req, res) => {
-  try {
-    const studentDoc = await getMemberById(req.body._id, true);
-    if (studentDoc) return res.status(200).json(crs.STU200FSBI(studentDoc));
-    return res.status(404).json(crs.STU404FSBI());
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json(crs.SERR500REST(err));
+memberRoute.post(
+  "/fetch-student-by-id",
+  authorisationLevel(2),
+  async (req, res) => {
+    try {
+      const studentDoc = await getMemberById(req.body._id, true);
+      if (studentDoc) return res.status(200).json(crs.STU200FSBI(studentDoc));
+      return res.status(404).json(crs.STU404FSBI());
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json(crs.SERR500REST(err));
+    }
   }
-});
+);
 
 memberRoute.post(
   "/fetch-one-application",
+  authorisationLevel(2),
   fetchApplicationById,
   async (req, res) => {
     try {
       return res.status(200).json(crs.APP200FA(req.cust.applicantionDoc));
     } catch (err) {
+      console.log(err);
       return res.status(500).json(crs.SERR500REST());
     }
   }
@@ -147,6 +153,7 @@ memberRoute.post(
 
 memberRoute.post(
   "/process-application",
+  authorisationLevel(3),
   fetchApplicationById,
   processDecision,
   async (req, res) => {
@@ -154,31 +161,39 @@ memberRoute.post(
   }
 ); //process-application
 
-memberRoute.post("/count-total-students", async (req, res) => {
-  try {
-    const numberOfStudentDocs = await countMemberDocs(req.body.filter);
-    return res.status(200).json(crs.STU200CTS(numberOfStudentDocs));
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json(crs.SERR500REST(err));
-  }
-});
-
-memberRoute.post("/edit-existing-student", async (req, res) => {
-  try {
-    const studentDoc = await getMemberByRollNumber(req.body.rollNumber);
-    if (studentDoc !== null) {
-      const { rollNumber } = await getMemberById(req.body._id);
-      if (studentDoc._doc.rollNumber !== rollNumber)
-        return res.status(409).json(crs.CONFL409CNS());
+memberRoute.post(
+  "/count-total-students",
+  authorisationLevel(1),
+  async (req, res) => {
+    try {
+      const numberOfStudentDocs = await countMemberDocs(req.body.filter);
+      return res.status(200).json(crs.STU200CTS(numberOfStudentDocs));
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json(crs.SERR500REST(err));
     }
-
-    await updateMemberById(req.body._id, req.body);
-    return res.status(200).json(crs.STU200ES());
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json(crs.SERR500REST(err));
   }
-});
+);
+
+memberRoute.post(
+  "/edit-existing-student",
+  authorisationLevel(4),
+  async (req, res) => {
+    try {
+      const studentDoc = await getMemberByRollNumber(req.body.rollNumber);
+      if (studentDoc) {
+        const { rollNumber } = await getMemberById(req.body._id);
+        if (studentDoc._doc.rollNumber !== rollNumber)
+          return res.status(409).json(crs.CONFL409CNS());
+      }
+
+      await updateMemberById(req.body._id, req.body);
+      return res.status(200).json(crs.STU200ES());
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json(crs.SERR500REST(err));
+    }
+  }
+);
 
 module.exports = { memberRoute };

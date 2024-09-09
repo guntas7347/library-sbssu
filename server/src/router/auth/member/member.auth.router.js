@@ -1,14 +1,8 @@
 const express = require("express");
 
-const { createJWT } = require("../jwt");
-const {
-  checkPassword,
-  createPasswordHash,
-} = require("../../../models/auth/functions");
+const { createPasswordHash } = require("../../../models/auth/functions");
 const {
   verifyEmailForLogin,
-  verifyEmailAvailabilityByEmail,
-  createUserAndOTP,
   sendVerificationEmail,
   createLink,
   processLink,
@@ -17,6 +11,9 @@ const {
 const { verifyPassword, setJwtCookie } = require("../auth.middlewares");
 const crs = require("../../../utils/custom-response-codes");
 const { uuidGenerator } = require("../../../utils/functions");
+const {
+  updateAuthMember,
+} = require("../../../models/auth/member/auth_member.controllers");
 
 const memberAuthRouter = express.Router();
 
@@ -40,9 +37,9 @@ memberAuthRouter.post(
   verifyEmailForLogin,
   createLink,
   processLink,
+  sendVerificationEmail,
   async (req, res) => {
     try {
-      console.log(req.cust.link);
       return res.status(200).json(crs.AUTH200LDPS());
     } catch (err) {
       console.log(err);

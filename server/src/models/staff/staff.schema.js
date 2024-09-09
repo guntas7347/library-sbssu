@@ -1,10 +1,14 @@
 const { default: mongoose } = require("mongoose");
 
 const StaffSchema = new mongoose.Schema({
-  idNumber: { type: Number, required: true },
+  idNumber: { type: Number, required: true, unique: true },
   fullName: { type: String, required: true },
-  role: { type: String, required: true },
-  email: { type: String, required: false },
+  role: { type: String, default: "STAFF" },
+  email: { type: String, required: true, unique: true },
+  authId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "auth_admin",
+  },
   phoneNumber: { type: String, required: false },
   dateOfBirth: { type: Date, required: false },
   gender: { type: String, required: false },

@@ -214,6 +214,50 @@ const cardNumberGenerator = (membershipId, numberOfCards = 2) => {
   return cardNumberArray;
 };
 
+const getLibraryCardLimit = (role = "STUDENT UG", category = "general") => {
+  switch (role) {
+    case "STUDENT UG":
+      return category === "SCST" ? 5 : 2;
+
+    case "STUDENT PG":
+      return 3;
+
+    case "TEACHER REGULAR":
+      return 10;
+
+    case "TEACHER ADHOC":
+      return 5;
+
+    case "NON TEACHING STAFF":
+      return 3;
+
+    default:
+      return 0;
+  }
+};
+
+const getBookReturnPeriodDays = (role = "STUDENT UG", category = "general") => {
+  switch (role) {
+    case "STUDENT UG":
+      return category === "BOOK BANK" ? 183 : 14;
+
+    case "STUDENT PG":
+      return 14;
+
+    case "TEACHER REGULAR":
+      return 183;
+
+    case "TEACHER ADHOC":
+      return 183;
+
+    case "NON TEACHING STAFF":
+      return 31;
+
+    default:
+      return 0;
+  }
+};
+
 const generateMembershipId = (previousId = 200000) => {
   const previousIdYear = Number(previousId.toString().substring(0, 2));
   const currentYear = Number(
@@ -236,4 +280,6 @@ module.exports = {
   uuidGenerator,
   cardNumberGenerator,
   generateMembershipId,
+  getLibraryCardLimit,
+  getBookReturnPeriodDays,
 };

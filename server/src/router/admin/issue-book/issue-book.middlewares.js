@@ -8,7 +8,6 @@ const {
 const {
   getLibraryCardByCardNumber,
   updateLibraryCardById,
-  getLibraryCardById,
   getLibraryCard,
 } = require("../../../models/library-cards/library-cards.controllers");
 const {
@@ -16,16 +15,18 @@ const {
 } = require("../../../models/auth/admin/aduth_admin.controllers");
 const {
   createIssueBook,
-  getIssuedBookByBookAccessionId,
   getIssuedBookById,
   getIssuedBooks,
   getIssuedBook,
 } = require("../../../models/issue-book/issue-book.controllers");
-const { createDateGap, checkDateGap } = require("../../../utils/functions");
+const {
+  createDateGap,
+  checkDateGap,
+  getBookReturnPeriodDays,
+} = require("../../../utils/functions");
 const { transporter } = require("../../../services/nodemailer");
 const { generateEmailTemplate } = require("../../../services/email-templates");
 
-const BOOK_RETURN_PERIOD_DAYS = 14;
 const FINE_PER_DAY = 1;
 
 const verifyBookAccessionAvailability = async (req, res, next) => {
@@ -34,10 +35,11 @@ const verifyBookAccessionAvailability = async (req, res, next) => {
       req.body.accessionNumber
     );
     if (bookAccession === null) return res.status(404).json();
-    const { status, _id } = bookAccession;
+    const { status, _id, category } = bookAccession;
     if (status != "available") return res.status(409).json(crs.MDW409VBAA());
     if (!req.cust) req.cust = {};
     req.cust.bookAccessionId = _id;
+    req.cust.bookCategory = category;
     next();
   } catch (err) {
     console.log(err);
@@ -48,18 +50,34 @@ const verifyBookAccessionAvailability = async (req, res, next) => {
 
 const verifyLibraryCardAvailability = async (req, res, next) => {
   try {
-    console.log("Hello");
     const memberCard = await getLibraryCard({
       cardNumber: req.body.cardNumber,
     });
 
     if (!memberCard) return res.status(404).json();
-    const { status, _id } = memberCard;
+    const { status, _id, category } = memberCard;
     if (status != "available") return res.status(409).json(crs.MDW409VLCA());
     if (!req.cust) req.cust = {};
     req.cust.libraryCardId = _id;
+    req.cust.cardCategory = category;
 
     next();
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+};
+
+const verifyBookBank = async (req, res, next) => {
+  try {
+    if (
+      (req.cust.cardCategory === "BOOK BANK" &&
+        req.cust.bookCategory === "BOOK BANK") ||
+      (req.cust.cardCategory !== "BOOK BANK" &&
+        req.cust.bookCategory !== "BOOK BANK")
+    )
+      next();
+    else return res.status(401).json(crs.MDW401VBBB());
   } catch (err) {
     console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
@@ -104,20 +122,21 @@ const sendIssuedConfirmationEmail = async (req, res, next) => {
     );
     const reciepientEmail = libraryCardDoc._doc.memberId.email;
     const emailContent = {
-      name: libraryCardDoc._doc.memberId.name,
+      name: libraryCardDoc._doc.memberId.fullName,
       accessionNumber,
       issueDate: new Date(issueDate).toDateString(),
       dueDate: createDateGap(issueDate, 14).toDateString(),
       cardNumber,
-      title: bookDoc._doc.title,
-      author: bookDoc._doc.author,
+      title: bookDoc._doc.bookId.title,
+      author: bookDoc._doc.bookId.author,
     };
-    // transporter.sendMail({
-    //   from: "sandhugameswithjoy@gmail.com",
-    //   to: "guntas7347@gmail.com",
-    //   subject: "Confirmation: Book Issuance from SBSSU Central Library",
-    //   html: generateEmailTemplate.issueBookConfirmation(emailContent),
-    // });
+
+    transporter.sendMail({
+      from: "librarysbssu@gmail.com",
+      to: reciepientEmail,
+      subject: "Confirmation: Book Issuance from SBSSU Central Library",
+      html: generateEmailTemplate.issueBookConfirmation(emailContent),
+    });
     next();
   } catch (err) {
     console.log(err);
@@ -141,7 +160,7 @@ const fetchIssuedBookByAccessionNumber = async (req, res, next) => {
     const { cardNumber, memberId } = issuedBookDoc.libraryCardId;
 
     const { bookId } = issuedBookDoc.bookAccessionId;
-    console.log(issuedBookDoc, bookId);
+
     req.cust = {
       _id: issuedBookDoc._id,
       accessionNumber: bookAccessionDoc.accessionNumber,
@@ -163,8 +182,11 @@ const fetchIssuedBookById = async (req, res, next) => {
   try {
     const issuedBook = await getIssuedBookById(req.body._id);
     if (issuedBook == null) return res.status(404).json(crs.MDW404FIBBI());
+    const issuedBookDoc = await getIssuedBookById(req.body._id, true);
     if (!req.cust) req.cust = {};
     req.cust.issuedBook = issuedBook;
+    req.cust.role = issuedBookDoc._doc.libraryCardId.memberId.role;
+    req.cust.category = issuedBookDoc._doc.libraryCardId.category;
     next();
   } catch (err) {
     console.log(err);
@@ -174,11 +196,18 @@ const fetchIssuedBookById = async (req, res, next) => {
 
 const calculateFine = async (req, res, next) => {
   try {
+    const returnDate = new Date();
     const { issueDate } = req.cust.issuedBook._doc;
-    let dateGap = checkDateGap(issueDate, new Date());
+    let dateGap = checkDateGap(issueDate, returnDate);
+    const BOOK_RETURN_PERIOD_DAYS = getBookReturnPeriodDays(
+      req.cust.role,
+      req.cust.category
+    );
+    console.log(BOOK_RETURN_PERIOD_DAYS);
     dateGap -= BOOK_RETURN_PERIOD_DAYS;
     if (dateGap < 0) dateGap = 0;
     req.cust.fine = dateGap * FINE_PER_DAY;
+    req.cust.returnDate = returnDate;
     next();
   } catch (err) {
     console.log(err);
@@ -221,7 +250,6 @@ const fetchIssuedBooks = async (req, res, next) => {
 
 const fetchIssuedBookDocById = async (req, res, next) => {
   try {
-    console.log(req.body);
     const returnedBookDoc = await getIssuedBookById(req.body._id, true);
     const { bookAccessionId, libraryCardId } = returnedBookDoc._doc;
     const issuer = returnedBookDoc._doc.issuedBy;
@@ -255,4 +283,5 @@ module.exports = {
   calculateFine,
   fetchIssuedBooks,
   fetchIssuedBookDocById,
+  verifyBookBank,
 };

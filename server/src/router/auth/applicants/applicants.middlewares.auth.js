@@ -1,6 +1,7 @@
+require("dotenv").config();
+
 const {
   getAuthApplicantByEmail,
-  getAuthApplicantById,
   updateAuthApplicantById,
   createAuthApplicant,
   getAuthApplicant,
@@ -52,14 +53,15 @@ const createApplicant = async (req, res, next) => {
 
 const sendVerificationEmail = async (req, res, next) => {
   try {
-    console.log(req.cust.link);
-
-    // transporter.sendMail({
-    //   from: "sandhugameswithjoy@gmail.com",
-    //   to: req.body.email,
-    //   subject: "Account Verification",
-    //   html: generateEmailTemplate.otp(req.body.displayName, otp),
-    // });
+    transporter.sendMail({
+      from: "librarysbssu@gmail.com",
+      to: req.cust.authApplicantDoc.email,
+      subject: "Reset Password",
+      html: generateEmailTemplate.resetPassword(
+        req.cust.authApplicantDoc.userName,
+        req.cust.link
+      ),
+    });
 
     next();
   } catch (err) {
@@ -87,7 +89,7 @@ const fetchAuthApplicantByEmail = async (req, res, next) => {
 const createLink = async (req, res, next) => {
   try {
     const code = uuidGenerator(3);
-    const link = `http://localhost:3000/reset-password/applicant/${code}`;
+    const link = `${process.env.APP_URL}/reset-password/applicant/${code}`;
     if (!req.cust) req.cust = {};
     req.cust.code = code;
     req.cust.link = link;

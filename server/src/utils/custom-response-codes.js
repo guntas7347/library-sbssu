@@ -3,6 +3,18 @@ const createCustomResponseObject = (status, message, payload = null) => {
 };
 
 const crs = {
+  ULD201IMG: (payload = null) =>
+    createCustomResponseObject(
+      "ULD201IMG",
+      "Image created successfully",
+      payload
+    ),
+  ULD200DELIMG: (payload = null) =>
+    createCustomResponseObject(
+      "ULD200DELIMG",
+      "Image deleted successfully",
+      payload
+    ),
   SRH200GLB: (payload = null) =>
     createCustomResponseObject("SRH200GLB", "Search Success", payload),
   STU201CNS: (payload = null) =>
@@ -54,11 +66,9 @@ const crs = {
       payload
     ),
   ADM401JWT: (payload = null) =>
-    createCustomResponseObject(
-      "ADM401JWT",
-      "Admin Authentication Failed",
-      payload
-    ),
+    createCustomResponseObject("ADM401JWT", "Authentication Failed", payload),
+  ADM403JWT: (payload = null) =>
+    createCustomResponseObject("ADM403JWT", "Forbidden Request", payload),
   STF401JWT: (payload = null) =>
     createCustomResponseObject(
       "STF401JWT",
@@ -135,6 +145,12 @@ const crs = {
     createCustomResponseObject("MDW404FBBAN", "Book not found", payload),
   MDW409VBAA: (payload = null) =>
     createCustomResponseObject("MDW409VBAA", "Book not available", payload),
+  MDW401VBBB: (payload = null) =>
+    createCustomResponseObject(
+      "MDW401VBBB",
+      "This Library Card doesn't issue Book Bank Books",
+      payload
+    ),
   MDW409VLCA: (payload = null) =>
     createCustomResponseObject(
       "MDW409VLCA",
@@ -321,6 +337,8 @@ const crs = {
     createCustomResponseObject("STF200FAS", "All Staff Fetched", payload),
   STF200FSBI: (payload = null) =>
     createCustomResponseObject("STF200FSBI", "Staff Member Fetched", payload),
+  STF201ESDI: (payload = null) =>
+    createCustomResponseObject("STF201ESDI", "Staff Member Edited", payload),
   FIN200FAF: (payload = null) =>
     createCustomResponseObject("FIN200FAF", "Fines Fetched", payload),
   FIN200FFBI: (payload = null) =>

@@ -10,20 +10,15 @@ const { searchBooks } = require("../../models/books/books.controllers");
 const {
   searchAccessions,
 } = require("../../models/book-accessions/book-accessions.controllers");
+const { authorisationLevel } = require("../auth/auth.middlewares");
 
 const adminRouter = express.Router();
 
-adminRouter.post("/search", async (req, res) => {
+adminRouter.post("/search", authorisationLevel(2), async (req, res) => {
   try {
-    // const modalsAndTypes = [
-    //   {
-    //     modal: MEMBER,
-    //   },
-    // ];
     const members = await searchMembers(req.query);
     const books = await searchBooks(req.query);
     const accessions = await searchAccessions(req.query);
-
     return res.status(200).json(crs.SRH200GLB({ members, books, accessions }));
   } catch (err) {
     console.log(err);

@@ -14,23 +14,29 @@ const { createExcel, dateTimeString } = require("../../../utils/functions");
 const {
   countReturnedBookDocs,
 } = require("../../../models/returned-book/returned-books.controllers.models");
+const { authorisationLevel } = require("../../auth/auth.middlewares");
 
 const returnBookRouter = express.Router();
 
-returnBookRouter.post("/count-returned-books", async (req, res) => {
-  try {
-    const numberOfReturnedBookDocs = await countReturnedBookDocs(
-      req.body.filter
-    );
-    return res.status(200).json(crs.REB200CRBD(numberOfReturnedBookDocs));
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json(crs.SERR500REST(err));
+returnBookRouter.post(
+  "/count-returned-books",
+  authorisationLevel(1),
+  async (req, res) => {
+    try {
+      const numberOfReturnedBookDocs = await countReturnedBookDocs(
+        req.body.filter
+      );
+      return res.status(200).json(crs.REB200CRBD(numberOfReturnedBookDocs));
+    } catch (err) {
+      console.log(err);
+      return res.status(500).json(crs.SERR500REST(err));
+    }
   }
-});
+);
 
 returnBookRouter.post(
   "/return-issued-book",
+  authorisationLevel(1),
   fetchIssuedBookById,
   calculateFine,
   processReturningBook,
@@ -47,6 +53,7 @@ returnBookRouter.post(
 
 returnBookRouter.post(
   "/fetch-all-returned-books",
+  authorisationLevel(2),
   fetchReturnedBooks,
   async (req, res) => {
     try {
@@ -60,6 +67,7 @@ returnBookRouter.post(
 
 returnBookRouter.post(
   "/fetch-returned-book",
+  authorisationLevel(2),
   fetchReturnedBookDocById,
   async (req, res) => {
     try {
@@ -73,6 +81,7 @@ returnBookRouter.post(
 
 returnBookRouter.post(
   "/download-all-returned-books",
+  authorisationLevel(5),
   fetchReturnedBooks,
   async (req, res) => {
     try {

@@ -38,15 +38,20 @@ const setJwtCookie = async (req, res, next) => {
   }
 };
 
-const adminOnly = (req, res, next) => {
-  try {
-    if (req.user.role === "ADMIN") {
-      next();
-    } else return res.status(401).json(crs.ADM401JWT());
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(crs.ERR500JWT(error));
-  }
+const authorisationLevel = (level = 1) => {
+  return function (req, res, next) {
+    try {
+      if (req.user.level >= level) next();
+      else return res.status(403).json(crs.ADM403JWT());
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.ERR500JWT(error));
+    }
+  };
 };
 
-module.exports = { verifyPassword, setJwtCookie, adminOnly };
+module.exports = {
+  verifyPassword,
+  setJwtCookie,
+  authorisationLevel,
+};

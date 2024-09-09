@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const express = require("express");
 const { applicantsAuthRouter } = require("./applicants/applicants.auth.router");
 const { adminRouter } = require("./admin/admin.auth.router");
@@ -22,13 +24,12 @@ authRouter.post("/sign-out", async (req, res) => {
 
 authRouter.post("/verify-recaptcha", async (req, res) => {
   try {
-    const RECAPTCHA_SECRET_KEY = "6LczFYgpAAAAALZmGHvfLp3XtaWYf7jH7ZFSfZFW";
     const response = await fetch(
       "https://www.google.com/recaptcha/api/siteverify",
       {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: `secret=${RECAPTCHA_SECRET_KEY}&response=${req.body.token}`,
+        body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${req.body.token}`,
       }
     );
     const json = await response.json();

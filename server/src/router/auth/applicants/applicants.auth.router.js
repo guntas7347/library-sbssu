@@ -2,7 +2,6 @@ const express = require("express");
 const crs = require("../../../utils/custom-response-codes");
 const {
   verifyEmailAvailabilityByEmail,
-  markUserAsVerified,
   createApplicant,
   sendVerificationEmail,
   verifyEmailForLogin,
@@ -57,9 +56,9 @@ applicantsAuthRouter.post(
   fetchAuthApplicantByEmail,
   createLink,
   processLink,
+  sendVerificationEmail,
   async (req, res) => {
     try {
-      console.log(req.cust.link);
       return res.status(200).json(crs.AUTH200LDPS());
     } catch (err) {
       console.log(err);

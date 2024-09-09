@@ -12,14 +12,17 @@ const {
   createMember,
   addLibraryCardToMember,
   getMember,
+  updateMemberById,
 } = require("../../../models/member/member.controllers");
 
 const {
-  getLibraryCardByCardNumber,
   createLibraryCard,
   getLibraryCard,
 } = require("../../../models/library-cards/library-cards.controllers");
-const { cardNumberGenerator } = require("../../../utils/functions");
+const {
+  cardNumberGenerator,
+  getLibraryCardLimit,
+} = require("../../../utils/functions");
 const {
   createAuthMember,
 } = require("../../../models/auth/member/auth_member.controllers");
@@ -61,27 +64,13 @@ const verifyRollNumberAvailability = async (req, res, next) => {
   }
 };
 
-const allotLibraryCard = async (req, res, next) => {
+const allotLibraryCard = async (req, res) => {
   const session = await mongoose.startSession();
   try {
-    const { _id, libraryCards, role } = req.cust.memberDoc;
-
-    let limit = 0;
-
-    switch (role) {
-      case "STUDENT":
-        limit = 2;
-        break;
-      case "TEACHER":
-        limit = 2;
-        break;
-
-      default:
-        break;
-    }
+    const { _id, libraryCards } = req.cust.memberDoc;
 
     // Check if Student already has maximum Library Cards
-    if (libraryCards.length >= limit)
+    if (libraryCards.length >= 10)
       return res.status(409).json(crs.STU409ALCTS());
 
     await session.withTransaction(async () => {
@@ -102,8 +91,8 @@ const allotLibraryCard = async (req, res, next) => {
     return res.status(200).json(crs.STU200ALCTS());
   } catch (err) {
     console.log(err);
-    if (err.code === 11000) return res.status(409).json(crs.STU4091ALCTS());
     if (session.inTransaction()) await session.abortTransaction();
+    if (err.code === 11000) return res.status(409).json(crs.STU4091ALCTS());
     return res.status(500).json(crs.SERR500REST(err));
   } finally {
     await session.endSession();
@@ -147,24 +136,49 @@ const processDecision = async (req, res, next) => {
           memberId: memberDoc[0].id,
           ...applicantAuthDoc._doc,
         };
-        await createAuthMember(authStudentDoc, session);
+        const authDoc = await createAuthMember(authStudentDoc, session);
+
+        await updateMemberById(
+          memberDoc[0].id,
+          { authId: authDoc[0].id },
+          session
+        );
         await deleteApplicationById(applicantionDocId, session);
         await deleteAuthApplicantById(applicantionDocId, session);
 
         // auto assigning library cards
-        const cardNumbers = cardNumberGenerator(memberDoc[0].membershipId);
+        const { membershipId, role, category } = memberDoc[0];
+        const cardLimit = getLibraryCardLimit(role, category);
+        const cardNumbers = cardNumberGenerator(membershipId, cardLimit);
         for (const cardNumber of cardNumbers) {
           const libraryCard = await getLibraryCard({ cardNumber });
           if (libraryCard) continue;
-          const libraryCardDoc = await createLibraryCard(
-            { cardNumber, memberId: memberDoc[0].id },
-            session
-          );
-          await addLibraryCardToMember(
-            libraryCardDoc[0].memberId,
-            libraryCardDoc[0]._id,
-            session
-          );
+
+          if (
+            role === "STUDENT UG" &&
+            category === "SCST" &&
+            cardNumber % 10 > 2
+          ) {
+            const libraryCardDoc = await createLibraryCard(
+              { cardNumber, memberId: memberDoc[0].id, category: "BOOK BANK" },
+              session
+            );
+            await addLibraryCardToMember(
+              libraryCardDoc[0].memberId,
+              libraryCardDoc[0]._id,
+              session
+            );
+          } else {
+            const libraryCardDoc = await createLibraryCard(
+              { cardNumber, memberId: memberDoc[0].id },
+              session
+            );
+            await addLibraryCardToMember(
+              libraryCardDoc[0].memberId,
+              libraryCardDoc[0]._id,
+              session
+            );
+          }
         }
       });
       await session.commitTransaction();

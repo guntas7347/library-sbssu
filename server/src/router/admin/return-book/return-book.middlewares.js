@@ -31,7 +31,7 @@ const processReturningBook = async (req, res, next) => {
     const StaffDoc = await getAuthAdminById(req.user.uid, "staffId -_id");
     const returningBookDetails = {
       ...issuedBook,
-      returnDate: new Date(),
+      returnDate: req.cust.returnDate,
       returnedBy: StaffDoc._doc.staffId,
     };
     let returnedBookDoc = null;
@@ -96,12 +96,12 @@ const sendReturnedConfirmationEmail = async (req, res, next) => {
       accessionNumber: bookAccessionId.accessionNumber,
     };
 
-    // transporter.sendMail({
-    //   from: "sandhugameswithjoy@gmail.com",
-    //   to: "guntas7347@gmail.com",
-    //   subject: "Confirmation: Book Return to SBSSU Central Library",
-    //   html: generateEmailTemplate.createReturnBookConfirmation(emailContent),
-    // });
+    transporter.sendMail({
+      from: "librarysbssu@gmail.com",
+      to: memberId.email,
+      subject: "Confirmation: Book Return to SBSSU Central Library",
+      html: generateEmailTemplate.returnBookConfirmation(emailContent),
+    });
 
     next();
   } catch (err) {

@@ -4,6 +4,7 @@ const ApplicationsSchema = new mongoose.Schema({
   rollNumber: { type: Number },
   fullName: { type: String, required: true },
   fathersName: { type: String, required: true },
+  imgUrl: { type: String, required: true },
   gender: { type: String, required: true },
   category: { type: String, required: true },
   role: { type: String, required: true },

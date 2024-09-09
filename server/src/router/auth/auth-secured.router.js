@@ -1,18 +1,14 @@
 const express = require("express");
+
 const {
   getAuthAdminById,
-  updateAuthAdminById,
 } = require("../../models/auth/admin/aduth_admin.controllers");
 const {
   getAuthApplicantById,
 } = require("../../models/auth/applicant/auth_applicant.controllers");
 
 const crs = require("../../utils/custom-response-codes");
-const {
-  checkPassword,
-  createPasswordHash,
-} = require("../../models/auth/functions");
-const { generateRandomNumber } = require("../../utils/functions");
+
 const {
   getAuthMember,
 } = require("../../models/auth/member/auth_member.controllers");
@@ -23,24 +19,31 @@ authSecured.post("/ping", async (req, res) => {
   try {
     const desiredRole = req.body.role;
 
+    let authDoc = null;
     let userAuth = null;
     switch (desiredRole[0]) {
-      case "ADMIN":
-        userAuth = await getAuthAdminById(req.user.uid);
-        break;
-
       case "STAFF":
-        userAuth = await getAuthAdminById(req.user.uid);
+        authDoc = await getAuthAdminById(req.user.uid);
+        if (!authDoc) break;
+        userAuth = {};
+        userAuth.userName = authDoc.userName;
+        userAuth.role = "STAFF";
         break;
 
       case "APPLICANT":
-        userAuth = await getAuthApplicantById(req.user.uid);
-
+        authDoc = await getAuthApplicantById(req.user.uid);
+        if (!authDoc) break;
+        userAuth = {};
+        userAuth.userName = authDoc.userName;
+        userAuth.role = "APPLICANT";
         break;
 
       case "STUDENT":
-        userAuth = await getAuthMember({ _id: req.user.uid });
-
+        authDoc = await getAuthMember({ _id: req.user.uid });
+        if (!authDoc) break;
+        userAuth = {};
+        userAuth.userName = authDoc.userName;
+        userAuth.role = "STUDENT";
         break;
 
       default:
@@ -52,12 +55,7 @@ authSecured.post("/ping", async (req, res) => {
       return res.status(401).json(crs.AUTH401PING());
     }
 
-    return res.status(200).json(
-      crs.AUTH200PING({
-        role: userAuth._doc.role,
-        userName: userAuth._doc.userName,
-      })
-    );
+    return res.status(200).json(crs.AUTH200PING(userAuth));
   } catch (err) {
     console.log(err);
     return res.status(401).json(crs.AUTH401PING());

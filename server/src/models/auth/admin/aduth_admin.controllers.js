@@ -1,12 +1,12 @@
 const { AUTH_ADMIN } = require("../auth.schema");
 const { createPasswordHash } = require("../functions");
 
-const createAuthAdmin = async (credentials) => {
+const createAuthAdmin = async (credentials, session) => {
   const { password } = credentials;
-  return await AUTH_ADMIN.create({
-    ...credentials,
-    password: await createPasswordHash(password),
-  });
+  return await AUTH_ADMIN.create(
+    [{ ...credentials, password: await createPasswordHash(password) }],
+    { session }
+  );
 };
 
 const getAuthAdminById = async (_id, select) => {
@@ -21,8 +21,8 @@ const getAuthAdmin = async (filter) => {
   return await AUTH_ADMIN.findOne(filter);
 };
 
-const updateAuthAdmin = async (filter, update) => {
-  return await AUTH_ADMIN.findOneAndUpdate(filter, update);
+const updateAuthAdmin = async (filter, update, session) => {
+  return await AUTH_ADMIN.findOneAndUpdate(filter, update, { session });
 };
 
 module.exports = {

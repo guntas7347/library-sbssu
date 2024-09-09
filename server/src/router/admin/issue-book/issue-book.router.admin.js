@@ -10,12 +10,13 @@ const {
   fetchIssuedBookByAccessionNumber,
   fetchIssuedBookDocById,
   fetchIssuedBooks,
+  verifyBookBank,
 } = require("./issue-book.middlewares");
 const { createExcel, dateTimeString } = require("../../../utils/functions");
 const {
   countIssuedBookDocs,
 } = require("../../../models/issue-book/issue-book.controllers");
-const { adminOnly } = require("../../auth/auth.middlewares");
+const { authorisationLevel } = require("../../auth/auth.middlewares");
 
 const issueBookRouter = express.Router();
 
@@ -31,8 +32,10 @@ issueBookRouter.post("/count-issued-books", async (req, res) => {
 
 issueBookRouter.post(
   "/issue-new-book",
+  authorisationLevel(1),
   verifyBookAccessionAvailability,
   verifyLibraryCardAvailability,
+  verifyBookBank,
   processIssuingBook,
   sendIssuedConfirmationEmail,
   async (req, res) => {
@@ -47,6 +50,7 @@ issueBookRouter.post(
 
 issueBookRouter.post(
   "/fetch-issued-book-by-accession-number",
+  authorisationLevel(1),
   fetchIssuedBookByAccessionNumber,
   async (req, res) => {
     try {
@@ -60,6 +64,7 @@ issueBookRouter.post(
 
 issueBookRouter.post(
   "/calculate-issue-book-fine",
+  authorisationLevel(1),
   fetchIssuedBookById,
   calculateFine,
   async (req, res) => {
@@ -74,6 +79,7 @@ issueBookRouter.post(
 
 issueBookRouter.post(
   "/fetch-all-issued-books",
+  authorisationLevel(2),
   fetchIssuedBooks,
   async (req, res) => {
     try {
@@ -87,6 +93,7 @@ issueBookRouter.post(
 
 issueBookRouter.post(
   "/fetch-issued-book",
+  authorisationLevel(2),
   fetchIssuedBookDocById,
   async (req, res) => {
     try {
@@ -99,6 +106,7 @@ issueBookRouter.post(
 
 issueBookRouter.post(
   "/download-all-issued-books",
+  authorisationLevel(5),
   fetchIssuedBooks,
   async (req, res) => {
     try {

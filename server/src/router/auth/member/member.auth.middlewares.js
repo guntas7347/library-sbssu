@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const {
   createAuthMember,
   getAuthMember,
@@ -53,16 +55,19 @@ const createUserAndOTP = async (req, res, next) => {
     return res.status(500).json(crs.SERR500REST(err));
   }
 };
+
 const sendVerificationEmail = async (req, res, next) => {
   try {
-    const otp = req.cust.otp;
-    console.log(`One Time Password: ${otp}`);
-    // transporter.sendMail({
-    //   from: "sandhugameswithjoy@gmail.com",
-    //   to: req.body.email,
-    //   subject: "Account Verification",
-    //   html: generateEmailTemplate.otp(req.body.displayName, otp),
-    // });
+    transporter.sendMail({
+      from: "librarysbssu@gmail.com",
+      to: req.cust.authStudentDoc.email,
+      subject: "Reset Password",
+      html: generateEmailTemplate.resetPassword(
+        req.cust.authStudentDoc.userName,
+        req.cust.link
+      ),
+    });
+
     next();
   } catch (err) {
     console.log(err);
@@ -73,7 +78,7 @@ const sendVerificationEmail = async (req, res, next) => {
 const createLink = async (req, res, next) => {
   try {
     const code = uuidGenerator(3);
-    const link = `http://localhost:3000/reset-password/student/${code}`;
+    const link = `${process.env.APP_URL}/reset-password/student/${code}`;
     req.cust.code = code;
     req.cust.link = link;
     next();

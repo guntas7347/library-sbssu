@@ -3,7 +3,10 @@ const {
   createAuthAdmin,
   getAuthAdmin,
 } = require("../../../models/auth/admin/aduth_admin.controllers");
-const { createNewStaff } = require("../../../models/staff/staff.controllers");
+const {
+  createNewStaff,
+  updateStaffById,
+} = require("../../../models/staff/staff.controllers");
 const crs = require("../../../utils/custom-response-codes");
 
 const verifyEmailAvailability = async (req, res, next) => {
@@ -17,20 +20,31 @@ const verifyEmailAvailability = async (req, res, next) => {
   }
 };
 
+const createStaffManualDev = async (doc) => {
+  const staffDoc = await createNewStaff(doc);
+  const authDoc = await createAuthAdmin({
+    ...doc,
+    staffId: staffDoc[0].id,
+    userName: doc.fullName,
+  });
+  await updateStaffById(staffDoc[0].id, { authId: authDoc[0].id });
+};
+
 const createStaffAndAuthAdmin = async (req, res, next) => {
   const session = await mongoose.startSession();
   try {
     await session.withTransaction(async () => {
-      const staffDoc = await createNewStaff(req.body);
-      await createAuthAdmin({
-        ...req.body,
-        staffId: staffDoc.id,
-        userName: req.body.fullName,
-      });
+      const staffDoc = await createNewStaff(req.body, session);
+      const authDoc = await createAuthAdmin(
+        { ...req.body, staffId: staffDoc[0].id, userName: req.body.fullName },
+        session
+      );
+      await updateStaffById(staffDoc[0].id, { authId: authDoc[0].id }, session);
     });
     await session.commitTransaction();
     next();
-  } catch (error) {
+  } catch (err) {
+    console.log(err);
     if (session.inTransaction()) await session.abortTransaction();
     return res.status(500).json(crs.SERR500REST());
   } finally {
@@ -38,4 +52,8 @@ const createStaffAndAuthAdmin = async (req, res, next) => {
   }
 };
 
-module.exports = { verifyEmailAvailability, createStaffAndAuthAdmin };
+module.exports = {
+  verifyEmailAvailability,
+  createStaffAndAuthAdmin,
+  createStaffManualDev,
+};

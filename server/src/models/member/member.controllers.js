@@ -16,20 +16,24 @@ const createMember = async (memberDetails, session) => {
 const getMembers = async (queryParam) => {
   const { filter, filterValue, page = 1 } = queryParam;
   let totalPages = 1;
-  const pageSize = 25;
+  const pageSize = 10;
   const skip = (page - 1) * pageSize;
 
   const query = MEMBER.find();
   switch (filter) {
     case "fetchAllStudents":
       query.where();
-      totalPages = Math.ceil((await countMemberDocs()) / pageSize);
+      break;
+
+    case "fullName":
+      query.where("fullName").regex(new RegExp(filterValue, "i"));
       break;
 
     default:
       query.where({ [filter]: filterValue });
       break;
   }
+  totalPages = Math.ceil((await countMemberDocs()) / pageSize);
 
   query.skip(skip).limit(pageSize);
   return { studentsArray: await query.exec(), totalPages };
@@ -67,8 +71,8 @@ const addLibraryCardToMember = async (_id, libraryCardId, session) => {
 
 const countMemberDocs = async (filter) => await MEMBER.countDocuments(filter);
 
-const updateMemberById = async (_id, updatedDoc) => {
-  return await MEMBER.findByIdAndUpdate(_id, updatedDoc);
+const updateMemberById = async (_id, updatedDoc, session) => {
+  return await MEMBER.findByIdAndUpdate(_id, updatedDoc, { session });
 };
 
 const getLatestMembershipId = async () => {

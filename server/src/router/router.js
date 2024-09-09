@@ -1,4 +1,5 @@
 const express = require("express");
+
 const { settingsRouter } = require("./admin/settings/settings.router.admin");
 const {
   issueHistoryRouter,
@@ -7,9 +8,6 @@ const { authRouter } = require("./auth/auth.router");
 const { applicantRouter } = require("./applicant/applicant.router");
 const { verifyJwt, decrptText } = require("./auth/jwt");
 const { adminRouter } = require("./admin/admin.router");
-const { addNewBook } = require("../models/books/books.controllers");
-
-const mongoose = require("mongoose");
 const crs = require("../utils/custom-response-codes");
 
 const {
@@ -17,6 +15,7 @@ const {
 } = require("../models/auth/admin/aduth_admin.controllers");
 
 const { authSecured } = require("./auth/auth-secured.router");
+const { uploadRouter } = require("./uploader");
 
 const router = express.Router();
 
@@ -39,10 +38,11 @@ const verifyJwtMiddleware = (req, res, next) => {
   }
 };
 
-const verifyAdmin = async (req, res, next) => {
+const verifyStaff = async (req, res, next) => {
   try {
-    const { role } = await getAuthAdminById(req.user.uid);
+    const { role, level } = await getAuthAdminById(req.user.uid);
     req.user.role = role;
+    req.user.level = level;
     if (role === "ADMIN" || role === "STAFF") {
       next();
     } else {
@@ -58,30 +58,12 @@ router.use(verifyJwtMiddleware);
 
 router.use("/auth-secured", authSecured);
 
-router.use("/admin", verifyAdmin, adminRouter);
+router.use("/admin", verifyStaff, adminRouter);
 
 router.use("/student/issue-history", issueHistoryRouter);
 
 router.use("/applicant", applicantRouter);
 
-router.post("/test", async (req, res) => {
-  const session = await mongoose.startSession();
-  try {
-    await session.withTransaction(async () => {
-      await addNewBook({ title: "Hello", author: "good" }, session);
-      await addNewBook({ title: "Hello" }, session);
-    });
-    await session.commitTransaction();
-    return res.status(200).json({ status: "Done" });
-  } catch (error) {
-    console.log(error);
-    if (session.inTransaction()) {
-      await session.abortTransaction();
-    }
-    return res.status(500).json({ status: "Failed" });
-  } finally {
-    session.endSession();
-  }
-});
+router.use("/upload", uploadRouter);
 
 module.exports = { router };

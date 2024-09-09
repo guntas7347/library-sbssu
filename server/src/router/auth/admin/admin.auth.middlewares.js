@@ -1,12 +1,13 @@
+require("dotenv").config();
+
 const {
   updateAuthAdminById,
   getAuthAdmin,
 } = require("../../../models/auth/admin/aduth_admin.controllers");
+const { generateEmailTemplate } = require("../../../services/email-templates");
+const { transporter } = require("../../../services/nodemailer");
 const crs = require("../../../utils/custom-response-codes");
-const {
-  generateRandomNumber,
-  uuidGenerator,
-} = require("../../../utils/functions");
+const { uuidGenerator } = require("../../../utils/functions");
 
 const verifyEmailForLogin = async (req, res, next) => {
   try {
@@ -37,52 +38,10 @@ const fetchAuthAdminByEmail = async (req, res, next) => {
   }
 };
 
-const createOtp = async (req, res, next) => {
-  try {
-    const { authAdminDoc } = req.cust;
-    const otp = generateRandomNumber();
-    await updateAuthAdminById(authAdminDoc._id, {
-      resetPass: {
-        code: otp,
-        createdAt: new Date(),
-        used: false,
-        attempts: 0,
-      },
-    });
-    console.log(`One Time Password: ${otp}`);
-    next();
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json(crs.SERR500REST(err));
-  }
-};
-
-const verifyOtp = async (req, res, next) => {
-  try {
-    const { authAdminDoc } = req.cust;
-    const { resetPass } = authAdminDoc._doc;
-    if (resetPass.attempts > 2) return res.status(402).json(crs.AUTH402RAPV());
-    const attempts = resetPass.attempts + 1;
-    if (resetPass.code !== +req.body.otp) {
-      await updateAuthAdminById(authAdminDoc._id, {
-        resetPass: {
-          ...resetPass,
-          attempts,
-        },
-      });
-      return res.status(409).json(crs.AUTH401RAPV());
-    }
-    next();
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json(crs.SERR500REST(err));
-  }
-};
-
 const createLink = async (req, res, next) => {
   try {
     const code = uuidGenerator(3);
-    const link = `http://localhost:3000/reset-password/admin/${code}`;
+    const link = `${process.env.APP_URL}/reset-password/admin/${code}`;
     req.cust.code = code;
     req.cust.link = link;
     next();
@@ -124,12 +83,30 @@ const verifyResetLink = async (req, res, next) => {
   }
 };
 
+const sendVerificationEmail = async (req, res, next) => {
+  try {
+    transporter.sendMail({
+      from: "librarysbssu@gmail.com",
+      to: req.cust.authAdminDoc.email,
+      subject: "Reset Password",
+      html: generateEmailTemplate.resetPassword(
+        req.cust.authAdminDoc.userName,
+        req.cust.link
+      ),
+    });
+
+    next();
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+};
+
 module.exports = {
   verifyEmailForLogin,
   fetchAuthAdminByEmail,
-  createOtp,
-  verifyOtp,
   createLink,
   processLink,
   verifyResetLink,
+  sendVerificationEmail,
 };

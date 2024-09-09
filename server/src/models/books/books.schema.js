@@ -7,7 +7,7 @@ const BooksSchema = new mongoose.Schema({
   placeAndPublishers: { type: String, required: false },
   publicationYear: { type: Number, required: false },
   pages: { type: Number, required: false },
-  volume: { type: String, required: false },
+  volume: { type: Number, required: false },
   source: { type: String, required: false },
   cost: { type: Number, required: false },
   callNumber: { type: Number, required: false },

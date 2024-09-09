@@ -23,7 +23,7 @@ const updateReturnBookById = async (_id, update, session) => {
 const getReturnedBooks = async (queryParam) => {
   const { filter, filterValue, page = 1 } = queryParam;
   let totalPages = 1;
-  const pageSize = 25;
+  const pageSize = 10;
   const skip = (page - 1) * pageSize;
 
   const query = returnedBooksMongo.find();
@@ -66,6 +66,8 @@ const getReturnedBooks = async (queryParam) => {
     default:
       break;
   }
+
+  totalPages = Math.ceil((await countReturnedBookDocs()) / pageSize);
 
   query.skip(skip).limit(pageSize);
 
@@ -178,7 +180,7 @@ const getReturnedBookById = async (_id) => {
     })
     .populate({
       path: "libraryCardId",
-      populate: { path: "memberId", select: "rollNumber fullName -_id" },
+      populate: { path: "memberId", select: "rollNumber email fullName -_id" },
     })
     .populate({ path: "issuedBy", select: "idNumber fullName -_id" })
     .populate({ path: "returnedBy", select: "idNumber fullName -_id" })

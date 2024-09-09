@@ -25,7 +25,7 @@ const getIssuedBook = async (filter) => {
     })
     .populate({
       path: "libraryCardId",
-      populate: { path: "memberId", select: "rollNumber fullName -_id" },
+      populate: { path: "memberId", select: "rollNumber fullName -_id imgUrl" },
     })
     .populate({
       path: "issuedBy",
@@ -42,13 +42,15 @@ const getIssuedBookById = async (_id, populate = false) => {
       })
       .populate({
         path: "libraryCardId",
-        populate: { path: "memberId", select: "rollNumber fullName -_id" },
+        populate: { path: "memberId", select: "rollNumber fullName -_id role" },
       })
       .populate({ path: "issuedBy", select: "idNumber fullName -_id" });
   }
 
   return await query.exec();
 };
+
+const getBookCategoryAndMemberRole = async (bookAccession) => {};
 
 const deleteIssuedBook = async (_id, session) => {
   return await issueBookMongo.findByIdAndDelete(_id, { session });

@@ -15,6 +15,11 @@ const LibraryCardsSchema = new mongoose.Schema({
     type: String,
     default: "available",
   },
+  category: {
+    type: String,
+    default: "GENERAL",
+    enum: ["GENERAL", "BOOK BANK"],
+  },
 });
 
 module.exports = mongoose.model(

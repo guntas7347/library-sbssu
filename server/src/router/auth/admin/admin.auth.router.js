@@ -8,6 +8,7 @@ const {
   createLink,
   processLink,
   verifyResetLink,
+  sendVerificationEmail,
 } = require("./admin.auth.middlewares");
 const { verifyPassword, setJwtCookie } = require("../auth.middlewares");
 const {
@@ -46,6 +47,7 @@ adminRouter.post(
   fetchAuthAdminByEmail,
   createLink,
   processLink,
+  sendVerificationEmail,
   async (req, res) => {
     try {
       console.log(req.cust.link);
