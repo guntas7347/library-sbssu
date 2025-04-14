@@ -1,9 +1,7 @@
-require("dotenv").config();
-
 const mongoose = require("mongoose");
 
 mongoose.connection.once("open", () => {
-  console.log("Mongo is running...");
+  console.log("MongoDB is running...");
 });
 
 mongoose.connection.on("error", (error) => {
@@ -27,8 +25,6 @@ mongoose.connection.on("error", (error) => {
 // "mongodb+srv://guntas7347:9NJ4DOc16xYRWVGR@cluster0.h1jlf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 const mongoURI = process.env.MONGO_URL;
-
-console.log(mongoURI);
 
 const mongoConnect = async () => {
   try {

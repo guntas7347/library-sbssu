@@ -1,49 +1,43 @@
 const express = require("express");
-// const morgan = require("morgan");
-// const cors = require("cors");
 const cookieParser = require("cookie-parser");
-// const rfs = require("rotating-file-stream");
+const cors = require("cors");
 const path = require("path");
 
 const { router } = require("./router/router");
-// const { booksBulkEntry } = require("./utils/dev-utils/bulk-json-db-entry");
-// const {
-//   createStaffManualDev,
-// } = require("./router/admin/staff/staff.middlewares");
-
-// const fileName = "Rec_BB_65001-65781-acm";
-
-// const fileData = require(`./library-data-json/${fileName}.json`);
 
 const app = express();
 
-// const stream = rfs.createStream("morgan.log", {
-//   size: "10M", // rotate every 10 MegaBytes written
-//   interval: "30d", // rotate monthly
-//   compress: "gzip", // compress rotated files
-// });
-
-// booksBulkEntry(fileData, fileName);
-
-// createStaffManualDev({
-//   fullName: "Tejpal Singh",
-//   email: "tejpal@email.com",
-//   password: "123456",
-//   idNumber: "101",
-//   level: 6,
-// });
+if (process.env.NODE_ENV !== "production") {
+  app.use(
+    cors({
+      origin: function (origin, callback) {
+        const allowedOrigins = ["http://localhost:3000"];
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+      credentials: true,
+    })
+  );
+}
 
 app.use(cookieParser());
-
-// app.use(morgan("combined", { stream }));
-// app.use(morgan("combined"));
-
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "..", "public")));
+
+app.use(express.static(path.join(__dirname, "..", "dist")));
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "public", "index.html"));
+  res.sendFile(path.join(__dirname, "..", "dist", "index.html"));
 });
 
-app.use("/api", router);
+app.use(
+  "/api",
+  (req, res, next) => {
+    console.log("Incoming req at: " + req.url);
+    next();
+  },
+  router
+);
 
 module.exports = { app };

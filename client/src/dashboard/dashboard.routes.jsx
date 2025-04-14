@@ -2,14 +2,9 @@ import { Route, Routes } from "react-router-dom";
 import ProtectedRoute from "../components/protected-route/protected-toute.component";
 import { Suspense, lazy } from "react";
 import Spinner from "../components/feedback/spinner/spinner.component";
+import Page404 from "../components/404/404";
 
-const AdminRoutes = lazy(() =>
-  import("./admin/routes/admin-routes.route.admin")
-);
-
-const UserRoutes = lazy(() => import("./student/routes/student-routes.user"));
-
-const ApplicationRouter = lazy(() => import("./applicant/router"));
+const AdminRoutes = lazy(() => import("./admin/routes/admin-routes"));
 
 const CenteredSpinner = () => {
   return (
@@ -24,7 +19,7 @@ const DashboardRoutes = () => {
     <div>
       <Routes>
         <Route
-          path="/admin/*"
+          path="/dashboard/*"
           element={
             <ProtectedRoute role={["STAFF"]}>
               <Suspense fallback={<CenteredSpinner />}>
@@ -33,35 +28,10 @@ const DashboardRoutes = () => {
             </ProtectedRoute>
           }
         />
-
-        <Route
-          path="/student/*"
-          element={
-            <ProtectedRoute role={["STUDENT"]}>
-              <Suspense fallback={<CenteredSpinner />}>
-                <UserRoutes />
-              </Suspense>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/applicant/*"
-          element={
-            <ProtectedRoute role={["APPLICANT"]}>
-              <Suspense fallback={<CenteredSpinner />}>
-                <ApplicationRouter />
-              </Suspense>
-            </ProtectedRoute>
-          }
-        />
+        <Route path="*" element={<Page404 />} />
       </Routes>
     </div>
   );
 };
 
 export default DashboardRoutes;
-{
-  /* <ProtectedRoute role="ADMIN">
-              <AdminRoutes />
-            </ProtectedRoute> */
-}

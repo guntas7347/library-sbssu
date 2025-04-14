@@ -3,8 +3,6 @@ const crs = require("../../../utils/custom-response-codes");
 const {
   verifyEmailForLogin,
   fetchAuthAdminByEmail,
-  verifyOtp,
-  createOtp,
   createLink,
   processLink,
   verifyResetLink,
@@ -12,17 +10,9 @@ const {
 } = require("./admin.auth.middlewares");
 const { verifyPassword, setJwtCookie } = require("../auth.middlewares");
 const {
-  createAuthAdmin,
-  getAuthAdminByEmail,
-  updateAuthAdminById,
-  getAuthAdminById,
-  getAuthAdmin,
   updateAuthAdmin,
-} = require("../../../models/auth/admin/aduth_admin.controllers");
-const {
-  generateRandomNumber,
-  uuidGenerator,
-} = require("../../../utils/functions");
+} = require("../../../models/auth/aduth_admin.controllers");
+const { uuidGenerator } = require("../../../utils/functions");
 const { createPasswordHash } = require("../../../models/auth/functions");
 
 const adminRouter = express.Router();

@@ -21,15 +21,22 @@ const getIssuedBook = async (filter) => {
     .findOne(filter)
     .populate({
       path: "bookAccessionId",
+      select: "accessionNumber -_id",
       populate: { path: "bookId", select: "title author -_id" },
     })
     .populate({
       path: "libraryCardId",
-      populate: { path: "memberId", select: "rollNumber fullName -_id imgUrl" },
+      select: "cardNumber -_id",
+      populate: {
+        path: "memberId",
+        select: "rollNumber fullName -_id imageUrl",
+      },
     })
     .populate({
       path: "issuedBy",
-    });
+      select: "fullName -_id",
+    })
+    .lean();
 };
 
 const getIssuedBookById = async (_id, populate = false) => {

@@ -1,9 +1,7 @@
-require("dotenv").config();
-
 const {
   updateAuthAdminById,
   getAuthAdmin,
-} = require("../../../models/auth/admin/aduth_admin.controllers");
+} = require("../../../models/auth/aduth_admin.controllers");
 const { generateEmailTemplate } = require("../../../services/email-templates");
 const { transporter } = require("../../../services/nodemailer");
 const crs = require("../../../utils/custom-response-codes");
@@ -11,7 +9,9 @@ const { uuidGenerator } = require("../../../utils/functions");
 
 const verifyEmailForLogin = async (req, res, next) => {
   try {
-    const authAdminDoc = await getAuthAdmin({ email: req.body.email });
+    const authAdminDoc = await getAuthAdmin({
+      email: req.body.email.toLowerCase(),
+    });
     if (authAdminDoc == null) return res.status(404).json(crs.AUTH404ADM());
     if (!req.cust) req.cust = {};
     req.cust.password = req.body.password;
@@ -41,7 +41,7 @@ const fetchAuthAdminByEmail = async (req, res, next) => {
 const createLink = async (req, res, next) => {
   try {
     const code = uuidGenerator(3);
-    const link = `${process.env.APP_URL}/reset-password/admin/${code}`;
+    const link = `${process.env.APP_URL}:${process.env.PORT}/reset-password/${code}`;
     req.cust.code = code;
     req.cust.link = link;
     next();

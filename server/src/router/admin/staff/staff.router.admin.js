@@ -9,7 +9,7 @@ const crs = require("../../../utils/custom-response-codes");
 const { authorisationLevel } = require("../../auth/auth.middlewares");
 const {
   updateAuthAdmin,
-} = require("../../../models/auth/admin/aduth_admin.controllers");
+} = require("../../../models/auth/aduth_admin.controllers");
 const { default: mongoose } = require("mongoose");
 
 const staffRouter = express.Router();

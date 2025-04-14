@@ -6,14 +6,9 @@ const {
   getMembers,
   countMemberDocs,
   updateMemberById,
-} = require("../../../models/member/member.controllers");
-const {
-  formatObjectValues,
-  uuidGenerator,
-} = require("../../../utils/functions");
-const {
+  quickSearchMember,
   findApplications,
-} = require("../../../models/applications/applications.controllers");
+} = require("../../../models/member/member.controllers");
 
 const mongoose = require("mongoose");
 const crs = require("../../../utils/custom-response-codes");
@@ -21,74 +16,39 @@ const {
   fetchApplicationById,
   processDecision,
   allotLibraryCard,
-  verifyRollNumberAvailability,
   fetchStudentByMembershipId,
+  sendApprovalEmail,
+  checkIssues,
+  checkPendingDues,
 } = require("./member.middlewares");
-const {
-  verifyEmailAvailabilityByEmail,
-} = require("../../auth/applicants/applicants.middlewares.auth");
-const {
-  createAuthMember,
-} = require("../../../models/auth/member/auth_member.controllers");
-const { createPasswordHash } = require("../../../models/auth/functions");
+
 const { authorisationLevel } = require("../../auth/auth.middlewares");
+const Member = require("../../../models/member/member.schema");
 
 const memberRoute = express.Router();
 
 memberRoute.post(
-  "/create-new-student",
-  authorisationLevel(4),
-  verifyRollNumberAvailability,
-  verifyEmailAvailabilityByEmail,
-  async (req, res) => {
-    const session = await mongoose.startSession();
-    try {
-      await session.withTransaction(async () => {
-        const memberDoc = await createMember(req.body, session);
-        const { _id, email, fullName } = memberDoc[0];
-        const authMemberDoc = {
-          memberId: _id,
-          email,
-          userName: fullName,
-          password: await createPasswordHash(uuidGenerator()),
-        };
-        const authDoc = await createAuthMember(authMemberDoc, session);
-        await updateMemberById(memberDoc[0].id, { authId: authDoc[0].id });
-      });
-      await session.commitTransaction();
-      return res.status(201).json(crs.STU201CNS());
-    } catch (err) {
-      console.log(err);
-      if (session.inTransaction()) await session.abortTransaction();
-      if (err.name === "ValidationError")
-        return res.status(422).json(crs.MONGO422CNS());
-      return res.status(500).json(crs.SERR500REST(err));
-    } finally {
-      await session.endSession();
-    }
-  }
-); //create-new-student
-
-memberRoute.post(
-  "/fetch-student-by-roll-number",
+  "/fetch-for-issue",
   authorisationLevel(1),
-  fetchStudentByMembershipId,
   async (req, res) => {
     try {
-      return res.status(200).json(crs.STU200FSBRN(req.cust.memberDoc));
+      const d = await Member.findOne({
+        membershipId: req.body.membershipId,
+        status: "ACTIVE",
+      })
+        .populate("libraryCards", "cardNumber status -_id")
+        .select("membershipId fullName imageUrl -_id")
+        .lean();
+
+      if (!d) return res.status(404).json(crs.STU404FSBRN());
+
+      return res.status(200).json(crs.STU200FSBRN(d));
     } catch (err) {
       console.log(err);
       return res.status(500).json(crs.SERR500REST(err));
     }
   }
-); //fetch-student-by-roll-number
-
-memberRoute.post(
-  "/allot-library-card-to-student",
-  authorisationLevel(4),
-  fetchStudentByMembershipId,
-  allotLibraryCard
-);
+); //fetch-for-issue
 
 memberRoute.post(
   "/fetch-all-applications",
@@ -105,14 +65,14 @@ memberRoute.post(
 );
 
 memberRoute.post(
-  "/fetch-all-students",
+  "/fetch-all-members",
   authorisationLevel(2),
   async (req, res) => {
     try {
       const members = await getMembers({
-        filter: req.query.filter,
-        filterValue: req.query.filterValue,
-        page: req.query.page || 1,
+        filter: req.body.name,
+        filterValue: req.body.value,
+        page: req.body.page || 1,
       });
       return res.status(200).json(crs.STU200FAS(members));
     } catch (err) {
@@ -156,13 +116,14 @@ memberRoute.post(
   authorisationLevel(3),
   fetchApplicationById,
   processDecision,
+  sendApprovalEmail,
   async (req, res) => {
     return res.status(200).json(crs.APP200APA());
   }
 ); //process-application
 
 memberRoute.post(
-  "/count-total-students",
+  "/count-total-members",
   authorisationLevel(1),
   async (req, res) => {
     try {
@@ -192,6 +153,33 @@ memberRoute.post(
     } catch (err) {
       console.log(err);
       return res.status(500).json(crs.SERR500REST(err));
+    }
+  }
+);
+
+memberRoute.post("/quick-search", async (req, res) => {
+  try {
+    //
+    const result = await quickSearchMember(req.body);
+    if (result.length === 0) return res.status(404).json(crs.SRH404GLB());
+    return res.status(200).json(crs.SRH200GLB(result));
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+});
+
+memberRoute.post(
+  "/mark-inactive",
+  checkIssues,
+  checkPendingDues,
+  async (req, res) => {
+    try {
+      await updateMemberById(req.body._id, { status: "INACTIVE" });
+      return res.status(200).json(crs.MEB200MI());
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 );

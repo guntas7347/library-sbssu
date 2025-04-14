@@ -3,7 +3,7 @@ import "./input-field.styles.scss";
 const InputField = (props) => {
   return (
     <div className="flex flex-row gap-5 justify-between items-center">
-      <label className="text-xl" htmlFor={props.htmlFor}>
+      <label className="text-lg" htmlFor={props.htmlFor}>
         {props.label}
       </label>
       <input

@@ -1,9 +1,7 @@
 import fileDownload from "js-file-download";
-import { ip1, ip2, localIp } from "../../http-requests";
-import { secret } from "../../../secrets";
+import { API_URL as API_URL_PRE } from "../../../keys";
 
-const API_URL_old = `http://${localIp ? ip1 : ip2}:8080/api/admin`;
-const API_URL = "/api/admin";
+const API_URL = API_URL_PRE + "/admin";
 
 const logResponseToConsole = ({ status, message, payload }, success = true) =>
   success
@@ -21,7 +19,7 @@ const postOptions = (obj) => {
   };
 };
 
-export const restCall = (url, obj, crs = [], blob = false) => {
+export const restCall = (url = "", obj = {}, crs = [], blob = false) => {
   return new Promise((resolve, reject) => {
     fetch(`${API_URL}/${url}`, postOptions(obj))
       .then(async (res) => {
@@ -66,42 +64,38 @@ export const restCall = (url, obj, crs = [], blob = false) => {
 };
 
 export const searchGlobally = (query) =>
-  restCall(`/search?${query && query}`, {}, ["SRH200GLB"]);
+  restCall(`search?${query && query}`, {}, ["SRH200GLB"]);
 
 export const createNewStudent = (obj) =>
-  restCall("students/create-new-student", obj, ["STU201CNS"]);
+  restCall("members/create-new-student", obj, ["STU201CNS"]);
 
 export const editExistingStudent = (obj) =>
-  restCall("students/edit-existing-student", obj, ["STU200ES"]);
+  restCall("members/edit-existing-student", obj, ["STU200ES"]);
 
 export const fetchStudentByRollNumber = (membershipId) =>
-  restCall("students/fetch-student-by-roll-number", { membershipId }, [
+  restCall("members/fetch-student-by-roll-number", { membershipId }, [
     "STU200FSBRN",
   ]);
 
+export const fetchMemberForIssue = (membershipId) =>
+  restCall("members/fetch-for-issue", { membershipId }, ["STU200FSBRN"]);
+
 export const allotLibraryCardToStudent = (cardDetails) =>
-  restCall("students/allot-library-card-to-student", cardDetails, [
+  restCall("members/allot-library-card-to-student", cardDetails, [
     "STU200ALCTS",
   ]);
 
-export const fetchAllStudents = (query) =>
-  restCall(`students/fetch-all-students?${query && query}`, {}, ["STU200FAS"]);
+export const fetchAllStudents = (filter) =>
+  restCall("members/fetch-all-members", filter, ["STU200FAS"]);
 
-export const fetchAllApplications = (query) =>
-  restCall(
-    `students/fetch-all-applications?${query && query}`,
-    {},
-    "STU200FAA"
-  );
+export const fetchAllApplications = (filter) =>
+  restCall("members/fetch-all-applications", filter, "STU200FAA");
 
 export const fetchOneApplication = (_id) =>
-  restCall("students/fetch-one-application", { _id }, "APP200FA");
+  restCall("members/fetch-one-application", { _id }, "APP200FA");
 
 export const processApplication = (decision) =>
-  restCall("students/process-application", decision, [
-    "APP200APA",
-    "APP200RPA",
-  ]);
+  restCall("members/process-application", decision, ["APP200APA", "APP200RPA"]);
 
 export const addNewBook = (bookDetails) =>
   restCall("/books/add-new-book", bookDetails, "BKS200ANB");
@@ -109,8 +103,8 @@ export const addNewBook = (bookDetails) =>
 export const quickAddBook = (bookDetails) =>
   restCall("/books/quick-add", bookDetails, "BKS200ABA");
 
-export const fetchAllBooks = (query) =>
-  restCall(`books/fetch-all-books?${query && query}`, {}, "BKS200FAB");
+export const fetchAllBooks = (filter) =>
+  restCall("books/fetch-all-books", filter, "BKS200FAB");
 
 export const fetchBookByISBN = (isbn) =>
   restCall("books/fetch-book-by-isbn", { isbn }, "BKS200FBBI");
@@ -124,15 +118,17 @@ export const fetchBookDetails = (_id) =>
 export const editExistingBook = (e) =>
   restCall("books/edit-existing-book", e, "BKS200EB");
 
-export const fetchBookByAccessionNumber = (accessionNumber) =>
-  restCall(
-    "books/fetch-book-by-accession-number",
-    { accessionNumber },
-    "BKS200FBBAN"
-  );
+export const fetchBookForIssue = (accessionNumber) =>
+  restCall("books/fetch-for-issue", { accessionNumber }, "BKS200FBBAN");
 
 export const fetchStudentById = (_id) =>
-  restCall("students/fetch-student-by-id", { _id }, "STU200FSBI");
+  restCall("members/fetch-student-by-id", { _id }, "STU200FSBI");
+
+export const quickSearchMember = (query) =>
+  restCall("members/quick-search", query, ["SRH200GLB"]);
+
+export const markInactive = (_id) =>
+  restCall("members/mark-inactive", { _id }, "MEB200MI");
 
 export const issueNewBook = (issueBookDetails) =>
   restCall("books/issue-books/issue-new-book", issueBookDetails, "ISB200INB");
@@ -158,6 +154,12 @@ export const issueBookFine = (returningBookDetails) =>
     "ISB200CIBF"
   );
 
+export const fetchTransactions = (filter) =>
+  restCall("transactions/fetch-transactions", filter, ["TRN200FT"]);
+
+export const fetchTransaction = (_id) =>
+  restCall("transactions/fetch-transaction", { _id }, ["TRN200FTBI"]);
+
 export const fetchAllFines = (query) =>
   restCall(`fines/fetch-all-fines?${query && query}`, {}, "FIN200FAF");
 
@@ -167,30 +169,17 @@ export const fetchFineById = (_id) =>
 export const addRecieptNumber = (data) =>
   restCall("fines/add-reciept-number", data, "FIN200ARN");
 
-export const fetchAllIssuedBooks = (query) =>
-  restCall(
-    `books/issue-books/fetch-all-issued-books?${query && query}`,
-    {},
-    "ISB200FAIB"
-  );
+export const fetchAllIssuedBooks = (filter) =>
+  restCall("books/issue-books/fetch-all-issued-books", filter, "ISB200FAIB");
 
 export const downloadAllIssuedBooks = (filter) =>
   restCall("books/issue-books/download-all-issued-books", filter, "", true);
 
-export const fetchAllReturnedBooks = (query) =>
-  restCall(
-    `books/return-books/fetch-all-returned-books?${query && query}`,
-    {},
-    "ISB200FARB"
-  );
+export const fetchAllReturnedBooks = (filter) =>
+  restCall("books/return-books/fetch-all-returned-books", filter, "ISB200FARB");
 
-export const downloadAllReturnedBooks = (query) =>
-  restCall(
-    `books/return-books/download-all-returned-books?${query && query}`,
-    {},
-    "",
-    true
-  );
+export const downloadAllReturnedBooks = (filter) =>
+  restCall("books/return-books/download-all-returned-books", filter, "", true);
 
 export const fetchReturnedBook = (_id) =>
   restCall("books/return-books/fetch-returned-book", { _id }, "ISB200FRB");
@@ -226,24 +215,9 @@ export const getNumberOfBookAccessions = () =>
   restCall("books/count-book-accessions", {}, "BKS200CTBA");
 
 export const getNumberOfStudents = (filter = null) =>
-  restCall("students/count-total-students", { filter }, "STU200CTS");
+  restCall("members/count-total-members", { filter }, "STU200CTS");
 
 //
-export const fetchSettingsAcademicPrograms = () => {
-  return new Promise((resolve, reject) => {
-    fetch(`${API_URL}/settings/get-academic-programs`, {})
-      .then(async (res) => {
-        const statusCode = res.status;
-        const { data } = await res.json();
-        if (statusCode === 200) {
-          resolve(data);
-        } else {
-          reject(data);
-        }
-      })
-      .catch((error) => reject(error));
-  });
-};
 
 export const fetchBookDetailsByIsbnApi = (isbn) => {
   return new Promise((resolve, reject) => {
@@ -264,28 +238,49 @@ export const fetchBookDetailsByIsbnApi = (isbn) => {
   });
 };
 
-export const fetchWeather = async () => {
-  const API_KEY = secret.WEATHER_API_KEY;
-  return new Promise((resolve) => {
-    fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=30.914519&lon=74.652159&appid=${API_KEY}`
-    )
-      .then(async (res) => {
-        const weather = await res.json();
-        const otherResults = weather.weather[0];
-        const result = {
-          temp: (weather.main.temp - 273.15).toFixed(1),
-          feels_like: (weather.main.feels_like - 273.15).toFixed(1),
-          description: otherResults.description,
-          icon: otherResults.icon,
-          city: weather.name,
-        };
+// export const fetchWeather = async () => {
+//   return new Promise((resolve) => {
+//     fetch(
+//       `https://api.openweathermap.org/data/2.5/weather?lat=30.914519&lon=74.652159&appid=${OPEN_WEATHER_API_KEY}`
+//     )
+//       .then(async (res) => {
+//         const weather = await res.json();
+//         const otherResults = weather.weather[0];
+//         const result = {
+//           temp: (weather.main.temp - 273.15).toFixed(1),
+//           feels_like: (weather.main.feels_like - 273.15).toFixed(1),
+//           description: otherResults.description,
+//           icon: otherResults.icon,
+//           city: weather.name,
+//         };
 
-        resolve(result);
-      })
-      .catch((err) => {
-        console.log(err);
-        resolve("Unable to Fetch");
-      });
-  });
+//         resolve(result);
+//       })
+//       .catch((err) => {
+//         console.log(err);
+//         resolve("Unable to Fetch");
+//       });
+//   });
+// };
+
+export const fetchWeather = () =>
+  restCall("get-weather", {}, ["API200WEATHER"]);
+
+const server = {
+  member: {
+    fetchStudentById: (_id) =>
+      restCall("members/fetch-student-by-id", { _id }, "STU200FSBI"),
+    quickSearchMember: (query) =>
+      restCall("members/quick-search", query, ["SRH200GLB"]),
+    markInactive: (_id) =>
+      restCall("members/mark-inactive", { _id }, "MEB200MI"),
+  },
+  transactions: {
+    fetchMember: (membershipId) =>
+      restCall("transactions/fetch-member", { membershipId }, ["TRN200FM"]),
+    addTransaction: (param) =>
+      restCall("transactions/add-transaction", param, ["TRN200AT"]),
+  },
 };
+
+export default server;

@@ -1,9 +1,9 @@
-const mongoose = require("mongoose");
+const { Schema, model, models } = require("mongoose");
 
-const LibraryCardsSchema = new mongoose.Schema({
+const LibraryCardsSchema = new Schema({
   memberId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "member",
+    type: Schema.Types.ObjectId,
+    ref: "Member",
     required: true,
   },
   cardNumber: {
@@ -22,8 +22,7 @@ const LibraryCardsSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model(
-  "libraryCard",
-  LibraryCardsSchema,
-  "libraryCards"
-);
+const LibraryCard =
+  models.LibraryCards || model("LibraryCard", LibraryCardsSchema);
+
+module.exports = LibraryCard;

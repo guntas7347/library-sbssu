@@ -1,7 +1,7 @@
 import LinkButton from "../../../../components/forms/link-button/link-button.component";
 
 const ManageBooksPage = () => {
-  const previousPath = "/dashboard/admin/manage-books";
+  const previousPath = "/admin/dashboard/manage-books";
   return (
     <div>
       <h1 className="text-center font-bold text-4xl my-5">Manage Books</h1>

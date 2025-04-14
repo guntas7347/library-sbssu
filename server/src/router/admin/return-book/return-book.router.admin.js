@@ -15,6 +15,10 @@ const {
   countReturnedBookDocs,
 } = require("../../../models/returned-book/returned-books.controllers.models");
 const { authorisationLevel } = require("../../auth/auth.middlewares");
+const {
+  sendTransactionEmail,
+  addTransactionMW,
+} = require("../transactions/transactions.mw");
 
 const returnBookRouter = express.Router();
 
@@ -41,6 +45,7 @@ returnBookRouter.post(
   calculateFine,
   processReturningBook,
   sendReturnedConfirmationEmail,
+  sendTransactionEmail,
   async (req, res) => {
     try {
       return res.status(200).json(crs.ISB200RIB());

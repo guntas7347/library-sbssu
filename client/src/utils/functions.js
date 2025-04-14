@@ -150,3 +150,16 @@ export const processDataForBooks = (array, sortArray = []) => {
     );
   });
 };
+
+export const toLowerCamelCase = (str) => {
+  return str
+    .toLowerCase()
+    .replace(/[^a-zA-Z0-9]+(.)/g, (match, chr) => chr.toUpperCase());
+};
+
+export const fromLowerCamelCase = (str) => {
+  return str
+    .replace(/([A-Z])/g, " $1") // Add space before uppercase letters
+    .toLowerCase() // Convert everything to lowercase
+    .replace(/\b\w/g, (match) => match.toUpperCase()); // Capitalize each word
+};

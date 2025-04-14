@@ -26,7 +26,7 @@ const {
 const { fetchStaffById } = require("../../../models/staff/staff.controllers");
 const {
   findAdminAuthById,
-} = require("../../../models/auth/admin/aduth_admin.controllers");
+} = require("../../../models/auth/aduth_admin.controllers");
 const {
   findAuthStudentById,
 } = require("../../../models/auth/student/auth_student.controllers");

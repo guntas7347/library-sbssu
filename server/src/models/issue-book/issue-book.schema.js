@@ -1,23 +1,25 @@
-const mongoose = require("mongoose");
+const { Schema, model, models } = require("mongoose");
 
-const issuedBooksSchema = new mongoose.Schema({
+const IssuedBookSchema = new Schema({
   bookAccessionId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "bookAccession",
+    type: Schema.Types.ObjectId,
+    ref: "Accession",
     required: true,
   },
   libraryCardId: {
-    type: mongoose.Types.ObjectId,
-    ref: "libraryCard",
+    type: Schema.Types.ObjectId,
+    ref: "LibraryCard",
     required: true,
   },
   issueDate: { type: Date, required: true },
   issuedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "staff",
+    type: Schema.Types.ObjectId,
+    ref: "Staff",
     required: true,
   },
   issueRemark: { type: String, default: "None" },
 });
 
-module.exports = mongoose.model("issuedBook", issuedBooksSchema, "issuedBooks");
+const IssuedBook = models.IssuedBook || model("IssuedBook", IssuedBookSchema);
+
+module.exports = IssuedBook;

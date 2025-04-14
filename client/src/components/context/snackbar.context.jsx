@@ -38,18 +38,36 @@ export const SnackbarProvider = ({ children }) => {
     return true;
   };
 
+  const handleClose = (index) => {
+    let newArr = [
+      ...feedbackArray.slice(0, index),
+      ...feedbackArray.slice(index + 1),
+    ];
+    setFeedbackArray(newArr);
+  };
+
   return (
     <>
       <SnackBarContext.Provider value={value}>
         {children}
+        <SnackBar feedback={feedback} />
+
         {feedbackArray.map((feedback, index) => {
           if (checkArraysEquality(feedback, [0, 0, ""])) return;
 
-          const bottomMargin = index === 0 ? 60 : index * 60;
+          const bm = index === 0 ? 80 : (index + 1) * 80;
 
           return (
-            <div key={index} className={`fixed bottom-[${bottomMargin}px] `}>
-              <SnackBar feedback={feedback} />
+            <div
+              key={index}
+              className="fixed z-[9999]"
+              style={{ bottom: `${bm}px` }}
+            >
+              <SnackBar
+                feedback={feedback}
+                keyNo={index}
+                onClose={handleClose}
+              />
             </div>
           );
         })}

@@ -2,16 +2,9 @@ const express = require("express");
 
 const {
   getAuthAdminById,
-} = require("../../models/auth/admin/aduth_admin.controllers");
-const {
-  getAuthApplicantById,
-} = require("../../models/auth/applicant/auth_applicant.controllers");
+} = require("../../models/auth/aduth_admin.controllers");
 
 const crs = require("../../utils/custom-response-codes");
-
-const {
-  getAuthMember,
-} = require("../../models/auth/member/auth_member.controllers");
 
 const authSecured = express.Router();
 
@@ -28,22 +21,6 @@ authSecured.post("/ping", async (req, res) => {
         userAuth = {};
         userAuth.userName = authDoc.userName;
         userAuth.role = "STAFF";
-        break;
-
-      case "APPLICANT":
-        authDoc = await getAuthApplicantById(req.user.uid);
-        if (!authDoc) break;
-        userAuth = {};
-        userAuth.userName = authDoc.userName;
-        userAuth.role = "APPLICANT";
-        break;
-
-      case "STUDENT":
-        authDoc = await getAuthMember({ _id: req.user.uid });
-        if (!authDoc) break;
-        userAuth = {};
-        userAuth.userName = authDoc.userName;
-        userAuth.role = "STUDENT";
         break;
 
       default:

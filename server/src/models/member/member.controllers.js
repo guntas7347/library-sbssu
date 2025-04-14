@@ -1,17 +1,4 @@
-const { generateMembershipId } = require("../../utils/functions");
-const MEMBER = require("./member.schema");
-
-const createMember = async (memberDetails, session) => {
-  return await MEMBER.create(
-    [
-      {
-        ...memberDetails,
-        membershipId: generateMembershipId(await getLatestMembershipId()),
-      },
-    ],
-    { session }
-  );
-};
+const Member = require("./member.schema");
 
 const getMembers = async (queryParam) => {
   const { filter, filterValue, page = 1 } = queryParam;
@@ -19,9 +6,11 @@ const getMembers = async (queryParam) => {
   const pageSize = 10;
   const skip = (page - 1) * pageSize;
 
-  const query = MEMBER.find();
+  console.log(filterValue);
+
+  const query = Member.find({ status: "ACTIVE" });
   switch (filter) {
-    case "fetchAllStudents":
+    case "allCategories":
       query.where();
       break;
 
@@ -40,7 +29,7 @@ const getMembers = async (queryParam) => {
 };
 
 const getMemberByRollNumber = async (rollNumber, populate = false, select) => {
-  const query = MEMBER.findOne({ rollNumber });
+  const query = Member.findOne({ rollNumber });
 
   if (populate) query.populate({ path: "libraryCards", select });
 
@@ -48,11 +37,11 @@ const getMemberByRollNumber = async (rollNumber, populate = false, select) => {
 };
 
 const getMember = async (filter) => {
-  return await MEMBER.findOne(filter).populate("libraryCards");
+  return await Member.findOne(filter).populate("libraryCards");
 };
 
 const getMemberById = async (_id, populate = false, selectLibraryCard) => {
-  const query = MEMBER.findById(_id);
+  const query = Member.findById(_id);
   if (populate)
     query.populate({ path: "libraryCards", select: selectLibraryCard });
 
@@ -60,7 +49,7 @@ const getMemberById = async (_id, populate = false, selectLibraryCard) => {
 };
 
 const addLibraryCardToMember = async (_id, libraryCardId, session) => {
-  return await MEMBER.findByIdAndUpdate(
+  return await Member.findByIdAndUpdate(
     _id,
     {
       $push: { libraryCards: libraryCardId },
@@ -69,14 +58,17 @@ const addLibraryCardToMember = async (_id, libraryCardId, session) => {
   );
 };
 
-const countMemberDocs = async (filter) => await MEMBER.countDocuments(filter);
+const countMemberDocs = async (filter) => await Member.countDocuments(filter);
 
 const updateMemberById = async (_id, updatedDoc, session) => {
-  return await MEMBER.findByIdAndUpdate(_id, updatedDoc, { session });
+  return await Member.findByIdAndUpdate(_id, updatedDoc, {
+    session,
+    new: true,
+  });
 };
 
 const getLatestMembershipId = async () => {
-  const member = await MEMBER.findOne().sort({ membershipId: -1 });
+  const member = await Member.findOne().sort({ membershipId: -1 });
   if (!member) return 200000;
   return member.membershipId;
 };
@@ -86,7 +78,7 @@ const searchMembers = async (param) => {
   let searchNumber = Number(search);
   if (Number.isNaN(searchNumber)) searchNumber = 0;
 
-  const query = MEMBER.find({
+  const query = Member.find({
     $or: [
       { fullName: { $regex: search, $options: "i" } },
       { rollNumber: searchNumber },
@@ -99,8 +91,42 @@ const searchMembers = async (param) => {
   return await query.exec();
 };
 
+const quickSearchMember = async ({ search }) => {
+  let searchNumber = Number(search);
+  if (Number.isNaN(searchNumber)) searchNumber = 0;
+
+  const query = Member.find({
+    $or: [
+      { fullName: { $regex: search, $options: "i" } },
+      { rollNumber: searchNumber },
+      { phoneNumber: searchNumber },
+      { membershipId: searchNumber },
+    ],
+  });
+
+  query.limit(10).select("_id fullName membershipId fatherName dob rollNumber");
+
+  return await query.exec();
+};
+
+const getApplicationById = async (id) => {
+  return await Member.findOne({ _id: id, status: "APPLIED" });
+};
+
+const findApplications = async (filter) => {
+  const { sortSelect, sortValue } = filter;
+  const query = Member.find({ status: "APPLIED" });
+  switch (sortSelect) {
+    case "rollNumber":
+      query.where({ rollNumber: sortValue });
+      break;
+    default:
+      break;
+  }
+  return await query.exec();
+};
+
 module.exports = {
-  createMember,
   getMembers,
   getMemberByRollNumber,
   getMemberById,
@@ -109,4 +135,8 @@ module.exports = {
   updateMemberById,
   getMember,
   searchMembers,
+  quickSearchMember,
+  getLatestMembershipId,
+  getApplicationById,
+  findApplications,
 };

@@ -19,6 +19,7 @@ const {
   verifyAccessionNumberAvailability,
   verifyIsbnAvailability,
   verifyIsbnExistance,
+  fetchBookForIssue,
 } = require("./books.middlewares.admin");
 const { default: mongoose } = require("mongoose");
 const { issueBookRouter } = require("../issue-book/issue-book.router.admin");
@@ -48,11 +49,11 @@ booksRouter.post(
   authorisationLevel(2),
   async (req, res) => {
     try {
-      console.log(req.query);
+      console.log(req.body);
       const booksArray = await getBooks({
-        filter: req.query.filter,
-        filterValue: req.query.filterValue,
-        page: req.query.page || 1,
+        filter: req.body.name,
+        filterValue: req.body.value,
+        page: req.body.page || 1,
       });
 
       return res.status(200).json(crs.BKS200FAB(booksArray));
@@ -127,12 +128,12 @@ booksRouter.post(
 );
 
 booksRouter.post(
-  "/fetch-book-by-accession-number",
+  "/fetch-for-issue",
   authorisationLevel(1),
-  fetchBookAccByAccNum,
+  fetchBookForIssue,
   async (req, res) => {
     try {
-      return res.status(200).json(crs.BKS200FBBAN(req.cust.bookAccessionDoc));
+      return res.status(200).json(crs.BKS200FBBAN(req.cust.book));
     } catch (err) {
       console.log(err);
       return res.status(500).json(crs.SERR500REST(err));

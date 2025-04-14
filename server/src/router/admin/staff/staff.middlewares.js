@@ -2,7 +2,7 @@ const { default: mongoose } = require("mongoose");
 const {
   createAuthAdmin,
   getAuthAdmin,
-} = require("../../../models/auth/admin/aduth_admin.controllers");
+} = require("../../../models/auth/aduth_admin.controllers");
 const {
   createNewStaff,
   updateStaffById,

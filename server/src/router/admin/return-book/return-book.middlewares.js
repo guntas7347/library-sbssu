@@ -1,11 +1,10 @@
 const { default: mongoose } = require("mongoose");
 const {
   getAuthAdminById,
-} = require("../../../models/auth/admin/aduth_admin.controllers");
+} = require("../../../models/auth/aduth_admin.controllers");
 const {
   updateBookAccession,
 } = require("../../../models/book-accessions/book-accessions.controllers");
-const { createFine } = require("../../../models/fines/fines.controllers");
 const {
   deleteIssuedBook,
 } = require("../../../models/issue-book/issue-book.controllers");
@@ -22,6 +21,11 @@ const {
 const { generateEmailTemplate } = require("../../../services/email-templates");
 const { transporter } = require("../../../services/nodemailer");
 const crs = require("../../../utils/custom-response-codes");
+const {
+  createReturnFine,
+  addTransaction,
+} = require("../../../models/transaction/transaction.controllers");
+const ReturnedBook = require("../../../models/returned-book/returned-books.schema");
 
 const processReturningBook = async (req, res, next) => {
   const session = await mongoose.startSession();
@@ -39,18 +43,28 @@ const processReturningBook = async (req, res, next) => {
       returnedBookDoc = await createReturnBook(returningBookDetails, session);
       const { memberId } = await getLibraryCardById(libraryCardId);
       if (req.cust.fine > 0) {
-        const fineDoc = await createFine({
-          returnedBookId: returnedBookDoc[0]._id,
-          amount: req.cust.fine,
-          category: "Late Fees",
-          memberId,
-        });
+        // const fineDoc = await createFine({
+        //   returnedBookId: returnedBookDoc[0]._id,
+        //   amount: req.cust.fine,
+        //   category: "Late Fees",
+        //   memberId,
+        // });
+
+        const fineDoc = await createReturnFine(
+          {
+            memberId,
+            returnedBookId: returnedBookDoc[0]._id,
+            amount: req.cust.fine,
+          },
+          session
+        );
 
         updateReturnBookById(
           returnedBookDoc[0]._id,
           { fine: fineDoc[0]._id },
           session
         );
+        req.cust.transactionId = fineDoc[0]._id;
       }
 
       await deleteIssuedBook(issuedBook._id, session);
@@ -78,17 +92,19 @@ const processReturningBook = async (req, res, next) => {
 
 const sendReturnedConfirmationEmail = async (req, res, next) => {
   try {
-    const returnedBookDoc = await getReturnedBookById(
-      req.cust.returnedBookId,
-      true
-    );
+    const returnedBookDoc = await getReturnedBookById(req.cust.returnedBookId);
     const { bookAccessionId, libraryCardId } = returnedBookDoc._doc;
     const { bookId } = bookAccessionId;
     const { memberId } = libraryCardId;
+
+    const fine = returnedBookDoc._doc.fine?.amount
+      ? returnedBookDoc._doc.fine?.amount
+      : "NULL";
+
     const emailContent = {
       issueDate: new Date(returnedBookDoc._doc.issueDate).toDateString(),
       returnDate: new Date(returnedBookDoc._doc.returnDate).toDateString(),
-      fine: "₹" + returnedBookDoc._doc.fine,
+      fine: "₹" + fine,
       name: memberId.fullName,
       title: bookId.title,
       author: bookId.author,
@@ -113,9 +129,9 @@ const sendReturnedConfirmationEmail = async (req, res, next) => {
 const fetchReturnedBooks = async (req, res, next) => {
   try {
     const returnedBooksCol = await getReturnedBooks({
-      filter: req.query.filter,
-      filterValue: req.query.filterValue,
-      page: req.query.page || 1,
+      filter: req.body.name,
+      filterValue: req.body.value,
+      page: req.body.page || 1,
     });
     const data = returnedBooksCol.returnedBooksArray.map((returnedBook) => {
       return {
@@ -144,30 +160,44 @@ const fetchReturnedBooks = async (req, res, next) => {
 
 const fetchReturnedBookDocById = async (req, res, next) => {
   try {
-    const returnedBookDoc = await getReturnedBookById(req.body._id, true);
+    const returnedBookDoc = await ReturnedBook.findById(req.body._id)
+      .populate({
+        path: "bookAccessionId",
+        select: "accessionNumber -_id",
+        populate: { path: "bookId", select: "title author -_id" },
+      })
+      .populate({
+        path: "libraryCardId",
+        select: "cardNumber -_id",
+        populate: {
+          path: "memberId",
+          select: "membershipId fullName -_id",
+        },
+      })
+      .populate({ path: "issuedBy", select: "idNumber fullName -_id" })
+      .populate({ path: "returnedBy", select: "idNumber fullName -_id" })
+      .populate({ path: "fine", select: "amount -_id" })
+      .select("issueDate returnDate -_id")
+      .lean();
 
-    const { bookAccessionId, libraryCardId } = returnedBookDoc._doc;
+    const { bookAccessionId, libraryCardId } = returnedBookDoc;
 
-    const issuer = returnedBookDoc._doc.issuedBy;
-    const returner = returnedBookDoc._doc.returnedBy;
+    const issuer = returnedBookDoc.issuedBy;
+    const returner = returnedBookDoc.returnedBy;
 
     const returnedBook = {
       accessionNumber: bookAccessionId.accessionNumber,
       title: bookAccessionId.bookId.title,
       author: bookAccessionId.bookId.author,
       cardNumber: libraryCardId.cardNumber,
-      issueDate: returnedBookDoc._doc.issueDate,
+      issueDate: returnedBookDoc.issueDate,
       issuedBy: issuer.fullName + " " + "|" + " " + issuer.idNumber,
-      returnDate: returnedBookDoc._doc.returnDate,
+      returnDate: returnedBookDoc.returnDate,
       returnedBy: returner.fullName + " " + "|" + " " + returner.idNumber,
-      rollNumber: libraryCardId.memberId.rollNumber,
-      name: libraryCardId.memberId.fullName,
-      fine: returnedBookDoc._doc.fine
-        ? returnedBookDoc._doc.fine.amount
-        : "Null",
+      rollNumber: libraryCardId.memberId.membershipId,
+      fullName: libraryCardId.memberId.fullName,
+      fine: returnedBookDoc.fine ? returnedBookDoc.fine.amount : "Null",
     };
-
-    console.log(returnedBook);
 
     if (!req.cust) req.cust = {};
     req.cust.returnedBook = returnedBook;

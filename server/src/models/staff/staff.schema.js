@@ -1,13 +1,13 @@
-const { default: mongoose } = require("mongoose");
+const { Schema, model, models } = require("mongoose");
 
-const StaffSchema = new mongoose.Schema({
+const StaffSchema = new Schema({
   idNumber: { type: Number, required: true, unique: true },
   fullName: { type: String, required: true },
   role: { type: String, default: "STAFF" },
   email: { type: String, required: true, unique: true },
   authId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "auth_admin",
+    type: Schema.Types.ObjectId,
+    ref: "Auth",
   },
   phoneNumber: { type: String, required: false },
   dateOfBirth: { type: Date, required: false },
@@ -23,4 +23,6 @@ const StaffSchema = new mongoose.Schema({
   createdAt: { type: Date, default: new Date() },
 });
 
-module.exports = mongoose.model("staff", StaffSchema, "staffs");
+const Staff = models.Staff || model("Staff", StaffSchema);
+
+module.exports = Staff;

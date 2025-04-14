@@ -100,6 +100,68 @@ const generateEmailTemplate = {
       },
     });
   },
+  approvalEmail: (memberName, membershipID, libraryCards) => {
+    return mailGenerator.generate({
+      body: {
+        name: memberName,
+        intro: `We are pleased to inform you that your library account has been approved! You are now a registered member of the SBSSU Library and can start issuing books.`,
+        table: {
+          data: [
+            {
+              "Membership ID": membershipID,
+              "Library Cards": libraryCards.join(", "),
+            },
+          ],
+          columns: {
+            customWidth: {
+              "Membership ID": "25%",
+              "Library Cards": "75%",
+            },
+            customAlignment: {
+              "Membership ID": "left",
+              "Library Cards": "left",
+            },
+          },
+        },
+        outro:
+          "You can now visit the library to start issuing books. If you have any questions, feel free to contact us. We're happy to assist!",
+      },
+    });
+  },
+  transactionConfirmation: ({
+    fullName,
+    transactionType,
+    amount,
+    balance,
+    category,
+    date,
+  }) => {
+    const typeText = transactionType === "CREDIT" ? "Credited" : "Debited";
+
+    return mailGenerator.generate({
+      body: {
+        name: fullName,
+        intro: `This is to inform you that ₹${amount.toFixed(
+          2
+        )} has been ${typeText.toLowerCase()} ${
+          transactionType === "CREDIT" ? "to" : "from"
+        } your library account.`,
+        table: {
+          data: [
+            {
+              "Transaction Type": typeText,
+              Amount: `₹${amount.toFixed(2)}`,
+              Category: category,
+              Date: date || new Date().toLocaleDateString(),
+              "Closing Balance": `₹${balance.toFixed(2)}`,
+            },
+          ],
+        },
+        outro:
+          "If you did not authorize this transaction or have any queries, please contact the Library immediately.",
+      },
+    });
+  },
 };
 
 module.exports = { generateEmailTemplate };

@@ -9,7 +9,27 @@ const ProfilePage = () => {
 
   const [staffData, setStaffData] = useState({ fullName: "", idNumber: null });
 
-  const { fullName, idNumber, email, level, active, createdAt } = staffData;
+  const {
+    idNumber,
+    fullName,
+    role,
+    email,
+    authId,
+    phoneNumber,
+    dateOfBirth,
+    gender,
+    address,
+    emergencyContact,
+    employeeId,
+    department,
+    designation,
+    joiningDate,
+    employmentStatus,
+    profilePictureURL,
+    createdAt,
+    level,
+    active,
+  } = staffData;
 
   useEffect(() => {
     const asyncFunc = async () => {
@@ -24,15 +44,39 @@ const ProfilePage = () => {
 
   return (
     <div>
-      <h1 className="text-center font-bold text-4xl my-5">Profile</h1>
-      <div className="">
+      <h1 className="text-center font-bold text-4xl my-5">Your Profile</h1>
+      <div className="c-box">
         <SpanningTable
           rows={[
             ["ID Number", idNumber],
             ["Staff Name", fullName],
             ["Email", email],
-            ["Level", level],
+            ["Role", role],
+            ["Phone Number", phoneNumber || "N/A"],
+            ["Date of Birth", dateOfBirth ? formatTime(dateOfBirth) : "N/A"],
+            ["Gender", gender || "N/A"],
+            ["Address", address || "N/A"],
+            ["Emergency Contact", emergencyContact || "N/A"],
+            ["Employee ID", employeeId || "N/A"],
+            ["Department", department || "N/A"],
+            ["Designation", designation || "N/A"],
+            ["Joining Date", joiningDate ? formatTime(joiningDate) : "N/A"],
+            ["Employment Status", employmentStatus || "N/A"],
+            ["Level", level || "N/A"],
             ["Status", active ? "Active" : "Inactive"],
+            [
+              "Profile Picture",
+              profilePictureURL ? (
+                <img
+                  src={profilePictureURL}
+                  alt="Profile"
+                  width="50"
+                  height="50"
+                />
+              ) : (
+                "N/A"
+              ),
+            ],
             ["Created At", formatTime(createdAt)],
           ]}
         />

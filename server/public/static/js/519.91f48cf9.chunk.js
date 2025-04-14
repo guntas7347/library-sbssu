@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkclient=self.webpackChunkclient||[]).push([[519],{519:(e,s,t)=>{t.r(s),t.d(s,{default:()=>i});var l=t(689),n=t(184);const c=()=>(0,n.jsx)("div",{className:"text-center flex h-screen items-center justify-center",children:(0,n.jsx)("h1",{className:"text-6xl font-bold",children:"Student Portal will be launched soon"})}),i=()=>(0,n.jsx)("div",{children:(0,n.jsx)(l.Z5,{children:(0,n.jsx)(l.AW,{index:!0,element:(0,n.jsx)(c,{})})})})}}]);
-//# sourceMappingURL=519.91f48cf9.chunk.js.map

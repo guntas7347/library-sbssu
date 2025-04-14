@@ -17,6 +17,8 @@ const crs = {
     ),
   SRH200GLB: (payload = null) =>
     createCustomResponseObject("SRH200GLB", "Search Success", payload),
+  SRH404GLB: (payload = null) =>
+    createCustomResponseObject("SRH200GLB", "No Data Found", payload),
   STU201CNS: (payload = null) =>
     createCustomResponseObject(
       "STU201CNS",
@@ -47,6 +49,16 @@ const crs = {
     createCustomResponseObject("STU404FSBRN", "Member not found", payload),
   STU200FSBRN: (payload = null) =>
     createCustomResponseObject("STU200FSBRN", "Member found", payload),
+  MEB200MI: (payload = null) =>
+    createCustomResponseObject(
+      "MEB200MI",
+      "Member marked as inactive",
+      payload
+    ),
+  MEB409MILU: (payload = null) =>
+    createCustomResponseObject("MEB409MILU", "Library Cards not free", payload),
+  MEB409MIPD: (payload = null) =>
+    createCustomResponseObject("MEB409MIPD", "Balance not zero", payload),
   STU409ALCTS: (payload = null) =>
     createCustomResponseObject(
       "STU409ALCTS",
@@ -155,6 +167,12 @@ const crs = {
     createCustomResponseObject(
       "MDW409VLCA",
       "Library Card not available",
+      payload
+    ),
+  MDW500APM: (payload = null) =>
+    createCustomResponseObject(
+      "MDW500APM",
+      "Member approved but Confirmation Email could not be sent",
       payload
     ),
   MDW500SICE: (payload = null) =>
@@ -343,6 +361,22 @@ const crs = {
     createCustomResponseObject("FIN200FAF", "Fines Fetched", payload),
   FIN200FFBI: (payload = null) =>
     createCustomResponseObject("FIN200FFBI", "Fine Fetched", payload),
+  TRN200FT: (payload = null) =>
+    createCustomResponseObject("TRN200FT", "Transactions Fetched", payload),
+  TRN200FTBI: (payload = null) =>
+    createCustomResponseObject("TRN200FTBI", "Transaction Fetched", payload),
+  TRN200AT: (payload = null) =>
+    createCustomResponseObject("TRN200AT", "Transaction Added", payload),
+  TRN200FM: (payload = null) =>
+    createCustomResponseObject("TRN200FM", "Member Fetched", payload),
+  TRN404FM: (payload = null) =>
+    createCustomResponseObject("TRN404FM", "Member not found", payload),
+  TRN400FM: (payload = null) =>
+    createCustomResponseObject(
+      "TRN400FM",
+      "MembershipId must be a 6-digit number",
+      payload
+    ),
   FIN200ARN: (payload = null) =>
     createCustomResponseObject("FIN200ARN", "Reciept Number Added", payload),
   AUTH200CAP: (payload = null) =>
@@ -400,6 +434,12 @@ const crs = {
     createCustomResponseObject(
       "AUTH200RECAPTCHA",
       "reCAPTCHA success",
+      payload
+    ),
+  API200WEATHER: (payload = null) =>
+    createCustomResponseObject(
+      "API200WEATHER",
+      "Weather deatils fetched",
       payload
     ),
 };

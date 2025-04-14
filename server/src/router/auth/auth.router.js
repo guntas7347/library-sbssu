@@ -1,16 +1,10 @@
-require("dotenv").config();
-
 const express = require("express");
-const { applicantsAuthRouter } = require("./applicants/applicants.auth.router");
 const { adminRouter } = require("./admin/admin.auth.router");
-const { memberAuthRouter } = require("./member/member.auth.router");
 const crs = require("../../utils/custom-response-codes");
 
 const authRouter = express.Router();
 
-authRouter.use("/applicants", applicantsAuthRouter);
 authRouter.use("/admin", adminRouter);
-authRouter.use("/students", memberAuthRouter);
 
 authRouter.post("/sign-out", async (req, res) => {
   try {

@@ -5,15 +5,14 @@ import CurrentIssues from "./components/current-issues";
 import TotalReturns from "./components/total-returns";
 import TotalMembers from "./components/total-members";
 import TotalBooks from "./components/total-books";
-import Graph from "./components/graph";
 import { AuthContext } from "../../../../components/context/auth.content";
 
 const Homepage = () => {
   const { userName } = useContext(AuthContext);
 
   return (
-    <div className="">
-      <div className="flex flex-row my-5 relative">
+    <div>
+      <div className="flex flex-row my-5 relative ">
         <div className="flex-start">
           <h1 className="text-4xl font-bold mb-2">
             Welcome {userName.split(" ")[0]},
@@ -23,7 +22,7 @@ const Homepage = () => {
             <a href="">0 unread alerts</a>
           </span>
         </div>
-        <div className="ml-auto flex flex-col bg-white relative h-10 px-3 justify-center">
+        <div className="ml-auto flex flex-col bg-white relative h-10 px-3 rounded-md justify-center dark:bg-gray-700">
           <span>{new Date().toDateString()}</span>
         </div>
       </div>
@@ -36,8 +35,8 @@ const Homepage = () => {
           <TotalMembers />
           <TotalBooks />
         </div>
-        <Graph />
-        <Graph />
+        {/* <Graph />
+        <Graph /> */}
       </div>
     </div>
   );

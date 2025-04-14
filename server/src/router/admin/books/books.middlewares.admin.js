@@ -10,6 +10,7 @@ const {
   addBookAccessionToBook,
 } = require("../../../models/books/books.controllers");
 const crs = require("../../../utils/custom-response-codes");
+const Accession = require("../../../models/book-accessions/book-accessions.schema");
 
 const fetchBookByIsbn = async (req, res, next) => {
   try {
@@ -41,6 +42,30 @@ const fetchBookAccByAccNum = async (req, res, next) => {
     req.cust.bookAccessionDoc = bookAccessionDoc;
     next();
   } catch (err) {
+    return res.status(500).json(crs.SERR500REST(err));
+  }
+};
+
+const fetchBookForIssue = async (req, res, next) => {
+  try {
+    const d = await Accession.findOne({
+      accessionNumber: req.body.accessionNumber,
+    })
+      .populate("bookId", "title author -_id")
+      .select("accessionNumber status -_id")
+      .lean();
+
+    if (!d) return res.status(404).json(crs.MDW404FBBAN());
+    if (!req.cust) req.cust = {};
+    req.cust.book = {
+      accessionNumber: d.accessionNumber,
+      status: d.status,
+      title: d.bookId.title,
+      author: d.bookId.author,
+    };
+    next();
+  } catch (err) {
+    console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
   }
 };
@@ -78,7 +103,7 @@ const verifyIsbnExistance = async (req, res, next) => {
           { accessionNumber: req.body.accessionNumber, bookId: isbn._id },
           session
         );
-        const a = await addBookAccessionToBook(
+        await addBookAccessionToBook(
           isbn._id,
           bookAccessionDoc[0]._id,
           session
@@ -102,4 +127,5 @@ module.exports = {
   verifyAccessionNumberAvailability,
   verifyIsbnAvailability,
   verifyIsbnExistance,
+  fetchBookForIssue,
 };

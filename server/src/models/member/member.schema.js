@@ -1,21 +1,26 @@
-const mongoose = require("mongoose");
+const { Schema, model, models } = require("mongoose");
 
-const MEMBER_SCHEMA = new mongoose.Schema({
-  membershipId: { type: Number, required: true, unique: true },
-  authId: { type: mongoose.Schema.Types.ObjectId, ref: "auth_member" },
+const MemberSchema = new Schema({
+  membershipId: { type: Number, unique: true, sparse: true },
+  applicationId: { type: Number, required: true, unique: true },
+  authId: { type: Schema.Types.ObjectId, ref: "Auth" },
   rollNumber: { type: Number },
   fullName: { type: String, required: true },
-  fathersName: { type: String, required: true },
-  imgUrl: { type: String, required: true },
+  fatherName: { type: String, required: true },
+  imageUrl: { type: String, required: true },
   category: { type: String, required: true },
-  gender: { type: String, required: true },
+  gender: {
+    type: String,
+    default: "MALE",
+    enum: ["MALE", "FEMALE", "OTHER"],
+  },
   dob: { type: Date, required: true },
   program: { type: String, required: true },
   specialization: { type: String, required: true },
   batch: { type: Number, required: true },
-  email: { type: String, required: true, unique: true },
+  email: { type: String, required: true },
   phoneNumber: { type: Number, required: true },
-  libraryCards: [{ type: mongoose.Schema.Types.ObjectId, ref: "libraryCard" }],
+  libraryCards: [{ type: Schema.Types.ObjectId, ref: "LibraryCard" }],
   role: {
     type: String,
     default: "STUDENT UG",
@@ -28,7 +33,15 @@ const MEMBER_SCHEMA = new mongoose.Schema({
     ],
   },
   active: { type: Boolean, default: true },
-  createdAt: { type: Date, default: new Date() },
+  status: {
+    type: String,
+    default: "APPLIED",
+    enum: ["APPLIED", "REJECTED", "CANCELLED", "ACTIVE", "INACTIVE"],
+  },
+  balance: { type: Number, default: 0 },
+  createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model("member", MEMBER_SCHEMA);
+const Member = models.Member || model("Member", MemberSchema);
+
+module.exports = Member;

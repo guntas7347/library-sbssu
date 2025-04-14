@@ -12,7 +12,7 @@ const {
 } = require("../../../models/library-cards/library-cards.controllers");
 const {
   getAuthAdminById,
-} = require("../../../models/auth/admin/aduth_admin.controllers");
+} = require("../../../models/auth/aduth_admin.controllers");
 const {
   createIssueBook,
   getIssuedBookById,
@@ -26,15 +26,21 @@ const {
 } = require("../../../utils/functions");
 const { transporter } = require("../../../services/nodemailer");
 const { generateEmailTemplate } = require("../../../services/email-templates");
+const Accession = require("../../../models/book-accessions/book-accessions.schema");
+const LibraryCard = require("../../../models/library-cards/library-cards.schema");
+const IssuedBook = require("../../../models/issue-book/issue-book.schema");
 
 const FINE_PER_DAY = 1;
 
 const verifyBookAccessionAvailability = async (req, res, next) => {
   try {
-    const bookAccession = await getBookAccessionByAccessionNumber(
-      req.body.accessionNumber
-    );
-    if (bookAccession === null) return res.status(404).json();
+    const bookAccession = await Accession.findOne({
+      accessionNumber: req.body.accessionNumber,
+    })
+      .select("status _id category")
+      .lean();
+
+    if (!bookAccession) return res.status(404).json();
     const { status, _id, category } = bookAccession;
     if (status != "available") return res.status(409).json(crs.MDW409VBAA());
     if (!req.cust) req.cust = {};
@@ -50,12 +56,14 @@ const verifyBookAccessionAvailability = async (req, res, next) => {
 
 const verifyLibraryCardAvailability = async (req, res, next) => {
   try {
-    const memberCard = await getLibraryCard({
+    const card = await LibraryCard.findOne({
       cardNumber: req.body.cardNumber,
-    });
+    })
+      .select("status _id category")
+      .lean();
 
-    if (!memberCard) return res.status(404).json();
-    const { status, _id, category } = memberCard;
+    if (!card) return res.status(404).json();
+    const { status, _id, category } = card;
     if (status != "available") return res.status(409).json(crs.MDW409VLCA());
     if (!req.cust) req.cust = {};
     req.cust.libraryCardId = _id;
@@ -144,34 +152,35 @@ const sendIssuedConfirmationEmail = async (req, res, next) => {
   }
 };
 
-const fetchIssuedBookByAccessionNumber = async (req, res, next) => {
+const fetchIssuedBookByAccessionNumber = async (req, res) => {
   try {
-    const bookAccessionDoc = await getAccession({
+    const accessionDoc = await Accession.findOne({
       accessionNumber: req.body.accessionNumber,
-    });
-    if (!bookAccessionDoc) return res.status(404).json(crs.MDW404FIBBAN());
-    if (bookAccessionDoc.status === "available")
+    })
+      .select("_id accessionNumber status")
+      .lean();
+
+    if (!accessionDoc) return res.status(404).json(crs.MDW404FIBBAN());
+    if (accessionDoc.status === "available")
       return res.status(409).json(crs.MDW409FIBBAN());
 
     const issuedBookDoc = await getIssuedBook({
-      bookAccessionId: bookAccessionDoc._id,
+      bookAccessionId: accessionDoc._id,
     });
 
     const { cardNumber, memberId } = issuedBookDoc.libraryCardId;
 
     const { bookId } = issuedBookDoc.bookAccessionId;
-
-    req.cust = {
+    const issuedBook = {
       _id: issuedBookDoc._id,
-      accessionNumber: bookAccessionDoc.accessionNumber,
-      ...bookId._doc,
+      accessionNumber: accessionDoc.accessionNumber,
+      ...bookId,
       libraryCard: cardNumber,
-      ...memberId._doc,
+      ...memberId,
       issueDate: issuedBookDoc.issueDate,
-      issuedBy: issuedBookDoc._doc.issuedBy.fullName,
+      issuedBy: issuedBookDoc.issuedBy.fullName,
     };
-
-    next();
+    return res.status(200).json(crs.ISB200FIBBAN(issuedBook));
   } catch (err) {
     console.log(err);
     return res.status(500).json(crs.SERR500REST(err));
@@ -203,7 +212,6 @@ const calculateFine = async (req, res, next) => {
       req.cust.role,
       req.cust.category
     );
-    console.log(BOOK_RETURN_PERIOD_DAYS);
     dateGap -= BOOK_RETURN_PERIOD_DAYS;
     if (dateGap < 0) dateGap = 0;
     req.cust.fine = dateGap * FINE_PER_DAY;
@@ -218,9 +226,9 @@ const calculateFine = async (req, res, next) => {
 const fetchIssuedBooks = async (req, res, next) => {
   try {
     const issuedBooksCol = await getIssuedBooks({
-      filter: req.query.filter,
-      filterValue: req.query.filterValue,
-      page: req.query.page || 1,
+      filter: req.body.name,
+      filterValue: req.body.value,
+      page: req.body.page || 1,
     });
 
     const data = issuedBooksCol.issuedBooksArray.map(
@@ -250,23 +258,36 @@ const fetchIssuedBooks = async (req, res, next) => {
 
 const fetchIssuedBookDocById = async (req, res, next) => {
   try {
-    const returnedBookDoc = await getIssuedBookById(req.body._id, true);
-    const { bookAccessionId, libraryCardId } = returnedBookDoc._doc;
-    const issuer = returnedBookDoc._doc.issuedBy;
+    const returnedBookDoc = await IssuedBook.findById(req.body._id)
+      .populate({
+        path: "bookAccessionId",
+        select: "accessionNumber -_id",
+        populate: { path: "bookId", select: "title author -_id" },
+      })
+      .populate({
+        path: "libraryCardId",
+        select: "cardNumber -_id",
+
+        populate: { path: "memberId", select: "membershipId fullName -_id" },
+      })
+      .populate({ path: "issuedBy", select: "idNumber fullName -_id" })
+      .lean();
+
+    const { bookAccessionId, libraryCardId } = returnedBookDoc;
+    const issuer = returnedBookDoc.issuedBy;
     const issuedBook = {
       accessionNumber: bookAccessionId.accessionNumber,
       title: bookAccessionId.bookId.title,
       author: bookAccessionId.bookId.author,
       cardNumber: libraryCardId.cardNumber,
-      issueDate: returnedBookDoc._doc.issueDate,
+      issueDate: returnedBookDoc.issueDate,
       issuedBy: issuer.fullName + " " + "|" + " " + issuer.idNumber,
-      rollNumber: libraryCardId.memberId.rollNumber,
-      name: libraryCardId.memberId.fullName,
+      rollNumber: libraryCardId.memberId.membershipId,
+      fullName: libraryCardId.memberId.fullName,
+      remark: bookAccessionId.issueRemark,
     };
 
-    if (!req.cust) req.cust = {};
-    req.cust.issuedBook = issuedBook;
-    next();
+    return res.status(200).json(crs.ISB200FIB(issuedBook));
   } catch (err) {
     console.log(err);
     return res.status(500).json(crs.SERR500REST(err));

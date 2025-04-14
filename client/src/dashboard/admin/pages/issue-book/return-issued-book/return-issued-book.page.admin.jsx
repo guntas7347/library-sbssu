@@ -11,6 +11,9 @@ import { formatDate, formatTime } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
 import Spinner from "../../../../../components/feedback/spinner/spinner.component";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
+import Input from "../../../../../components/forms/input";
+import SearchBar from "./search-bar";
+import ReturnConfirmationModal from "./return-confirmation.modal";
 
 const ReturnIssuedBookPage = () => {
   const { setFeedback } = useContext(SnackBarContext);
@@ -33,7 +36,7 @@ const ReturnIssuedBookPage = () => {
     issuedBy,
     rollNumber,
     _id,
-    imgUrl,
+    imageUrl,
   } = issuedBookDoc;
 
   const handleFetch = async () => {
@@ -80,85 +83,77 @@ const ReturnIssuedBookPage = () => {
   return (
     <div>
       <h1 className="text-center font-bold text-3xl my-2">Return book?</h1>
-      <div className="bg-white rounded-3xl p-5 flex justify-between">
-        <InputField
-          label="Accession Number"
-          name="accessionNumber"
-          type="number"
-          onChange={handleChange}
-          value={formFields.accessionNumber}
-        />
+      <div className="c-box ">
+        <div>
+          <SearchBar
+            label="Search"
+            name="accessionNumber"
+            type="number"
+            onChange={handleChange}
+            value={formFields.accessionNumber}
+            placeholder="Accession Number..."
+            onClick={handleFetch}
+          />
+        </div>
 
-        <button className="my-button" onClick={handleFetch}>
-          Search
-        </button>
-      </div>
-
-      {isStudentFetching &&
-        (isStudentFetched() ? (
-          <>
-            <div className="my-5">
-              <SpanningTable
-                rows={[
-                  ["Accession Number", accessionNumber],
-                  ["Library Card Number", libraryCard],
-                  ["Issue Date", formatTime(issueDate)],
-                  ["Issued By", issuedBy],
-                  ["Book title", title],
-                  ["Book Author", author],
-                  ["Member Name", fullName],
-                  ["Roll Number", rollNumber],
-                ]}
-                imgUrl={imgUrl}
-              />
-            </div>
-            <div className="bg-white rounded-3xl p-5 flex justify-between items-center">
-              <InputField
-                label="Return Date"
-                name="returnDate"
-                value={returnDate}
-                disabled
-                style={{ textAlign: "center" }}
-                InputLabelProps={{ shrink: true }}
-              />
-
-              <button className="my-button" onClick={handleCheckFine}>
-                Return
-              </button>
-            </div>
-          </>
-        ) : (
-          <div
-            className="d-flex justify-content-center align-items-center"
-            style={{
-              height: "50vh",
-            }}
-          >
-            <Spinner />
-          </div>
-        ))}
-
-      <div>
-        <AlertDialog
-          title="Confirm?"
-          content={
+        {isStudentFetching &&
+          (isStudentFetched() ? (
             <>
-              Return Book:-
-              <br />
-              Accession Number: {accessionNumber}
-              <br />
-              Fine:{" "}
-              {fine ? <span style={{ color: "red" }}>₹{fine}</span> : "N/A"}
+              <div className="my-5">
+                <SpanningTable
+                  rows={[
+                    ["Accession Number", accessionNumber],
+                    ["Library Card Number", libraryCard],
+                    ["Issue Date", formatTime(issueDate)],
+                    ["Issued By", issuedBy],
+                    ["Book title", title],
+                    ["Book Author", author],
+                    ["Member Name", fullName],
+                    ["Roll Number", rollNumber],
+                  ]}
+                  imageUrl={imageUrl}
+                />
+              </div>
+              <div className="flex justify-center items-end gap-10">
+                <Input
+                  label="Return Date"
+                  name="returnDate"
+                  value={returnDate}
+                  disabled
+                  style={{ textAlign: "center" }}
+                  InputLabelProps={{ shrink: true }}
+                />
+
+                <button
+                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                  onClick={handleCheckFine}
+                >
+                  Return
+                </button>
+              </div>
             </>
-          }
-          open={ShowAlertDialog}
-          handleClick={(e) => {
-            if (e) handleReturnBook();
+          ) : (
+            <div
+              className="d-flex justify-content-center align-items-center"
+              style={{
+                height: "50vh",
+              }}
+            >
+              <Spinner />
+            </div>
+          ))}
+      </div>
+      {ShowAlertDialog && (
+        <ReturnConfirmationModal
+          accessionNumber={accessionNumber}
+          fine={fine}
+          onClick={(e) => {
+            e && handleReturnBook();
             setShowAlertDialog(false);
           }}
+          onClose={() => setShowAlertDialog(false)}
         />
-      </div>
-      {/* <SnackBar feedback={showSnackbarFeedback} /> */}
+      )}
     </div>
   );
 };

@@ -7,7 +7,7 @@ const CustomTableSelect = ({
   columns,
   onSelect,
   indexToSelect,
-  imgUrl = null,
+  imageUrl = null,
 }) => {
   const [isChecked, setIsChecked] = useState(false);
 
@@ -33,13 +33,17 @@ const CustomTableSelect = ({
 
   return (
     <>
-      <div>
-        <table>
-          <thead>
-            <tr>
-              <th>Checked</th>
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200">
+              <th className="px-6 py-3">Checked</th>
               {columns.map((column, index) => {
-                return <th key={index}>{column}</th>;
+                return (
+                  <th key={index} className="px-6 py-3">
+                    {column}
+                  </th>
+                );
               })}
             </tr>
           </thead>
@@ -47,13 +51,12 @@ const CustomTableSelect = ({
             {rows.map((row, index) => {
               return (
                 <tr
-                  className={`${
-                    selectedRowIndex === index && "table-active-row"
-                  }`}
+                  className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700 border-gray-200"
                   key={index}
                 >
-                  <td>
+                  <td className="px-6 py-4">
                     <input
+                      className="size-5"
                       type="checkbox"
                       onChange={(e) => {
                         handleRowClick(index, row);
@@ -63,16 +66,20 @@ const CustomTableSelect = ({
                     />
                   </td>
                   {row.map((td, index) => {
-                    return <td key={index}>{td}</td>;
+                    return (
+                      <td key={index} className="px-6 py-4">
+                        {td}
+                      </td>
+                    );
                   })}
                 </tr>
               );
             })}
-            {imgUrl && (
+            {imageUrl && (
               <tr>
-                <td className="text-left w-96">Image</td>
+                <td className="text-left w-96 px-6 py-3">Image</td>
                 <td>
-                  <img className="w-52 h-52" src={imgUrl} alt="image" />
+                  <img className="w-52 h-52" src={imageUrl} alt="image" />
                 </td>
               </tr>
             )}

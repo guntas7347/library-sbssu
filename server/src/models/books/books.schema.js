@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+const { Schema, model, models } = require("mongoose");
 
-const BooksSchema = new mongoose.Schema({
+const BookSchema = new Schema({
   isbn: { type: Number, required: false },
   title: { type: String, required: false },
   author: { type: String, required: false },
@@ -12,9 +12,9 @@ const BooksSchema = new mongoose.Schema({
   cost: { type: Number, required: false },
   callNumber: { type: Number, required: false },
   createdAt: { type: Date, default: new Date() },
-  accessionNumbers: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "bookAccession" },
-  ],
+  accessionNumbers: [{ type: Schema.Types.ObjectId, ref: "Accession" }],
 });
 
-module.exports = mongoose.model("book", BooksSchema, "books");
+const Book = models.Book || model("Book", BookSchema);
+
+module.exports = Book;

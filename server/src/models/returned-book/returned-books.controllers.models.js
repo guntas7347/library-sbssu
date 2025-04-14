@@ -80,7 +80,8 @@ const getReturnedBooks = async (queryParam) => {
       path: "libraryCardId",
       populate: { path: "memberId", select: "rollNumber fullName -_id" },
     })
-    .populate({ path: "fine", select: "amount -_id" });
+    .populate({ path: "fine", select: "amount -_id" })
+    .sort({ returnDate: -1 });
 
   return { returnedBooksArray: await query.exec(), totalPages };
 };

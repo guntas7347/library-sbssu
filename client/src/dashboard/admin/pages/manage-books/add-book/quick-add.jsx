@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
-import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import { quickAddBook } from "../../../hooks/http-requests.hooks.admin";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
+import Input from "../../../../../components/forms/input";
 
-const QuickAddBook = ({ passSuccess }) => {
+const QuickAddBook = ({ onClose }) => {
   const { setFeedback } = useContext(SnackBarContext);
 
   const { formFields, handleChange, resetFormFields } = useForm({
@@ -19,7 +19,7 @@ const QuickAddBook = ({ passSuccess }) => {
 
     await quickAddBook(formFields)
       .then((res) => {
-        passSuccess();
+        onClose();
         resetFormFields();
         setFeedback([1, 1, res]);
       })
@@ -27,42 +27,129 @@ const QuickAddBook = ({ passSuccess }) => {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-10 grid gap-10  z-50 opacity-100">
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-2 gap-10">
-          <InputField
-            label="Book Title"
-            name="title"
-            type="text"
-            onChange={handleChange}
-          />
-          <InputField
-            label="Author"
-            name="author"
-            type="text"
-            onChange={handleChange}
-          />
-          <InputField
-            label="ISBN"
-            name="isbn"
-            type="number"
-            onChange={handleChange}
-            required={false}
-          />
-          <InputField
-            label="Accession Number"
-            name="accessionNumber"
-            type="number"
-            onChange={handleChange}
-          />
+    <>
+      <div>
+        <div
+          id="default-modal"
+          aria-hidden="true"
+          className=" flex inset-0 overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black/50"
+        >
+          <div className="relative p-4 w-full max-w-2xl max-h-full">
+            <div className="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+              <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Quick Add Book
+                </h3>
+                <button
+                  type="button"
+                  className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                  onClick={onClose}
+                >
+                  <svg
+                    className="w-3 h-3"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 14 14"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+                    />
+                  </svg>
+                  <span className="sr-only">Close modal</span>
+                </button>
+              </div>
+              <div className="p-4 md:p-5 ">
+                <form action="" onSubmit={handleSubmit}>
+                  <div className="grid gap-6 mb-6 md:grid-cols-2">
+                    <Input
+                      label="Book Title"
+                      name="title"
+                      type="text"
+                      onChange={handleChange}
+                      value={formFields.title}
+                    />
+                    <Input
+                      label="Author"
+                      name="author"
+                      type="text"
+                      onChange={handleChange}
+                      value={formFields.author}
+                    />
+                    <Input
+                      label="ISBN"
+                      name="isbn"
+                      type="number"
+                      onChange={handleChange}
+                      value={formFields.isbn}
+                      required={false}
+                    />
+                    <Input
+                      label="Accession Number"
+                      name="accessionNumber"
+                      type="number"
+                      onChange={handleChange}
+                      value={formFields.accessionNumber}
+                    />
+                  </div>{" "}
+                  <div className="flex justify-end items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                    <button
+                      type="submit"
+                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                    >
+                      Add Now
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex justify-center mt-5">
-          <button className="my-button" type="submit">
-            Add Now
-          </button>
-        </div>
-      </form>
-    </div>
+      </div>
+    </>
+    // <div className="bg-white rounded-3xl p-10 grid gap-10 z-50 opacity-100">
+    //   <form onSubmit={handleSubmit}>
+    //     <div className="grid grid-cols-2 gap-10">
+    //       <Input
+    //         label="Book Title"
+    //         name="title"
+    //         type="text"
+    //         onChange={handleChange}
+    //       />
+    //       <Input
+    //         label="Author"
+    //         name="author"
+    //         type="text"
+    //         onChange={handleChange}
+    //       />
+    //       <Input
+    //         label="ISBN"
+    //         name="isbn"
+    //         type="number"
+    //         onChange={handleChange}
+    //         required={false}
+    //       />
+    //       <Input
+    //         label="Accession Number"
+    //         name="accessionNumber"
+    //         type="number"
+    //         onChange={handleChange}
+    //       />
+    //     </div>
+    //     <div className="flex justify-center mt-5">
+    //       <button
+    //         className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+    //         type="submit"
+    //       >
+    //         Add Now
+    //       </button>
+    //     </div>
+    //   </form>
+    // </div>
   );
 };
 

@@ -4,12 +4,19 @@
     "sass": "^1.71.1"
   },
   "scripts": {
+    "dev": "concurrently --kill-others \"npm run server\" \"npm run client\"",
     "start": "concurrently --kill-others \"npm run mongo\" \"npm run server\" \"npm run client\"",
     "server": "cd server && npm run watch",
-    "client": "cd client && start npm start",
+    "client": "cd client && npm run dev",
     "mongo": "concurrently \"npm run mongoRS1\" \"npm run mongoRS2\" \"npm run mongoRS3\" ",
     "mongoRS1": "start mongod --replSet rs0 --port 27017 --bind_ip 127.0.0.1 --dbpath \"D:\\Programming\\MongoDB Database\\Library-SBSSU\\db-replica\\rs1\"",
     "mongoRS2": "start mongod --replSet rs0 --port 27018 --bind_ip 127.0.0.1 --dbpath \"D:\\Programming\\MongoDB Database\\Library-SBSSU\\db-replica\\rs2\"",
-    "mongoRS3": "start mongod --replSet rs0 --port 27019 --bind_ip 127.0.0.1 --dbpath \"D:\\Programming\\MongoDB Database\\Library-SBSSU\\db-replica\\rs3\""
+    "mongoRS3": "start mongod --replSet rs0 --port 27019 --bind_ip 127.0.0.1 --dbpath \"D:\\Programming\\MongoDB Database\\Library-SBSSU\\db-replica\\rs3\"",
+    "build": "cd client && npm run build && cp -r dist ../server"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.0.17"
   }
 }

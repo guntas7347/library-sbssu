@@ -1,18 +1,20 @@
 import { useContext, useState } from "react";
 
 import {
-  fetchBookByAccessionNumber,
-  fetchStudentByRollNumber,
+  fetchBookForIssue,
+  fetchMemberForIssue,
   issueNewBook,
 } from "../../../hooks/http-requests.hooks.admin";
 import { useForm } from "../../../../../components/forms/use-form-hook/use-form.hook.component";
 import CustomTableSelect from "../../../../../components/table/custom-table-select.component";
-import InputField from "../../../../../components/forms/input-field/input-field.component";
 import { rowsArray } from "../../../../../utils/functions";
 import AlertDialog from "../../../../../components/feedback/dialog/alert-dialog.component";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 import Dialog from "../../../../../components/feedback/dialog/dialog.component";
 import QuickAddBook from "../../manage-books/add-book/quick-add";
+import Input from "../../../../../components/forms/input";
+import QuickSearchMember from "../../members/quick-search.modal";
+import IssueConfirmationModal from "./issue-confirmation.modal";
 
 const IssueNewBookPage = () => {
   const { setFeedback } = useContext(SnackBarContext);
@@ -22,14 +24,15 @@ const IssueNewBookPage = () => {
   const [bookRowData, setBookRowData] = useState([]);
   const [studentRowData, setMemberRowData] = useState([]);
 
-  const [imgUrl, setImgUrl] = useState(null);
+  const [imageUrl, setImgUrl] = useState(null);
 
   const [selectedCardNumber, setSelectedCardNumber] = useState("");
   const [selectedAccessionNumber, setSelectedAccessionNumber] = useState("");
 
   const [showAlertDialog, setShowAlertDialog] = useState(false);
 
-  const [showDialog, setShowDialog] = useState(false);
+  const [showBookDialog, setShowBookDialog] = useState(false);
+  const [showMemberDialog, setShowMemberDialog] = useState(false);
 
   const { formFields, handleChange } = useForm({
     membershipId: "",
@@ -40,24 +43,21 @@ const IssueNewBookPage = () => {
   const { membershipId, accessionNumber, issueDate } = formFields;
 
   const handleFetchBook = async () => {
-    await fetchBookByAccessionNumber(accessionNumber)
+    await fetchBookForIssue(accessionNumber)
       .then((res) => {
         setShowBookTable(true);
         setBookRowData(
-          rowsArray(
-            [{ ...res, ...res.bookId }],
-            ["isbn", "title", "author", "accessionNumber", "status"]
-          )
+          rowsArray([res], ["title", "author", "accessionNumber", "status"])
         );
       })
       .catch((err) => setFeedback([1, 2, err]));
   };
 
-  const handleFetchStuent = () => {
-    fetchStudentByRollNumber(formFields.membershipId)
+  const handleFetchMember = () => {
+    fetchMemberForIssue(formFields.membershipId)
       .then((res) => {
         setShowMemberTable(true);
-        setImgUrl(res.imgUrl);
+        setImgUrl(res.imageUrl);
         setMemberRowData(
           rowsArray(addLibraryCardsValueToObject(res), [
             "membershipId",
@@ -74,7 +74,8 @@ const IssueNewBookPage = () => {
     const array = [];
     for (let i = 0; i < obj.libraryCards.length; i++) {
       array.push({
-        ...obj,
+        fullName: obj.fullName,
+        membershipId: obj.membershipId,
         cardNumber: obj.libraryCards[i].cardNumber,
         cardStatus: obj.libraryCards[i].status,
       });
@@ -110,7 +111,7 @@ const IssueNewBookPage = () => {
       .then((res) => {
         setFeedback([1, 1, res]);
         handleFetchBook();
-        handleFetchStuent();
+        handleFetchMember();
       })
       .catch((err) => setFeedback([1, 2, err]));
   };
@@ -129,29 +130,31 @@ const IssueNewBookPage = () => {
 
   return (
     <>
-      <h1 className="text-center font-bold text-3xl my-2">Issue a Book</h1>
-      <div className="bg-white rounded-3xl p-5 grid gap-10">
-        <div>
-          <div className="flex justify-between gap-5">
-            <InputField
-              label="Book's Accession Number"
-              name="accessionNumber"
-              type="text"
-              value={accessionNumber}
-              disabled={showBookTable}
-              onChange={handleChange}
-            />
+      <h1 className="text-3xl font-semibold my-5">Issue Book</h1>
+      <div className="c-box">
+        <div className="grid grid-cols-1">
+          <div className="grid grid-cols-4 gap-1">
+            <div className="col-span-2 max-w-96">
+              <Input
+                label="Book's Accession Number"
+                name="accessionNumber"
+                type="text"
+                value={accessionNumber}
+                disabled={showBookTable}
+                onChange={handleChange}
+              />
+            </div>
             <button
-              className="my-button w-48"
+              className="c-button"
               disabled={showBookTable}
               onClick={handleFetchBook}
             >
               Search Book
             </button>
             <button
-              className="my-button w-48"
+              className="c-button"
               disabled={showBookTable}
-              onClick={() => setShowDialog(true)}
+              onClick={() => setShowBookDialog(true)}
             >
               Quick Add Book
             </button>
@@ -161,7 +164,6 @@ const IssueNewBookPage = () => {
               <div className="mt-5">
                 <CustomTableSelect
                   columns={[
-                    "ISBN",
                     "Title",
                     "Author",
                     "Accession Number",
@@ -169,30 +171,36 @@ const IssueNewBookPage = () => {
                   ]}
                   rows={bookRowData}
                   onSelect={handleSelect}
-                  indexToSelect={3}
+                  indexToSelect={2}
                   tableName="booksTable"
                 />
               </div>
             )}
           </div>
-        </div>
-
-        <div>
-          <div className="flex justify-between gap-5">
-            <InputField
-              label="Membership Id"
-              name="membershipId"
-              type="text"
-              value={membershipId}
-              disabled={showMemberTable}
-              onChange={handleChange}
-            />
+          <div className="grid grid-cols-4 mt-10">
+            <div className="col-span-2 max-w-96">
+              <Input
+                label="Membership Id"
+                name="membershipId"
+                type="text"
+                value={membershipId}
+                disabled={showMemberTable}
+                onChange={handleChange}
+              />
+            </div>
             <button
-              className="my-button w-48"
+              className="c-button"
               disabled={showMemberTable}
-              onClick={handleFetchStuent}
+              onClick={handleFetchMember}
             >
               Search Member
+            </button>
+            <button
+              className="c-button"
+              disabled={showMemberTable}
+              onClick={() => setShowMemberDialog(true)}
+            >
+              Quick Search
             </button>
           </div>
           <div>
@@ -209,14 +217,14 @@ const IssueNewBookPage = () => {
                   onSelect={handleSelect}
                   indexToSelect={2}
                   tableName="studentsTable"
-                  imgUrl={imgUrl}
+                  imageUrl={imageUrl}
                 />
               </div>
             )}
           </div>
         </div>
 
-        <div>
+        <div className="mt-10">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -224,21 +232,21 @@ const IssueNewBookPage = () => {
             }}
           >
             <div className="grid grid-cols-3 gap-5 items-center justify-center">
-              <InputField
+              <Input
                 disabled
                 label="Card Number"
                 name="cardNumber"
                 value={selectedCardNumber}
               />
 
-              <InputField
+              <Input
                 disabled
                 label="Accession Number"
                 name="accessionNumber"
                 value={selectedAccessionNumber}
               />
 
-              <InputField
+              <Input
                 label="Issue Date"
                 name="issueDate"
                 type="date"
@@ -250,7 +258,7 @@ const IssueNewBookPage = () => {
             </div>
             <div className="mt-5 flex flex-row justify-center items-center">
               <button
-                className="my-button"
+                className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
                 disabled={disableIssueButton()}
                 type="submit"
               >
@@ -260,30 +268,23 @@ const IssueNewBookPage = () => {
           </form>
         </div>
       </div>
-
-      <div>
-        <AlertDialog
-          title="Confirm?"
-          content={
-            <>
-              Issue Book:- <br />
-              Accession Number: {selectedAccessionNumber} <br />
-              Library Card Number: {selectedCardNumber} <br />
-              Issue Date: {new Date(issueDate).toDateString()}
-            </>
-          }
-          open={showAlertDialog}
-          handleClick={(e) => {
-            if (e) handleIssueNewBook();
+      <div></div>
+      {showAlertDialog && (
+        <IssueConfirmationModal
+          onClose={() => setShowAlertDialog(false)}
+          accessionNumber={selectedAccessionNumber}
+          cardNumber={selectedCardNumber}
+          issueDate={issueDate}
+          onClick={(e) => {
+            e && handleIssueNewBook();
             setShowAlertDialog(false);
           }}
         />
-      </div>
-      {showDialog && (
-        <Dialog onClose={() => setShowDialog(false)}>
-          <QuickAddBook passSuccess={() => setShowDialog(false)} />
-        </Dialog>
       )}
+      {showBookDialog && (
+        <QuickAddBook onClose={() => setShowBookDialog(false)} />
+      )}
+      {/* {showMemberDialog && <QuickSearchMember />} */}
     </>
   );
 };

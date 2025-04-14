@@ -5,8 +5,14 @@ import Dialog from "../../feedback/dialog/dialog.component";
 import { getCroppedImg } from "../../../utils/functions";
 import Spinner from "../../feedback/spinner/spinner.component";
 import { deleteImageFromCloud } from "../../../dashboard/http-requests";
+import { API_URL } from "../../../keys";
 
-const ImageUploader = ({ onChange }) => {
+const ImageUploader = ({
+  onChange,
+  label = "Image",
+  maxFileSize = 1,
+  name = "imageUrl",
+}) => {
   const fileInputRef = useRef(null);
   const [imgErrorMessage, setImgErrorMessage] = useState(false);
   const [imgSrc, setImgSrc] = useState(null);
@@ -19,7 +25,7 @@ const ImageUploader = ({ onChange }) => {
   });
   const [crpdImg, setCrpdImg] = useState(null);
 
-  const [imgUrl, setImgUrl] = useState(null);
+  const [imageUrl, setImgUrl] = useState(null);
 
   const [isUploading, setIsUploading] = useState(false);
 
@@ -30,10 +36,10 @@ const ImageUploader = ({ onChange }) => {
   const handleImageSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 1024 * 1024) {
+    if (file.size > 1024 * 1024 * maxFileSize) {
       e.target.value = "";
       setImgErrorMessage(true);
-      setImgSrc(""); // Clear image source
+      setImgSrc("");
       return;
     }
     if (imgErrorMessage) setImgErrorMessage(false);
@@ -64,7 +70,7 @@ const ImageUploader = ({ onChange }) => {
 
     try {
       setIsUploading(true);
-      const response = await fetch("http://localhost:8080/api/upload/image", {
+      const response = await fetch(`${API_URL}/upload/image`, {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -72,13 +78,13 @@ const ImageUploader = ({ onChange }) => {
       const data = await response.json();
 
       if (data.status === "ULD201IMG") {
-        setImgUrl(data.payload.imgUrl);
+        setImgUrl(data.payload.imageUrl);
         setIsUploading(false);
         setShowDialog(false);
         onChange({
           target: {
-            name: "imgUrl",
-            value: data.payload.imgUrl,
+            name,
+            value: data.payload.imageUrl,
           },
         });
       }
@@ -106,9 +112,9 @@ const ImageUploader = ({ onChange }) => {
   };
 
   const handleDelete = async (e) => {
-    if (imgUrl) {
+    if (imageUrl) {
       e.preventDefault();
-      await deleteImageFromCloud({ imgUrl })
+      await deleteImageFromCloud({ imageUrl })
         .then(() => {
           resetComponent();
         })
@@ -122,10 +128,10 @@ const ImageUploader = ({ onChange }) => {
     <>
       <div className="flex flex-row gap-3 justify-between items-center">
         <label className="text-xl" htmlFor="Image">
-          Image
+          {label}
         </label>
         <div className="flex gap-3 justify-between items-center">
-          {!imgUrl ? (
+          {!imageUrl ? (
             <>
               <input
                 className="border border-black px-1 w-60 text-xl"
@@ -136,7 +142,9 @@ const ImageUploader = ({ onChange }) => {
                 required
               />
               {imgErrorMessage && (
-                <p className="text-red-800">File size exceeds 1 MB!</p>
+                <p className="text-red-800">
+                  File size exceeds {maxFileSize} MB!
+                </p>
               )}
             </>
           ) : (
@@ -144,7 +152,7 @@ const ImageUploader = ({ onChange }) => {
               <div className="flex gap-5">
                 <img
                   className="w-20 h-20 rounded-full"
-                  src={imgUrl}
+                  src={imageUrl}
                   alt="image"
                 />
                 <button onClick={handleDelete}>
@@ -187,7 +195,10 @@ const ImageUploader = ({ onChange }) => {
                 <Spinner />
               </div>
             ) : (
-              <button className="mt-10 my-button" onClick={handleUpload}>
+              <button
+                className="mt-10 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+                onClick={handleUpload}
+              >
                 Upload
               </button>
             )}

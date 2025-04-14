@@ -33,7 +33,7 @@ const Pagination = ({ totalPages = 1 }) => {
   return (
     <div className="flex gap-10 justify-center items-center my-2">
       <button
-        className="my-button"
+        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         onClick={handlePreviousPage}
         disabled={pageNumber < 2}
       >
@@ -43,7 +43,7 @@ const Pagination = ({ totalPages = 1 }) => {
         {pageNumber} of {totalPages}
       </p>
       <button
-        className="my-button"
+        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
         onClick={handleNextPage}
         disabled={pageNumber >= totalPages}
       >
@@ -63,7 +63,10 @@ const Pagination = ({ totalPages = 1 }) => {
               e.target.value > totalPages ? totalPages : e.target.value;
           }}
         />
-        <button className="my-button" onClick={handleJumpPage}>
+        <button
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+          onClick={handleJumpPage}
+        >
           Jump
         </button>
       </div>

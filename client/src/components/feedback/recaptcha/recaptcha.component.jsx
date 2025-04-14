@@ -1,12 +1,10 @@
-import ReCAPTCHA from "react-google-recaptcha";
+// import ReCAPTCHA from "react-google-recaptcha";
+// import { reCAPTCHA_SITE_KEY } from "../../../keys";
 
 const ReCaptcha = ({ onChange }) => {
   return (
     <div>
-      <ReCAPTCHA
-        sitekey="6LczFYgpAAAAALk-4XyUrx0bRXOXoWLK9phbwe1O"
-        onChange={onChange}
-      />
+      {/* <ReCAPTCHA sitekey={reCAPTCHA_SITE_KEY} onChange={onChange} /> */}
     </div>
   );
 };

@@ -26,7 +26,7 @@ const getBooks = async (queryParam) => {
 
   switch (filter) {
     case "accessionNumber":
-      const accessionNumber = await getAccession({
+      var accessionNumber = await getAccession({
         accessionNumber: filterValue,
       });
       if (accessionNumber)
@@ -34,6 +34,18 @@ const getBooks = async (queryParam) => {
           _id: accessionNumber.bookId,
         });
       else query.where({ _id: { $exists: false } });
+      break;
+
+    case "title":
+      query.where({ title: { $regex: filterValue, $options: "i" } });
+
+      totalPages = Math.ceil(
+        (await countTotalBooks({
+          title: { $regex: filterValue, $options: "i" },
+        })) / 25
+      );
+
+      // to do, add respective total books counter
       break;
 
     default:
@@ -49,8 +61,8 @@ const getBooks = async (queryParam) => {
   };
 };
 
-const countTotalBooks = async () => {
-  return await booksMongo.countDocuments();
+const countTotalBooks = async (query = {}) => {
+  return await booksMongo.countDocuments().where(query);
 };
 
 const getBookByIsbn = async (isbn, select, populate = false) => {

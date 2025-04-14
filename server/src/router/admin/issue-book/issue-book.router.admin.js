@@ -51,15 +51,7 @@ issueBookRouter.post(
 issueBookRouter.post(
   "/fetch-issued-book-by-accession-number",
   authorisationLevel(1),
-  fetchIssuedBookByAccessionNumber,
-  async (req, res) => {
-    try {
-      return res.status(200).json(crs.ISB200FIBBAN(req.cust));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
-    }
-  }
+  fetchIssuedBookByAccessionNumber
 ); //fetch-issued-book-by-accession-number
 
 issueBookRouter.post(
@@ -94,14 +86,7 @@ issueBookRouter.post(
 issueBookRouter.post(
   "/fetch-issued-book",
   authorisationLevel(2),
-  fetchIssuedBookDocById,
-  async (req, res) => {
-    try {
-      return res.status(200).json(crs.ISB200FIB(req.cust.issuedBook));
-    } catch (err) {
-      return res.status(500).json(crs.SERR500REST(err));
-    }
-  }
+  fetchIssuedBookDocById
 ); //fetch-issued-book
 
 issueBookRouter.post(

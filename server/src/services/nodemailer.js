@@ -1,5 +1,3 @@
-require("dotenv").config();
-
 const nodemailer = require("nodemailer");
 
 const config = {
@@ -9,7 +7,7 @@ const config = {
     pass: process.env.NODEMAILER_PASSWORD,
   },
 };
-//sandhugameswithJob vszebtreekxlwsxu
+//sandhugameswithJoy vszebtreekxlwsxu
 
 const transporter = nodemailer.createTransport(config);
 

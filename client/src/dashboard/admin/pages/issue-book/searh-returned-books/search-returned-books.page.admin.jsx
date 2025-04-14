@@ -1,28 +1,30 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import {
   downloadAllReturnedBooks,
   fetchAllReturnedBooks,
 } from "../../../hooks/http-requests.hooks.admin";
-import CustomTable from "../../../../../components/table/custom-table.component";
 import { processData } from "../../../../../utils/functions";
-import { useNavigate } from "react-router-dom";
-import SearchQueriesComponent from "../../../../../components/forms/search-query/search-query.component";
 import { SnackBarContext } from "../../../../../components/context/snackbar.context";
 import useQueryParams from "../../../../../components/hooks/useQueryParams.hook";
-import Pagination from "../../../../../components/pagination/pagination";
+import SearchBarMenu from "../../../../../components/forms/search-bar-menu";
+import Table from "../../../../../components/table/button-table";
+import ReturnedBookModal from "./view-book.issue-book.page.admin";
 
 const SearchReturnedBooks = () => {
-  const navigate = useNavigate();
-
   const { queryString } = useQueryParams();
   const { setFeedback } = useContext(SnackBarContext);
 
   const [rowData, setRowData] = useState([]);
 
   const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [modal, setModal] = useState("");
+  const [currentFilter, setCurrentFilter] = useState({});
 
-  const handleFetch = async () => {
-    await fetchAllReturnedBooks(queryString)
+  const handleFetch = async (e) => {
+    setCurrentFilter({ ...currentFilter, ...e });
+
+    await fetchAllReturnedBooks({ ...currentFilter, ...e })
       .then((res) => {
         setTotalPages(res.totalPages);
         setRowData(
@@ -46,7 +48,7 @@ const SearchReturnedBooks = () => {
   };
 
   const handleDownload = async () => {
-    await downloadAllReturnedBooks(queryString)
+    await downloadAllReturnedBooks(currentFilter)
       .then((res) => {
         setFeedback([1, 1, res]);
       })
@@ -58,64 +60,73 @@ const SearchReturnedBooks = () => {
     return true;
   };
 
-  useEffect(() => {
-    handleFetch();
-  }, [queryString]);
-
   return (
     <>
       <div>
-        <h1 className="text-center font-bold text-3xl my-2">
-          Search Returned Books
-        </h1>
         <div>
-          <div className="flex gap-10 justify-between my-5 bg-white p-5 rounded-3xl">
-            <SearchQueriesComponent
-              selectFields={[
-                {
-                  name: "Search All Returned Books",
-                  value: "fetchAllReturnedBooks",
-                },
-                {
-                  name: "Accession Number",
-                  value: "accessionNumber",
-                },
-                {
-                  name: "Library Card Number",
-                  value: "cardNumber",
-                },
-                {
-                  name: "Current Month",
-                  value: "currentMonth",
-                },
-                {
-                  name: "Date Range",
-                  value: "dateRange",
-                },
-              ]}
-            />
-          </div>
-          <CustomTable
-            columns={[
-              "Accession Number",
-              "Book Title",
-              "Card Number",
-              "Issue Date",
-              "Return Date",
-              "Student Roll Number",
-              "Student Name",
-              "Fine",
-            ]}
-            rows={rowData}
-            handleRowClick={(e) => navigate(`view-book/${e}`)}
-          />
-          <div className="mt-5 flex flex-row gap-10 justify-center items-center">
-            {tableHasData() && (
-              <button className="my-button" onClick={handleDownload}>
-                Export To Excel
-              </button>
+          <div className="px-10">
+            <h1 className="text-3xl font-semibold my-5">Returned Books</h1>
+            <div className="c-box">
+              <SearchBarMenu
+                onSearch={(e) => {
+                  handleFetch(e);
+                }}
+                menuOptions={[
+                  "Accession Number",
+                  "Current Month",
+                  "Date Range",
+                  "Library Card Number",
+                ]}
+              />
+              <div className="my-5">
+                <Table
+                  cols={[
+                    "Accession Number",
+                    "Book Title",
+                    "Card Number",
+                    "Issue Date",
+                    "Return Date",
+                    "Student Roll Number",
+                    "Student Name",
+                    "Fine",
+                    "Action",
+                  ]}
+                  rows={rowData}
+                  onClick={(a, e) => setModal(e)}
+                  actions={["View"]}
+                  totalPages={totalPages}
+                  currentPage={currentPage}
+                  setPage={(e) => {
+                    setCurrentPage(e);
+                    handleFetch({ page: e });
+                  }}
+                />
+              </div>
+              {tableHasData() && (
+                <button
+                  type="button"
+                  onClick={handleDownload}
+                  className="py-2 px-3 inline-flex items-center text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                >
+                  <svg
+                    className="w-3 h-3 me-1.5"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z" />
+                    <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z" />
+                  </svg>
+                  Download
+                </button>
+              )}
+            </div>
+            {modal !== "" ? (
+              <ReturnedBookModal id={modal} onClose={() => setModal("")} />
+            ) : (
+              <div />
             )}
-            <Pagination totalPages={totalPages} />
           </div>
         </div>
       </div>

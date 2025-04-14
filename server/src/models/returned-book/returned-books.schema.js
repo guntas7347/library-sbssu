@@ -1,31 +1,31 @@
-const { default: mongoose, Schema, model } = require("mongoose");
+const { Schema, model, models } = require("mongoose");
 
 const ReturnedBooksSchema = new Schema({
   bookAccessionId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "bookAccession",
+    type: Schema.Types.ObjectId,
+    ref: "Accession",
     required: true,
   },
   libraryCardId: {
-    type: mongoose.Types.ObjectId,
-    ref: "libraryCard",
+    type: Schema.Types.ObjectId,
+    ref: "LibraryCard",
     required: true,
   },
   issueDate: { type: Date, required: true },
   returnDate: { type: Date, required: true },
   fine: {
-    type: mongoose.Types.ObjectId,
-    ref: "fine",
+    type: Schema.Types.ObjectId,
+    ref: "Transaction",
     default: null,
   },
   issuedBy: {
-    type: mongoose.Types.ObjectId,
-    ref: "staff",
+    type: Schema.Types.ObjectId,
+    ref: "Staff",
     required: true,
   },
   returnedBy: {
-    type: mongoose.Types.ObjectId,
-    ref: "staff",
+    type: Schema.Types.ObjectId,
+    ref: "Staff",
     required: true,
   },
   issueRemark: {
@@ -38,4 +38,7 @@ const ReturnedBooksSchema = new Schema({
   },
 });
 
-module.exports = model("returnedBook", ReturnedBooksSchema, "returnedBooks");
+const ReturnedBook =
+  models.ReturnedBook || model("ReturnedBook", ReturnedBooksSchema);
+
+module.exports = ReturnedBook;
