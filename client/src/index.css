@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+.c-box {
+  @apply bg-white px-10 py-5 rounded dark:bg-gray-900;
+}
+
+.c-sidebar-li {
+  @apply flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.display-none {
+  display: none !important;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  gap: 20px;
+}
+.admin-dashboard-body {
+  padding: 10px 50px;
+  .page-header {
+    font-size: 30px;
+    font-weight: bold;
+    margin-bottom: 0;
+  }
+  .white-container {
+    padding: 30px;
+    border-radius: 20px;
+    background-color: white;
+  }
+}
+
+.page-heading {
+  @apply font-bold text-3xl;
+}
+
+.c-btn-blue {
+  @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800;
+}
+
+.text-white
+  bg-blue-700
+  hover:bg-blue-800
+  focus:ring-4
+  focus:ring-blue-300
+  font-medium
+  rounded-lg
+  text-sm
+  px-5
+  py-2.5
+  me-2
+  mb-2
+  dark:bg-blue-600
+  dark:hover:bg-blue-700
+  focus:outline-none
+  dark:focus:ring-blue-800:hover {
+  background-color: #907ad6;
+
+  cursor: pointer;
+}
+
+.text-white
+  bg-blue-700
+  hover:bg-blue-800
+  focus:ring-4
+  focus:ring-blue-300
+  font-medium
+  rounded-lg
+  text-sm
+  px-5
+  py-2.5
+  me-2
+  mb-2
+  dark:bg-blue-600
+  dark:hover:bg-blue-700
+  focus:outline-none
+  dark:focus:ring-blue-800:active,
+.text-white
+  bg-blue-700
+  hover:bg-blue-800
+  focus:ring-4
+  focus:ring-blue-300
+  font-medium
+  rounded-lg
+  text-sm
+  px-5
+  py-2.5
+  me-2
+  mb-2
+  dark:bg-blue-600
+  dark:hover:bg-blue-700
+  focus:outline-none
+  dark:focus:ring-blue-800:disabled {
+  opacity: 0.5;
+}
+
+.bg-custom-dark-blue {
+  --tw-bg-opacity: 1;
+  background-color: rgb(32 38 80 / var(--tw-bg-opacity));
+}
