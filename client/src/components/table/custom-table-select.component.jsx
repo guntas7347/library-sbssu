@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import "./table.styles.scss";
+import { BadgeCheckSVG, CloseCircleSVG } from "../svg/svg-icons";
 
 const CustomTableSelect = ({
   tableName,
@@ -54,7 +55,7 @@ const CustomTableSelect = ({
                 >
                   <td className="px-6 py-4">
                     <input
-                      className="size-5"
+                      className="size-5 cursor-pointer text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                       type="checkbox"
                       onChange={(e) => {
                         handleRowClick(index, row);
@@ -64,6 +65,23 @@ const CustomTableSelect = ({
                     />
                   </td>
                   {row.map((td, index) => {
+                    if (td === "available")
+                      return (
+                        <td key={index} className="px-6 py-4">
+                          <span className="flex gap-2">
+                            Available {td === "available" && <BadgeCheckSVG />}
+                          </span>
+                        </td>
+                      );
+                    if (td === "issued")
+                      return (
+                        <td key={index} className="px-6 py-4">
+                          <span className="flex gap-2">
+                            Issued {td === "issued" && <CloseCircleSVG />}{" "}
+                          </span>
+                        </td>
+                      );
+
                     return (
                       <td key={index} className="px-6 py-4">
                         {td}
@@ -77,7 +95,12 @@ const CustomTableSelect = ({
               <tr>
                 <td className="text-left w-96 px-6 py-3">Image</td>
                 <td>
-                  <img className="w-52 h-52" src={imageUrl} alt="image" />
+                  <img
+                    className="w-52 h-52"
+                    crossOrigin="anonymous"
+                    src={imageUrl}
+                    alt="image"
+                  />
                 </td>
               </tr>
             )}

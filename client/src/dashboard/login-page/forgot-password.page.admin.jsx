@@ -1,14 +1,14 @@
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
 import { resetPasswordAdminDispatchLink } from "../http-requests";
 import { useContext } from "react";
-import { SnackBarContext } from "../../components/context/snackbar.context";
+import { useFeedback } from "../../components/context/snackbar.context";
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/forms/input";
 
 const AdminForgotPassword = () => {
   const navigate = useNavigate();
 
-  const { setFeedback } = useContext(SnackBarContext);
+  const setFeedback = useFeedback();
 
   const { formFields, handleChange } = useForm({
     email: "",
@@ -19,10 +19,10 @@ const AdminForgotPassword = () => {
     await resetPasswordAdminDispatchLink(formFields)
       .then((res) => {
         setFeedback([1, 1, res.message]);
-        navigate("/");
+        navigate("/admin");
       })
-      .catch((err) => {
-        setFeedback([1, 2, err]);
+      .catch((error) => {
+        setFeedback([1, 2, error]);
       });
   };
 
@@ -32,7 +32,7 @@ const AdminForgotPassword = () => {
         <div className="self-start flex flex-row items-center gap-5">
           <img
             className="h-10 inline-block"
-            src="https://sbssu.ac.in/images/Tricolor.png"
+            src="/sbssu-logo.png"
             alt="sbssu logo"
           />
           <h1 className="text-3xl text-indigo-900 dark:text-indigo-100 font-bold inline-block">
@@ -62,7 +62,7 @@ const AdminForgotPassword = () => {
         </div>
         <div className="flex  w-full justify-center">
           <div>
-            <Link to={"/"}>Login with credentials</Link>
+            <Link to={"/admin"}>Login with credentials</Link>
           </div>
         </div>
       </div>

@@ -1,225 +1,188 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   fetchStudentById,
   processApplication,
 } from "../../hooks/http-requests.hooks.admin";
 import Input from "../../../../components/forms/input";
-import { SnackBarContext } from "../../../../components/context/snackbar.context";
+import { useFeedback } from "../../../../components/context/snackbar.context";
+import { UPLOADS_PATH } from "../../../../keys";
+import Modal from "../../../../components/modals/modal.component";
+import LoadingModal from "../../../../components/modals/loading-modal";
+import ConfirmationModal from "../../../../components/modals/confirmation-model";
 
 const ApproveModal = ({ id, onClose }) => {
-  const { setFeedback } = useContext(SnackBarContext);
-  const [formFields, setFormFields] = useState({ dob: "", image: null });
+  const setFeedback = useFeedback();
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [alert, setAlert] = useState(false);
+  const [btn, setBtn] = useState(true);
 
   const [decisionTaken, setDecisionTaken] = useState(false);
 
-  const disabled = true;
-
-  const {
-    rollNumber,
-    fullName,
-    fatherName,
-    gender,
-    dob,
-    program,
-    specialization,
-    batch,
-    email,
-    category,
-    phoneNumber,
-    createdAt,
-    role,
-    imageUrl,
-  } = formFields;
-
-  console.log();
-
   useEffect(() => {
-    const asyncFunc = async () => {
-      await fetchStudentById(id)
-        .then((studentDoc) => {
-          const libraryCardsString = mergeArrayElementsToString(
-            studentDoc.libraryCards.map((libraryCard) => {
-              return libraryCard.cardNumber;
-            })
-          );
-          setFormFields({ ...studentDoc, libraryCards: libraryCardsString });
-        })
-        .catch(() => setFormFields({ fullName: "Not Found" }));
-    };
-    asyncFunc();
+    (async () => {
+      try {
+        const res = await fetchStudentById(id);
+
+        setData(res);
+        setLoading(false);
+      } catch (error) {
+        setFeedback(2, error);
+        onClose();
+      }
+    })();
   }, []);
 
-  const mergeArrayElementsToString = (array = []) => {
-    let string = "";
-    let isFirst = true;
-
-    if (array.length === 0) {
-      return "None";
+  const handleApprove = async () => {
+    setBtn(false);
+    try {
+      const res = await processApplication({ decision: "APPROVE", _id: id });
+      setFeedback(1, res);
+      setDecisionTaken(true);
+    } catch (error) {
+      setFeedback(2, error);
     }
-
-    array.forEach((element) => {
-      if (isFirst) {
-        string += element;
-        isFirst = false;
-      } else {
-        string += ", " + element;
+  };
+  const handleReject = async () => {
+    setBtn(false);
+    if (confirm(`Are you sure of it to REJECT the appliction?`))
+      try {
+        const res = await processApplication({ decision: "REJECT", _id: id });
+        setFeedback(1, res);
+        setDecisionTaken(true);
+      } catch (error) {
+        setFeedback(2, error);
       }
-    });
-
-    return string;
+    else setBtn(true);
   };
 
-  const handleDecision = async (decision) => {
-    if (confirm(`Are you sure of it to ${decision} the appliction?`))
-      await processApplication({ decision, _id: id })
-        .then((res) => {
-          setFeedback([1, 1, res]);
-          setDecisionTaken(true);
-        })
-        .catch((err) => setFeedback([1, 2, err]));
-  };
+  if (loading)
+    return <LoadingModal onClose={onClose} title="Applicant details" />;
+
+  const imagePath = data.imageUrl
+    ? UPLOADS_PATH + data.imageUrl
+    : UPLOADS_PATH + "/sample-user.jpg";
 
   return (
-    <div>
-      <div
-        id="default-modal"
-        aria-hidden="true"
-        className=" flex inset-0 overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black/50"
-      >
-        <div className="relative p-4 w-full max-w-2xl max-h-full">
-          <div className="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
-            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Member Details
-              </h3>
-              <button
-                type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                onClick={onClose}
-              >
-                <svg
-                  className="w-3 h-3"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 14 14"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                  />
-                </svg>
-                <span className="sr-only">Close modal</span>
-              </button>
-            </div>
-            <div className="p-4 md:p-5 ">
-              <div className="grid gap-6 mb-6 md:grid-cols-2">
-                <div className="grid gap-6">
-                  <Input
-                    disabled={disabled}
-                    label="Name"
-                    name="fullName"
-                    value={fullName}
-                  />
-                  <Input
-                    disabled={disabled}
-                    label="Father's Name"
-                    name="fatherName"
-                    value={fatherName}
-                  />
+    <>
+      <Modal title="Applicant details" onClose={onClose}>
+        <div className="grid gap-6 mb-6 md:grid-cols-2">
+          <div className="grid gap-6">
+            <Input
+              disabled={true}
+              label="Name"
+              name="fullName"
+              value={data.fullName}
+            />
+            <Input
+              disabled={true}
+              label="Father's Name"
+              name="fatherName"
+              value={data.fatherName}
+            />
 
-                  <Input
-                    disabled={disabled}
-                    label="Roll Number"
-                    name="rollNumber"
-                    value={rollNumber}
-                  />
-                </div>
-                <div className="flex justify-center items-center">
-                  <img
-                    className="border border-black"
-                    src={imageUrl}
-                    alt="image"
-                  />
-                </div>
-                <Input
-                  disabled={disabled}
-                  label="Gender"
-                  name="gender"
-                  value={gender}
-                />
-                <Input
-                  disabled={disabled}
-                  label="Date Of Birth"
-                  name="dob"
-                  type="date"
-                  value={dob.slice(0, 10)}
-                />
-                <Input
-                  disabled={disabled}
-                  label="Category"
-                  name="category"
-                  value={category}
-                />
-                <Input
-                  disabled={disabled}
-                  label="User Type"
-                  name="role"
-                  value={role}
-                />
-                <Input
-                  disabled={disabled}
-                  label="Academic Program"
-                  name="program"
-                  value={program}
-                />
-                <Input
-                  disabled={disabled}
-                  label="Batch"
-                  name="batch"
-                  value={batch}
-                />
-                <Input
-                  disabled={disabled}
-                  label="Email address"
-                  name="email"
-                  type="email"
-                  value={email}
-                />
-                <Input
-                  disabled={disabled}
-                  label="Phone Number"
-                  name="phoneNumber"
-                  type="number"
-                  value={phoneNumber}
-                />
-              </div>
-              {!decisionTaken && (
-                <div className="flex justify-end items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-                  <button
-                    type="button"
-                    onClick={async () => await handleDecision("REJECT")}
-                    className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                  >
-                    Reject
-                  </button>
-                  <button
-                    type="button"
-                    onClick={async () => await handleDecision("APPROVE")}
-                    className="c-btn-blue"
-                  >
-                    Approve
-                  </button>
-                </div>
-              )}
-            </div>
+            <Input
+              disabled={true}
+              label="Roll Number"
+              name="rollNumber"
+              value={data.rollNumber}
+            />
           </div>
+          <div className="flex justify-center items-center">
+            <img
+              className="border border-black w-full h-full max-h-full max-w-full object-cover"
+              crossOrigin="anonymous"
+              src={imagePath}
+              alt="image"
+            />
+          </div>
+          <Input
+            disabled={true}
+            label="Gender"
+            name="gender"
+            value={data.gender}
+          />
+          <Input
+            disabled={true}
+            label="Date Of Birth"
+            name="dob"
+            type="date"
+            value={data.dob.slice(0, 10)}
+          />
+          <Input
+            disabled={true}
+            label="Category"
+            name="category"
+            value={data.category}
+          />
+          <Input
+            disabled={true}
+            label="User Type"
+            name="role"
+            value={data.role}
+          />
+          <Input
+            disabled={true}
+            label="Academic Program"
+            name="program"
+            value={data.program}
+          />
+          <Input
+            disabled={true}
+            label="Batch"
+            name="batch"
+            value={data.batch}
+          />
+          <Input
+            disabled={true}
+            label="Email address"
+            name="email"
+            type="email"
+            value={data.email}
+          />
+          <Input
+            disabled={true}
+            label="Phone Number"
+            name="phoneNumber"
+            type="number"
+            value={data.phoneNumber}
+          />
         </div>
-      </div>
-    </div>
+        {!decisionTaken && (
+          <div className="flex justify-end items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+            <button
+              type="button"
+              onClick={async () => await handleReject()}
+              disabled={!btn}
+              className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+            >
+              Reject
+            </button>
+            <button
+              type="button"
+              onClick={() => setAlert(true)}
+              disabled={!btn}
+              className="c-btn-blue"
+            >
+              Approve
+            </button>
+          </div>
+        )}
+      </Modal>
+      <ConfirmationModal
+        onClose={() => setAlert(false)}
+        onYes={handleApprove}
+        show={alert}
+        title="Are you sure of it to approve the below applicant?"
+      >
+        <div className="grid grid-cols-2 text-start mb-5">
+          <span> Applicant name</span>
+          <span> {data.fullName} </span>
+          <span> Program</span>
+          <span> {data.program} </span>
+        </div>
+      </ConfirmationModal>
+    </>
   );
 };
 

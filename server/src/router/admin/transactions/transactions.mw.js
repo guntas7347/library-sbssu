@@ -58,7 +58,7 @@ const sendTransactionEmail = async (req, res, next) => {
     };
 
     transporter.sendMail({
-      from: "librarysbssu@gmail.com",
+      from: process.env.NODEMAILER_EMAIL,
       to: "guntas7347@gmail.com",
       subject: "Transaction detected",
       html: generateEmailTemplate.transactionConfirmation(emailContent),

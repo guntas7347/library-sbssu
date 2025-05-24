@@ -7,10 +7,22 @@ const AccessionSchema = new Schema({
   category: {
     type: String,
     default: "GENERAL",
-    enum: ["GENERAL", "BOOK BANK"],
   },
 });
 
 const Accession = models.Accession || model("Accession", AccessionSchema);
 
 module.exports = Accession;
+
+// async function updateBookBankCategory() {
+//   try {
+//     const result = await Accession.updateMany(
+//       { category: "BOOK BANK" },
+//       { $set: { category: "BOOK-BANK" } }
+//     );
+
+//     console.log(`${result.modifiedCount} documents updated.`);
+//   } catch (err) {
+//     console.error("Error updating documents:", err);
+//   }
+// }

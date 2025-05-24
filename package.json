@@ -1,10 +1,13 @@
 {
   "dependencies": {
     "concurrently": "^8.2.2",
-    "sass": "^1.71.1"
+    "qrcode": "^1.5.4",
+    "sass": "^1.71.1",
+    "speakeasy": "^2.0.0"
   },
   "scripts": {
     "dev": "concurrently --kill-others \"npm run server\" \"npm run client\"",
+    "dev-mongo-local": "concurrently --kill-others \"npm run server\" \"npm run client\" \"mongod --dbpath=D:/Programming/MongoDB Database/data-4-25\"",
     "start": "concurrently --kill-others \"npm run mongo\" \"npm run server\" \"npm run client\"",
     "server": "cd server && npm run watch",
     "client": "cd client && npm run dev",

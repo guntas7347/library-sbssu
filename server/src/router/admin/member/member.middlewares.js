@@ -18,12 +18,14 @@ const {
   cardNumberGenerator,
   getLibraryCardLimit,
   generateMembershipId,
+  createLog,
 } = require("../../../utils/functions");
 
 const { transporter } = require("../../../services/nodemailer");
 const { generateEmailTemplate } = require("../../../services/email-templates");
 const libraryCards = require("../../../models/library-cards/library-cards.schema");
 const Member = require("../../../models/member/member.schema");
+const Auth = require("../../../models/auth/auth.schema");
 
 const fetchStudentByRollNumber = async (req, res, next) => {
   try {
@@ -33,8 +35,8 @@ const fetchStudentByRollNumber = async (req, res, next) => {
     if (!req.cust) req.cust = {};
     req.cust.memberDoc = memberDoc;
     next();
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
     return res.status(500).json(crs.SERR500REST());
   }
 };
@@ -48,8 +50,8 @@ const fetchStudentByMembershipId = async (req, res, next) => {
     if (!req.cust) req.cust = {};
     req.cust.memberDoc = memberDoc;
     next();
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
     return res.status(500).json(crs.SERR500REST());
   }
 };
@@ -59,8 +61,8 @@ const verifyRollNumberAvailability = async (req, res, next) => {
     const memberDoc = await getMember({ rollNumber: req.body.rollNumber });
     if (memberDoc) return res.status(409).json(crs.CONFL409CNS());
     next();
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
     return res.status(500).json(crs.SERR500REST());
   }
 };
@@ -90,11 +92,11 @@ const allotLibraryCard = async (req, res) => {
     });
     await session.commitTransaction();
     return res.status(200).json(crs.STU200ALCTS());
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
     if (session.inTransaction()) await session.abortTransaction();
-    if (err.code === 11000) return res.status(409).json(crs.STU4091ALCTS());
-    return res.status(500).json(crs.SERR500REST(err));
+    if (error.code === 11000) return res.status(409).json(crs.STU4091ALCTS());
+    return res.status(500).json(crs.SERR500REST(error));
   } finally {
     await session.endSession();
   }
@@ -109,8 +111,8 @@ const fetchApplicationById = async (req, res, next) => {
     req.cust.applicantionDocId = applicantionDoc._doc._id;
 
     next();
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
     return res.status(500).json(crs.SERR500REST());
   }
 };
@@ -138,53 +140,42 @@ const processDecision = async (req, res, next) => {
 
         // auto assigning library cards
         const { membershipId, fullName, email, role, category } = memberDoc;
-        const cardLimit = getLibraryCardLimit(role, category);
+        const cardLimit = await getLibraryCardLimit(role, category);
         const cardNumbers = cardNumberGenerator(membershipId, cardLimit);
-
         if (!req.cust) req.cust = {};
         req.cust.fullName = fullName;
         req.cust.membershipId = membershipId;
         req.cust.email = email;
         req.cust.libraryCards = cardNumbers;
 
-        for (const cardNumber of cardNumbers) {
-          const libraryCard = await getLibraryCard({ cardNumber });
-          if (libraryCard) continue;
+        const { staffId } = await Auth.findById(req.user.uid)
+          .select("staffId -_id")
+          .lean();
 
-          if (
-            role === "STUDENT UG" &&
-            category === "SCST" &&
-            cardNumber % 10 > 2
-          ) {
-            const libraryCardDoc = await createLibraryCard(
-              { cardNumber, memberId: memberDoc.id, category: "BOOK BANK" },
-              session
-            );
-            await addLibraryCardToMember(
-              libraryCardDoc[0].memberId,
-              libraryCardDoc[0]._id,
-              session
-            );
-          } else {
-            const libraryCardDoc = await createLibraryCard(
-              { cardNumber, memberId: memberDoc.id },
-              session
-            );
-            await addLibraryCardToMember(
-              libraryCardDoc[0].memberId,
-              libraryCardDoc[0]._id,
-              session
-            );
-          }
+        for (const cardNumber of cardNumbers) {
+          const libraryCardDoc = await createLibraryCard(
+            {
+              cardNumber,
+              memberId: memberDoc.id,
+              createdBy: staffId,
+              autoAlloted: true,
+            },
+            session
+          );
+          await addLibraryCardToMember(
+            libraryCardDoc[0].memberId,
+            libraryCardDoc[0]._id,
+            session
+          );
         }
       });
       await session.commitTransaction();
     }
     next();
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
     if (session.inTransaction()) await session.abortTransaction();
-    return res.status(500).json(crs.SERR500REST(err));
+    return res.status(500).json(crs.SERR500REST(error));
   } finally {
     await session.endSession();
   }
@@ -193,7 +184,7 @@ const processDecision = async (req, res, next) => {
 const sendApprovalEmail = (req, res, next) => {
   try {
     transporter.sendMail({
-      from: "librarysbssu@gmail.com",
+      from: process.env.NODEMAILER_EMAIL,
       to: req.cust.email,
       subject: "Your Library Account is Approved – Start Issuing Books Now!",
       html: generateEmailTemplate.approvalEmail(
@@ -203,9 +194,9 @@ const sendApprovalEmail = (req, res, next) => {
       ),
     });
     next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.MDW500APM(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.MDW500APM(error));
   }
 };
 

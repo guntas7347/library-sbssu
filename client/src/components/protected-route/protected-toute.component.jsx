@@ -7,14 +7,17 @@ const ProtectedRoute = ({ redirectPath = "/", children, role = [] }) => {
   const [session, setSession] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const { setUserName } = useContext(AuthContext);
+  const { setUser } = useContext(AuthContext);
 
   useEffect(() => {
     const asyncFunc = async () => {
       await verifyAuthRole(role)
         .then((res) => {
           if (role.includes(res.payload.role)) {
-            setUserName(res.payload.userName);
+            setUser({
+              name: res.payload.staffId.fullName,
+              email: res.payload.email,
+            });
             setSession(true);
             setIsLoading(false);
           } else {
@@ -23,8 +26,8 @@ const ProtectedRoute = ({ redirectPath = "/", children, role = [] }) => {
             setIsLoading(false);
           }
         })
-        .catch((err) => {
-          console.log(err);
+        .catch((error) => {
+          console.log(error);
           setIsLoading(false);
         });
     };

@@ -1,7 +1,7 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import SearchBarMenu from "../../../../components/forms/search-bar-menu";
 import Table from "../../../../components/table/button-table";
-import { SnackBarContext } from "../../../../components/context/snackbar.context";
+import { useFeedback } from "../../../../components/context/snackbar.context";
 import { fetchTransactions } from "../../hooks/http-requests.hooks.admin";
 import { processData } from "../../../../utils/functions";
 import TransactionModal from "./modal";
@@ -9,7 +9,7 @@ import AddTransactionModal from "./add-transaction.modal";
 import AddButtonSVG from "../../../../components/buttons/svg-buttons/add-svg.button";
 
 const TransactionsPage = () => {
-  const { setFeedback } = useContext(SnackBarContext);
+  const setFeedback = useFeedback();
   const [rowData, setRowData] = useState([]);
 
   const [totalPages, setTotalPages] = useState(1);
@@ -39,8 +39,8 @@ const TransactionsPage = () => {
           setFeedback([1, 2, "No data found"]);
         }
       })
-      .catch((err) => {
-        setFeedback([1, 2, err]);
+      .catch((error) => {
+        setFeedback([1, 2, error]);
       });
   };
 

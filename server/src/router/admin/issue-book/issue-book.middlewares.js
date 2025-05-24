@@ -15,7 +15,7 @@ const {
 } = require("../../../models/auth/aduth_admin.controllers");
 const {
   createIssueBook,
-  getIssuedBookById,
+  getIssuedBookForReturning,
   getIssuedBooks,
   getIssuedBook,
 } = require("../../../models/issue-book/issue-book.controllers");
@@ -32,6 +32,7 @@ const Accession = require("../../../models/book-accessions/book-accessions.schem
 const LibraryCard = require("../../../models/library-cards/library-cards.schema");
 const IssuedBook = require("../../../models/issue-book/issue-book.schema");
 const Auth = require("../../../models/auth/auth.schema");
+const Setting = require("../../../models/setting/setting.schema");
 
 const FINE_PER_DAY = 1;
 
@@ -50,10 +51,10 @@ const verifyBookAccessionAvailability = async (req, res, next) => {
     req.cust.bookAccessionId = _id;
     req.cust.bookCategory = category;
     next();
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
 
-    return res.status(500).json(crs.SERR500REST(err));
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -73,25 +74,46 @@ const verifyLibraryCardAvailability = async (req, res, next) => {
     req.cust.cardCategory = category;
 
     next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
+  }
+};
+
+const checkIssueCompatibility = async (req, res, next) => {
+  try {
+    const libraryCardCategory = req.cust.cardCategory;
+    const BookCategory = req.cust.bookCategory;
+
+    const { value } = await Setting.findOne({
+      key: "ISSUE-COMPATIBILITY",
+    }).lean();
+
+    const allowedBookCategories = value[libraryCardCategory] || [];
+    const allowed = allowedBookCategories.includes(BookCategory);
+
+    if (allowed) return next();
+
+    return res.status(401).json(crs.MDW401VBBB());
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
 const verifyBookBank = async (req, res, next) => {
   try {
     if (
-      (req.cust.cardCategory === "BOOK BANK" &&
-        req.cust.bookCategory === "BOOK BANK") ||
-      (req.cust.cardCategory !== "BOOK BANK" &&
-        req.cust.bookCategory !== "BOOK BANK")
+      (req.cust.cardCategory === "BOOK-BANK" &&
+        req.cust.bookCategory === "BOOK-BANK") ||
+      (req.cust.cardCategory !== "BOOK-BANK" &&
+        req.cust.bookCategory !== "BOOK-BANK")
     )
       return next();
     else return res.status(401).json(crs.MDW401VBBB());
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -115,10 +137,10 @@ const processIssuingBook = async (req, res, next) => {
     });
     await session.commitTransaction();
     next();
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
     if (session.inTransaction()) await session.abortTransaction();
-    return res.status(500).json(crs.SERR500REST(err));
+    return res.status(500).json(crs.SERR500REST(error));
   } finally {
     session.endSession();
   }
@@ -159,15 +181,15 @@ const sendIssuedConfirmationEmail = async (req, res, next) => {
     };
 
     transporter.sendMail({
-      from: "librarysbssu@gmail.com",
+      from: process.env.NODEMAILER_EMAIL,
       to: Libdoc.memberId.email,
       subject: "Confirmation: Book Issuance from SBSSU Central Library",
       html: generateEmailTemplate.issueBookConfirmation(emailContent),
     });
     next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.MDW500SICE(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.MDW500SICE(error));
   }
 };
 
@@ -188,7 +210,6 @@ const fetchIssuedBookByAccessionNumber = async (req, res) => {
     });
 
     const { cardNumber, memberId } = issuedBookDoc.libraryCardId;
-
     const { bookId } = issuedBookDoc.bookAccessionId;
     const issuedBook = {
       _id: issuedBookDoc._id,
@@ -200,48 +221,46 @@ const fetchIssuedBookByAccessionNumber = async (req, res) => {
       issuedBy: issuedBookDoc.issuedBy.fullName,
     };
     return res.status(200).json(crs.ISB200FIBBAN(issuedBook));
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
 const fetchIssuedBookById = async (req, res, next) => {
   try {
-    const issuedBook = await getIssuedBookById(req.body._id);
-    if (issuedBook == null) return res.status(404).json(crs.MDW404FIBBI());
-    const issuedBookDoc = await getIssuedBookById(req.body._id, true);
+    const issuedBookDoc = await getIssuedBookForReturning(req.body._id);
+    if (!issuedBookDoc) return res.status(404).json(crs.MDW404FIBBI());
     if (!req.cust) req.cust = {};
-    req.cust.issuedBook = issuedBook;
+    req.cust.issuedBook = issuedBookDoc;
     req.cust.role = issuedBookDoc.libraryCardId.memberId.role;
     req.cust.category = issuedBookDoc.libraryCardId.category;
     req.cust.cast = issuedBookDoc.libraryCardId.memberId.category;
     next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
 const calculateFine = async (req, res, next) => {
   try {
     const returnDate = new Date();
-    const { issueDate } = req.cust.issuedBook._doc;
+    const { issueDate } = req.cust.issuedBook;
     let dateGap = checkDateGap(issueDate, returnDate);
     const BOOK_RETURN_PERIOD_DAYS = await getBookReturnPeriodDays(
       req.cust.role,
       req.cust.cast,
       req.cust.category
     );
-    console.log(BOOK_RETURN_PERIOD_DAYS);
     dateGap -= BOOK_RETURN_PERIOD_DAYS;
     if (dateGap < 0) dateGap = 0;
     req.cust.fine = dateGap * FINE_PER_DAY;
     req.cust.returnDate = returnDate;
     next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -292,9 +311,9 @@ const fetchIssuedBooks = async (req, res, next) => {
       totalPages: issuedBooksCol.totalPages,
     };
     return next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -330,9 +349,9 @@ const fetchIssuedBookDocById = async (req, res, next) => {
     };
 
     return res.status(200).json(crs.ISB200FIB(issuedBook));
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -346,6 +365,6 @@ module.exports = {
   calculateFine,
   fetchIssuedBooks,
   fetchIssuedBookDocById,
-  verifyBookBank,
+  checkIssueCompatibility,
   verifyIssuePermission,
 };

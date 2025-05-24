@@ -33,9 +33,9 @@ const finesRouter = express.Router();
 //       });
 
 //       return res.status(200).json(crs.FIN200FAF(finesData));
-//     } catch (err) {
-//       console.log(err);
-//       return res.status(500).json(crs.SERR500REST(err));
+//     } catch (error) {
+//       console.log(error);
+//       return res.status(500).json(crs.SERR500REST(error));
 //     }
 //   }
 // );
@@ -53,9 +53,9 @@ const finesRouter = express.Router();
 //       recieptNumber: fineDoc.recieptNumber ? fineDoc.recieptNumber : "NULL",
 //     };
 //     return res.status(200).json(crs.FIN200FFBI(data));
-//   } catch (err) {
-//     console.log(err);
-//     return res.status(500).json(crs.SERR500REST(err));
+//   } catch (error) {
+//     console.log(error);
+//     return res.status(500).json(crs.SERR500REST(error));
 //   }
 // });
 
@@ -68,9 +68,9 @@ const finesRouter = express.Router();
 //         recieptNumber: req.body.recieptNumber,
 //       });
 //       return res.status(200).json(crs.FIN200ARN());
-//     } catch (err) {
-//       console.log(err);
-//       return res.status(500).json(crs.SERR500REST(err));
+//     } catch (error) {
+//       console.log(error);
+//       return res.status(500).json(crs.SERR500REST(error));
 //     }
 //   }
 // );

@@ -37,23 +37,23 @@ const booksRouter = express.Router();
 
 booksRouter.post(
   "/create",
-  authorisationLevel(4),
+  authorisationLevel(["create-book"]),
   validateBook,
   checkAccessionsAvailability,
   createBook,
   async (req, res) => {
     try {
       return res.status(200).json(crs.BKS200ANB());
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
-);
+); //create
 
 booksRouter.post(
   "/fetch/add-accession",
-  authorisationLevel(4),
+  authorisationLevel(["create-book"]),
   validateAccessionNumber,
   async (req, res) => {
     try {
@@ -92,31 +92,31 @@ booksRouter.post(
       );
 
       return res.status(200).json(crs.BKS200FBBI(d.bookId));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
-);
+); //fetch/add-accession
 
 booksRouter.post(
   "/accession/create",
-  authorisationLevel(2),
+  authorisationLevel(["create-book"]),
   validate_books_accession_create,
   createAccession,
   async (req, res) => {
     try {
       return res.status(200).json(crs.BKS200ABA());
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
-);
+); //accession/create
 
 booksRouter.post(
   "/fetch-all-books",
-  authorisationLevel(2),
+  authorisationLevel(["search-books"]),
   async (req, res) => {
     try {
       const booksArray = await getBooks({
@@ -126,12 +126,12 @@ booksRouter.post(
       });
 
       return res.status(200).json(crs.BKS200FAB(booksArray));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
-);
+); //fetch-all-books
 
 booksRouter.post(
   "/fetch-book-by-id",
@@ -141,12 +141,12 @@ booksRouter.post(
       const bookDoc = await getBookById(req.body._id, true);
       if (bookDoc == null) return res.status(404).json(crs.BKS404FBDBI());
       return res.status(200).json(crs.BKS200FBDBI(bookDoc));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
-);
+); //fetch-book-by-id
 
 booksRouter.post(
   "/fetch-book-by-isbn",
@@ -155,12 +155,12 @@ booksRouter.post(
   async (req, res) => {
     try {
       return res.status(200).json(crs.BKS200FBBI(req.cust.bookDoc));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
-);
+); //fetch-book-by-isbn
 
 booksRouter.post(
   "/add-book-accession",
@@ -187,37 +187,37 @@ booksRouter.post(
       });
       await session.commitTransaction();
       return res.status(200).json(crs.BKS200ABA());
-    } catch (err) {
+    } catch (error) {
       if (session.inTransaction()) await session.abortTransaction();
-      return res.status(200).json(crs.SERR500REST(err));
+      return res.status(200).json(crs.SERR500REST(error));
     } finally {
       await session.endSession();
     }
   }
-);
+); //add-book-accession
 
 booksRouter.post(
   "/fetch-for-issue",
-  authorisationLevel(1),
+  authorisationLevel(["issue-book"]),
   validateAccessionNumber,
   fetchBookForIssue,
   async (req, res) => {
     try {
       return res.status(200).json(crs.BKS200FBBAN(req.cust.book));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
-);
+); //fetch-for-issue
 
 booksRouter.post("/count-book-accessions", async (req, res) => {
   try {
     const numberOfBookAccessions = await countBookAccessionDocs();
     return res.status(200).json(crs.BKS200CTBA(numberOfBookAccessions));
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 });
 
@@ -234,12 +234,12 @@ booksRouter.post(
       }
       await updateBookById(req.body._id, req.body);
       return res.status(200).json(crs.BKS200EB());
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
-);
+); //edit-existing-book
 
 booksRouter.post(
   "/quick-add",
@@ -266,14 +266,14 @@ booksRouter.post(
       });
       await session.commitTransaction();
       return res.status(200).json(crs.BKS200ABA());
-    } catch (err) {
+    } catch (error) {
       if (session.inTransaction()) await session.abortTransaction();
-      return res.status(200).json(crs.SERR500REST(err));
+      return res.status(200).json(crs.SERR500REST(error));
     } finally {
       await session.endSession();
     }
   }
-);
+); //quick-add
 
 booksRouter.use("/issue-books", issueBookRouter);
 booksRouter.use("/return-books", returnBookRouter);

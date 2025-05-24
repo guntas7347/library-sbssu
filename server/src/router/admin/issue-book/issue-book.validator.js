@@ -3,7 +3,6 @@ const crs = require("../../../utils/custom-response-codes");
 
 const validateIssueBookDetails = async (req, res, next) => {
   try {
-    // Joi schema validation
     const { error } = Joi.object({
       accessionNumber: Joi.number()
         .integer()
@@ -19,11 +18,9 @@ const validateIssueBookDetails = async (req, res, next) => {
         .required(),
     }).validate(req.body);
 
-    // If validation fails, send an error response
     if (error)
       return res.status(400).json(crs.VAL400FAIL(error.details[0].message));
 
-    // Proceed to next middleware if validation passes
     return next();
   } catch (error) {
     console.error(error);

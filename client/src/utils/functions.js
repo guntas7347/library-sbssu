@@ -163,3 +163,12 @@ export const fromLowerCamelCase = (str) => {
     .toLowerCase() // Convert everything to lowercase
     .replace(/\b\w/g, (match) => match.toUpperCase()); // Capitalize each word
 };
+
+export function getCookieValue(name) {
+  return (
+    document.cookie
+      .split("; ")
+      .find((row) => row.startsWith(name + "="))
+      ?.split("=")[1] || null
+  );
+}

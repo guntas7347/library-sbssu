@@ -1,11 +1,11 @@
-const { createLog } = require("../../utils/functions");
 const Setting = require("./setting.schema");
 
 const createSettings = async (req) => {
   try {
     await Setting.create(req);
+    console.log("CREATED SETTINGS: " + req.value);
   } catch (error) {
-    createLog(error);
+    console.log(error);
   }
 }; //disable in production
 

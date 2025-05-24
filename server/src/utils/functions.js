@@ -200,9 +200,17 @@ const uuidGenerator = (length = 1) => {
   return uuid.replace(/-/g, "");
 };
 
-const cardNumberGenerator = (membershipId, numberOfCards = 2) => {
+const cardNumberGenerator = (
+  membershipId,
+  numberOfCards = 2,
+  startingNumber = 0
+) => {
   const cardNumberArray = [];
-  for (let index = 0; index < numberOfCards; index++) {
+  for (
+    let index = Number(startingNumber);
+    index < Number(numberOfCards) + Number(startingNumber);
+    index++
+  ) {
     let numberToAdd = index + 1;
     if (numberToAdd < 10) numberToAdd = "0" + numberToAdd.toString();
     else numberToAdd = numberToAdd.toString();
@@ -215,25 +223,37 @@ const cardNumberGenerator = (membershipId, numberOfCards = 2) => {
   return cardNumberArray;
 };
 
-const getLibraryCardLimit = (role = "STUDENT UG", category = "general") => {
-  switch (role) {
-    case "STUDENT UG":
-      return category === "SCST" ? 5 : 2;
+const getLibraryCardLimit = async (
+  role = "STUDENT UG",
+  memberCategory = "GENERAL"
+) => {
+  try {
+    const { value: AALCL } = await fetchSettings("AALCL");
+    const keyMap = {
+      "STUDENT UG": {
+        GENERAL: "ug_gen",
+        "SC/ST": "ug_scst",
+        OTHER: "ug_other",
+      },
+      "STUDENT PG": {
+        GENERAL: "pg_gen",
+        "SC/ST": "pg_scst",
+        OTHER: "pg_other",
+      },
+      "TEACHER REGULAR": "teacher_regular",
+      "TEACHER ADHOC": "teacher_adhoc",
+      "NON TEACHING STAFF": "non_teaching_staff",
+    };
 
-    case "STUDENT PG":
-      return 3;
+    const key =
+      role === "STUDENT UG" || role === "STUDENT PG"
+        ? keyMap[role]?.[memberCategory]
+        : keyMap[role];
 
-    case "TEACHER REGULAR":
-      return 10;
-
-    case "TEACHER ADHOC":
-      return 5;
-
-    case "NON TEACHING STAFF":
-      return 3;
-
-    default:
-      return 0;
+    return AALCL[key] ?? 0;
+  } catch (error) {
+    console.error("Error fetching library cards auto allotment limit:", error);
+    return 0;
   }
 };
 
@@ -303,7 +323,7 @@ const isIssueAllowed = async (
         ? keyMap[role]?.[memberCategory]
         : keyMap[role];
 
-    return issuePermission[key] === "allow";
+    return issuePermission[key] === true;
   } catch (error) {
     console.error("Error fetching issue permission:", error);
     return false;
@@ -323,11 +343,11 @@ const createLog = (e) => {
   console.log(e);
 };
 
-function handleMongoError(err) {
-  if (err.code === 11000) {
+function handleMongoError(error) {
+  if (error.code === 11000) {
     // Get the field name from the error message using regex
-    const fieldMatch = err.message.match(/index:\s+([^\s]+)_\d+\s/);
-    const valueMatch = err.message.match(/dup key:\s+\{ :\s+"(.+?)" \}/);
+    const fieldMatch = error.message.match(/index:\s+([^\s]+)_\d+\s/);
+    const valueMatch = error.message.match(/dup key:\s+\{ :\s+"(.+?)" \}/);
 
     const field = fieldMatch ? fieldMatch[1] : "field";
     const value = valueMatch ? valueMatch[1] : "value";
@@ -339,6 +359,21 @@ function handleMongoError(err) {
   // Return generic error if not 11000
   return "Something went wrong. Please try again.";
 }
+
+const addLibraryCardsValueToObject = (obj) => {
+  const array = [];
+  for (let i = 0; i < obj.libraryCards.length; i++) {
+    array.push({
+      fullName: obj.fullName,
+      membershipId: obj.membershipId,
+      cardNumber: obj.libraryCards[i].cardNumber,
+      cardStatus: obj.libraryCards[i].status,
+      category: obj.libraryCards[i].category,
+    });
+  }
+
+  return array;
+};
 
 module.exports = {
   checkDateGap,
@@ -358,4 +393,5 @@ module.exports = {
   createLog,
   isIssueAllowed,
   handleMongoError,
+  addLibraryCardsValueToObject,
 };

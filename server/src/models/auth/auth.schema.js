@@ -1,7 +1,6 @@
 const { Schema, model, models } = require("mongoose");
 
 const AuthSchema = Schema({
-  userName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, default: "STAFF" },
@@ -14,6 +13,7 @@ const AuthSchema = Schema({
   },
   resetCode: { type: String },
   resetCodeTime: { type: Date },
+  twoFaSecret: { type: String, required: true },
   active: { type: Boolean, default: true },
 });
 

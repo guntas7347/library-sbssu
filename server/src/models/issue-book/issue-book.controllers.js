@@ -39,22 +39,17 @@ const getIssuedBook = async (filter) => {
     .lean();
 };
 
-const getIssuedBookById = async (_id) => {
+const getIssuedBookForReturning = async (_id) => {
   const query = issueBookMongo.findById(_id);
-
   query
-    .populate({
-      path: "bookAccessionId",
-      populate: { path: "bookId", select: "title author -_id" },
-    })
     .populate({
       path: "libraryCardId",
       populate: {
         path: "memberId",
-        select: "rollNumber fullName -_id role category",
+        select: "-_id role category",
       },
+      select: "category",
     })
-    .populate({ path: "issuedBy", select: "idNumber fullName -_id" })
     .lean();
 
   return await query.exec();
@@ -136,7 +131,7 @@ const countIssuedBookDocs = async (filter) => {
 module.exports = {
   createIssueBook,
   getIssuedBook,
-  getIssuedBookById,
+  getIssuedBookForReturning,
   deleteIssuedBook,
   getIssuedBooks,
   countIssuedBookDocs,

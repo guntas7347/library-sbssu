@@ -3,8 +3,6 @@ const { Schema, model, models } = require("mongoose");
 const StaffSchema = new Schema({
   idNumber: { type: Number, required: true, unique: true },
   fullName: { type: String, required: true },
-  role: { type: String, default: "STAFF" },
-  email: { type: String, required: true, unique: true },
   authId: {
     type: Schema.Types.ObjectId,
     ref: "Auth",

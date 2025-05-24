@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { getNumberOfStudents } from "../../../hooks/http-requests.hooks.admin";
+import Spinner from "../../../../../components/feedback/spinner/spinner.component";
 
 const TotalMembers = () => {
   const [totalStudents, setTotalStudents] = useState("Loading...");
   const [past30DaysAddedStudents, setPast30DaysAddedStudents] =
     useState("Loading...");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const asyncFunc = async () => {
@@ -17,13 +19,21 @@ const TotalMembers = () => {
         });
         setTotalStudents(result1);
         setPast30DaysAddedStudents(result2);
-      } catch (err) {
-        console.log(err);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
       }
     };
 
     asyncFunc();
   }, []);
+
+  if (loading)
+    return (
+      <div className="bg-purple-500 rounded-3xl p-10 flex justify-center">
+        <Spinner center={true} />
+      </div>
+    );
 
   return (
     <div className="bg-purple-500 rounded-3xl p-10">

@@ -38,9 +38,9 @@ const validateStrongPassword = async (req, res, next) => {
       return res.status(400).json(crs.VAL400FAIL(error.details[0].message));
 
     return next();
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -60,17 +60,22 @@ const validateLoginCreds = async (req, res, next) => {
         "string.empty": "Password is required",
         "any.required": "Password is required",
       }),
+      totp: Joi.string().min(1).required().messages({
+        "string.empty": "TOTP is required",
+        "any.required": "TOTP is required",
+      }),
     });
 
     const { error } = schema.validate(req.body);
 
+    console.log(error);
     if (error)
       return res.status(400).json(crs.VAL400FAIL(error.details[0].message));
 
     return next();
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 

@@ -1,12 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import InputField from "../../../../components/forms/input-field/input-field.component";
 import { useForm } from "../../../../components/forms/use-form-hook/use-form.hook.component";
 import { quickSearchMember } from "../../hooks/http-requests.hooks.admin";
 import { processData } from "../../../../utils/functions";
-import { SnackBarContext } from "../../../../components/context/snackbar.context";
+import { useFeedback } from "../../../../components/context/snackbar.context";
 
 const QuickSearchMember = () => {
-  const { setFeedback } = useContext(SnackBarContext);
+  const setFeedback = useFeedback();
 
   const { formFields, handleChange } = useForm({ search: "" });
   const { search } = formFields;
@@ -30,7 +30,7 @@ const QuickSearchMember = () => {
             ])
           );
         })
-        .catch((err) => console.log(err));
+        .catch((error) => console.log(error));
     }, 1000);
 
     return () => clearTimeout(debounce);

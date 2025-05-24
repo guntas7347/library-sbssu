@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { getNumberOfReturnedBooks } from "../../../hooks/http-requests.hooks.admin";
+import Spinner from "../../../../../components/feedback/spinner/spinner.component";
 
 const TotalReturns = () => {
   const [past7dayReturns, setPast7dayReturns] = useState("Loading...");
   const [totalReturns, setTotalReturns] = useState("Loading...");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const asyncFunc = async () => {
@@ -16,12 +18,20 @@ const TotalReturns = () => {
         });
         setPast7dayReturns(result2);
         setTotalReturns(result1);
-      } catch (err) {
-        console.log(err);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
       }
     };
     asyncFunc();
   }, []);
+
+  if (loading)
+    return (
+      <div className="bg-violet-500 rounded-3xl p-10 flex justify-center">
+        <Spinner center={true} />
+      </div>
+    );
 
   return (
     <div className="bg-violet-500 rounded-3xl p-10">

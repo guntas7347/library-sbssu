@@ -1,42 +1,34 @@
 import { useEffect, useState } from "react";
 import { fetchStudentById } from "../../hooks/http-requests.hooks.admin";
 import Input from "../../../../components/forms/input";
+import Modal from "../../../../components/modals/modal.component";
+import LoadingModal from "../../../../components/modals/loading-modal";
+import { useFeedback } from "../../../../components/context/snackbar.context";
+import { UPLOADS_PATH } from "../../../../keys";
+import LibraryCardsModal from "./library-cards.modal";
 
 const MembersModal = ({ id, onClose }) => {
-  const [formFields, setFormFields] = useState({ dob: "", image: null });
-
-  const {
-    rollNumber,
-    fullName,
-    fatherName,
-    gender,
-    dob,
-    program,
-    specialization,
-    batch,
-    email,
-    category,
-    phoneNumber,
-    createdAt,
-    role,
-    imageUrl,
-    membershipId,
-  } = formFields;
+  const setFeedback = useFeedback();
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [libraryCardsModal, setLibraryCardsModal] = useState("");
 
   useEffect(() => {
-    const asyncFunc = async () => {
-      await fetchStudentById(id)
-        .then((studentDoc) => {
-          const libraryCardsString = mergeArrayElementsToString(
-            studentDoc.libraryCards.map((libraryCard) => {
-              return libraryCard.cardNumber;
-            })
-          );
-          setFormFields({ ...studentDoc, libraryCards: libraryCardsString });
-        })
-        .catch(() => setFormFields({ fullName: "Not Found" }));
-    };
-    asyncFunc();
+    (async () => {
+      try {
+        const res = await fetchStudentById(id);
+        const libraryCardsString = mergeArrayElementsToString(
+          res.libraryCards.map((libraryCard) => {
+            return libraryCard.cardNumber;
+          })
+        );
+        setData({ ...res, libraryCards: libraryCardsString });
+        setLoading(false);
+      } catch (error) {
+        setFeedback(2, error);
+        onClose();
+      }
+    })();
   }, []);
 
   const mergeArrayElementsToString = (array = []) => {
@@ -59,147 +51,139 @@ const MembersModal = ({ id, onClose }) => {
     return string;
   };
 
-  return (
-    <div>
-      <div
-        id="default-modal"
-        aria-hidden="true"
-        className=" flex inset-0 overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black/50"
-      >
-        <div className="relative p-4 w-full max-w-2xl max-h-full">
-          <div className="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
-            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Member Details
-              </h3>
-              <button
-                type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                onClick={onClose}
-              >
-                <svg
-                  className="w-3 h-3"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 14 14"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                  />
-                </svg>
-                <span className="sr-only">Close modal</span>
-              </button>
-            </div>
-            <div className="p-4 md:p-5 ">
-              <div className="grid gap-6 mb-6 md:grid-cols-2">
-                <div className="grid gap-6">
-                  <Input
-                    disabled={true}
-                    label="Name"
-                    name="fullName"
-                    value={fullName}
-                  />
-                  <Input
-                    disabled={true}
-                    label="Father's Name"
-                    name="fatherName"
-                    value={fatherName}
-                  />
+  if (loading) return <LoadingModal onClose={onClose} title="Member details" />;
 
-                  <Input
-                    disabled={true}
-                    label="Membership Id"
-                    name="membershipId"
-                    value={membershipId}
-                  />
-                </div>
-                <div className="flex justify-center items-center">
-                  <img
-                    className="border border-black"
-                    src={imageUrl}
-                    alt="image"
-                  />
-                </div>{" "}
-                <Input
-                  disabled={true}
-                  label="Roll Number"
-                  name="rollNumber"
-                  value={rollNumber}
-                />
-                <Input
-                  disabled={true}
-                  label="Gender"
-                  name="gender"
-                  value={gender}
-                />
-                <Input
-                  disabled={true}
-                  label="Date Of Birth"
-                  name="dob"
-                  type="date"
-                  value={dob.slice(0, 10)}
-                />
-                <Input
-                  disabled={true}
-                  label="Category"
-                  name="category"
-                  value={category}
-                />
-                <Input
-                  disabled={true}
-                  label="User Type"
-                  name="role"
-                  value={role}
-                />
-                <Input
-                  disabled={true}
-                  label="Academic Program"
-                  name="program"
-                  value={program}
-                />{" "}
-                <Input
-                  disabled={true}
-                  label="Academic Specialization"
-                  name="specialization"
-                  value={specialization}
-                />
-                <Input
-                  disabled={true}
-                  label="Batch"
-                  name="batch"
-                  value={batch}
-                />
-                <Input
-                  disabled={true}
-                  label="Email address"
-                  name="email"
-                  type="email"
-                  value={email}
-                />
-                <Input
-                  disabled={true}
-                  label="Phone Number"
-                  name="phoneNumber"
-                  type="number"
-                  value={phoneNumber}
-                />
-                <Input
-                  disabled={true}
-                  label="Created At"
-                  name="createdAt"
-                  value={new Date(createdAt).toLocaleString()}
-                />
-              </div>
-            </div>
+  const imagePath = data.imageUrl
+    ? UPLOADS_PATH + data.imageUrl
+    : UPLOADS_PATH + "/sample-user.jpg";
+
+  return (
+    <>
+      {" "}
+      <Modal title="Member details" onClose={onClose}>
+        <div className="grid gap-6 mb-6 md:grid-cols-2">
+          <div className="grid gap-6">
+            <Input
+              disabled={true}
+              label="Name"
+              name="fullName"
+              value={data.fullName}
+            />
+            <Input
+              disabled={true}
+              label="Father's Name"
+              name="fatherName"
+              value={data.fatherName}
+            />
+
+            <Input
+              disabled={true}
+              label="Membership Id"
+              name="membershipId"
+              value={data.membershipId}
+            />
+          </div>
+          <div className="flex justify-center items-center">
+            <img
+              className="border border-black"
+              crossOrigin="anonymous"
+              src={imagePath}
+              alt="image"
+            />
+          </div>{" "}
+          <Input
+            disabled={true}
+            label="Roll Number"
+            name="rollNumber"
+            value={data.rollNumber}
+          />
+          <Input
+            disabled={true}
+            label="Gender"
+            name="gender"
+            value={data.gender}
+          />
+          <Input
+            disabled={true}
+            label="Date Of Birth"
+            name="dob"
+            type="date"
+            value={data.dob.slice(0, 10)}
+          />
+          <Input
+            disabled={true}
+            label="Category"
+            name="category"
+            value={data.category}
+          />
+          <Input
+            disabled={true}
+            label="User Type"
+            name="role"
+            value={data.role}
+          />
+          <Input
+            disabled={true}
+            label="Academic Program"
+            name="program"
+            value={data.program}
+          />{" "}
+          <Input
+            disabled={true}
+            label="Academic Specialization"
+            name="specialization"
+            value={data.specialization}
+          />
+          <Input
+            disabled={true}
+            label="Batch"
+            name="batch"
+            value={data.batch}
+          />
+          <Input
+            disabled={true}
+            label="Email address"
+            name="email"
+            type="email"
+            value={data.email}
+          />
+          <Input
+            disabled={true}
+            label="Phone Number"
+            name="phoneNumber"
+            type="number"
+            value={data.phoneNumber}
+          />
+          <Input
+            disabled={true}
+            label="Created At"
+            name="createdAt"
+            value={new Date(data.createdAt).toLocaleString()}
+          />
+          <div>
+            <label
+              htmlFor="first_name"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Library Cards
+            </label>
+            <button
+              type="button"
+              onClick={() => setLibraryCardsModal(id)}
+              className="c-btn-blue"
+            >
+              View Library Cards
+            </button>
           </div>
         </div>
-      </div>
-    </div>
+      </Modal>
+      {libraryCardsModal !== "" && (
+        <LibraryCardsModal
+          id={libraryCardsModal}
+          onClose={() => setLibraryCardsModal("")}
+        />
+      )}
+    </>
   );
 };
 

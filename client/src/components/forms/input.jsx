@@ -10,6 +10,8 @@ const Input = ({
   className = "",
   required = false,
   handleDate = false,
+  onEnterKey,
+  ...props
 }) => {
   return (
     <div className={className}>
@@ -28,6 +30,8 @@ const Input = ({
         value={handleDate ? value.slice(0, 10) : value}
         disabled={disabled}
         required={required}
+        onKeyDown={(e) => e.key === "Enter" && onEnterKey()}
+        {...props}
       />
     </div>
   );

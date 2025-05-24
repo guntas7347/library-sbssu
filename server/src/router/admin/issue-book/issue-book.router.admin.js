@@ -10,8 +10,8 @@ const {
   fetchIssuedBookByAccessionNumber,
   fetchIssuedBookDocById,
   fetchIssuedBooks,
-  verifyBookBank,
   verifyIssuePermission,
+  checkIssueCompatibility,
 } = require("./issue-book.middlewares");
 const { createExcel, dateTimeString } = require("../../../utils/functions");
 const {
@@ -28,72 +28,72 @@ issueBookRouter.post("/count-issued-books", async (req, res) => {
   try {
     const numberOfIssuedBookDocs = await countIssuedBookDocs(req.body.filter);
     return res.status(200).json(crs.ISB200CIBD(numberOfIssuedBookDocs));
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 });
 
 issueBookRouter.post(
   "/issue-new-book",
-  authorisationLevel(1),
+  authorisationLevel(["issue-book"]),
   validateIssueBookDetails,
   verifyIssuePermission,
   verifyBookAccessionAvailability,
   verifyLibraryCardAvailability,
-  verifyBookBank,
+  checkIssueCompatibility,
   processIssuingBook,
   sendIssuedConfirmationEmail,
   async (req, res) => {
     try {
       return res.status(200).json(crs.ISB200INB());
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 ); //issue-new-book
 
 issueBookRouter.post(
   "/fetch-issued-book-by-accession-number",
-  authorisationLevel(1),
+  authorisationLevel(["return-book"]),
   validateAccessionNumber,
   fetchIssuedBookByAccessionNumber
 ); //fetch-issued-book-by-accession-number
 
 issueBookRouter.post(
   "/calculate-issue-book-fine",
-  authorisationLevel(1),
+  authorisationLevel(["return-book"]),
   validateObjectId,
   fetchIssuedBookById,
   calculateFine,
   async (req, res) => {
     try {
       return res.status(200).json(crs.ISB200CIBF(req.cust.fine));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 ); //calculate-issue-book-fine
 
 issueBookRouter.post(
   "/fetch-all-issued-books",
-  authorisationLevel(2),
+  authorisationLevel(["search-issued-books"]),
   fetchIssuedBooks,
   async (req, res) => {
     try {
       res.status(200).json(crs.ISB200FAIB(req.cust.issuedBooks));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 ); //fetch-all-issued-books
 
 issueBookRouter.post(
   "/fetch-issued-book",
-  authorisationLevel(2),
+  authorisationLevel(["view-issued-book"]),
   fetchIssuedBookDocById
 ); //fetch-issued-book
 
@@ -126,9 +126,9 @@ issueBookRouter.post(
       res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
 
       res.status(200).send(excelBuffer);
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 ); //download-all-issued-books

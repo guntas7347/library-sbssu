@@ -1,13 +1,13 @@
 import { fetchAllApplications } from "../../hooks/http-requests.hooks.admin";
 import { rowsArray } from "../../../../utils/functions";
-import { useContext, useState } from "react";
-import { SnackBarContext } from "../../../../components/context/snackbar.context";
+import { useState } from "react";
+import { useFeedback } from "../../../../components/context/snackbar.context";
 import Table from "../../../../components/table/button-table";
 import SearchBarMenu from "../../../../components/forms/search-bar-menu";
 import ApproveModal from "./application.modal";
 
 const ApplicationsPage = () => {
-  const { setFeedback } = useContext(SnackBarContext);
+  const setFeedback = useFeedback();
 
   const [rowData, setRowData] = useState([]);
 
@@ -23,7 +23,6 @@ const ApplicationsPage = () => {
 
     await fetchAllApplications({ ...currentFilter, ...e })
       .then((res) => {
-        console.log(res);
         setRowData(
           rowsArray(res, [
             "_id",
@@ -38,8 +37,8 @@ const ApplicationsPage = () => {
           setFeedback([1, 2, "No data found"]);
         }
       })
-      .catch((err) => {
-        setFeedback([1, 2, err]);
+      .catch((error) => {
+        setFeedback([1, 2, error]);
       });
   };
 

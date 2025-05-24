@@ -77,6 +77,10 @@ export const SnackbarProvider = ({ children }) => {
 };
 
 export const useFeedback = () => {
-  const { setFeedback } = useContext(SnackBarContext);
+  const { setFeedback: sf } = useContext(SnackBarContext);
+  const setFeedback = (s = 3, m = "") => {
+    if (Array.isArray(s)) sf(s);
+    else sf([1, s, m]);
+  };
   return setFeedback;
 };

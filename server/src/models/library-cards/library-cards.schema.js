@@ -18,8 +18,17 @@ const LibraryCardsSchema = new Schema({
   category: {
     type: String,
     default: "GENERAL",
-    enum: ["GENERAL", "BOOK BANK"],
   },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: "Staff",
+    required: true,
+  },
+  autoAlloted: {
+    type: Boolean,
+    default: false,
+  },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const LibraryCard =

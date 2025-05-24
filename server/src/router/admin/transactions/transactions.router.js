@@ -10,12 +10,13 @@ const {
   getTransactionMW,
 } = require("./transactions.mw");
 const Member = require("../../../models/member/member.schema");
+const { addTransactionJoi } = require("./transactions.joi");
 
 const transactionsRouter = express.Router();
 
 transactionsRouter.post(
   "/fetch-transactions",
-  authorisationLevel(2),
+  authorisationLevel(["search-transactions"]),
   async (req, res) => {
     try {
       const d = await getTransactions({
@@ -50,13 +51,14 @@ transactionsRouter.post(
 
 transactionsRouter.post(
   "/fetch-transaction",
-  authorisationLevel(2),
+  authorisationLevel(["view-transaction"]),
   getTransactionMW
 );
 
 transactionsRouter.post(
   "/add-transaction",
-  authorisationLevel(2),
+  authorisationLevel(["create-transaction"]),
+  addTransactionJoi,
   addTransactionMW,
   sendTransactionEmail,
   async (req, res) => {
@@ -71,7 +73,7 @@ transactionsRouter.post(
 
 transactionsRouter.post(
   "/fetch-member",
-  authorisationLevel(2),
+  authorisationLevel(["create-transaction"]),
   async (req, res) => {
     try {
       if (!/^\d{6}$/.test(String(req.body.membershipId))) {
@@ -83,7 +85,6 @@ transactionsRouter.post(
       })
         .select("fullName balance")
         .lean();
-      console.log(m);
       if (!m) return res.status(404).json(crs.TRN404FM());
       return res.status(200).json(crs.TRN200FM(m));
     } catch (error) {

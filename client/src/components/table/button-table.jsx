@@ -11,6 +11,8 @@ const Table = ({
   currentPage = 1,
   setPage,
   actions,
+  readOnly = false,
+  dateIdx = false,
 }) => {
   return (
     <div>
@@ -36,28 +38,36 @@ const Table = ({
                 >
                   {tr.map((td, idx) => {
                     if (idx === 0) return;
-
+                    if (dateIdx)
+                      if (idx === dateIdx)
+                        return (
+                          <td key={idx} className="px-6 py-4">
+                            {new Date(td).toLocaleString()}
+                          </td>
+                        );
                     return (
                       <td key={idx} className="px-6 py-4">
                         {td}
                       </td>
                     );
                   })}
-                  <td key={idx} className="px-6 py-4 flex gap-4">
-                    {actions.map((action, idx) => {
-                      return (
-                        <>
-                          <span
-                            key={idx}
-                            className="font-medium cursor-pointer text-blue-600 dark:text-blue-500 hover:underline"
-                            onClick={() => onClick(action, tr[indexToSelect])}
-                          >
-                            {action}
-                          </span>
-                        </>
-                      );
-                    })}
-                  </td>
+                  {!readOnly && (
+                    <td key={idx} className="px-6 py-4 flex gap-4">
+                      {actions.map((action, idx) => {
+                        return (
+                          <>
+                            <span
+                              key={idx}
+                              className="font-medium capitalize cursor-pointer text-blue-600 dark:text-blue-500 hover:underline"
+                              onClick={() => onClick(action, tr[indexToSelect])}
+                            >
+                              {action}
+                            </span>
+                          </>
+                        );
+                      })}
+                    </td>
+                  )}
                 </tr>
               );
             })}

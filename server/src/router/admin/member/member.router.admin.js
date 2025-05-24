@@ -1,22 +1,17 @@
 const express = require("express");
 const {
   getMemberById,
-  getMemberByRollNumber,
-  createMember,
   getMembers,
   countMemberDocs,
   updateMemberById,
   quickSearchMember,
   findApplications,
+  addLibraryCardToMember,
 } = require("../../../models/member/member.controllers");
-
-const mongoose = require("mongoose");
 const crs = require("../../../utils/custom-response-codes");
 const {
   fetchApplicationById,
   processDecision,
-  allotLibraryCard,
-  fetchStudentByMembershipId,
   sendApprovalEmail,
   checkIssues,
   checkPendingDues,
@@ -25,12 +20,23 @@ const {
 const { authorisationLevel } = require("../../auth/auth.middlewares");
 const Member = require("../../../models/member/member.schema");
 const { validateMembershipId } = require("./member.validator");
+const {
+  addLibraryCardsValueToObject,
+  cardNumberGenerator,
+  createLog,
+} = require("../../../utils/functions");
+const LibraryCard = require("../../../models/library-cards/library-cards.schema");
+const { default: mongoose } = require("mongoose");
+const {
+  createLibraryCard,
+} = require("../../../models/library-cards/library-cards.controllers");
+const Auth = require("../../../models/auth/auth.schema");
 
 const memberRoute = express.Router();
 
 memberRoute.post(
   "/fetch-for-issue",
-  authorisationLevel(1),
+  authorisationLevel(["issue-book"]),
   validateMembershipId,
   async (req, res) => {
     try {
@@ -38,16 +44,18 @@ memberRoute.post(
         membershipId: req.body.membershipId,
         status: "ACTIVE",
       })
-        .populate("libraryCards", "cardNumber status -_id")
+        .populate("libraryCards", "cardNumber status category -_id")
         .select("membershipId fullName imageUrl -_id")
         .lean();
 
       if (!d) return res.status(404).json(crs.STU404FSBRN());
-
-      return res.status(200).json(crs.STU200FSBRN(d));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+      const data = addLibraryCardsValueToObject(d);
+      return res
+        .status(200)
+        .json(crs.STU200FSBRN({ imageUrl: d.imageUrl, data }));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 ); //fetch-for-issue
@@ -59,16 +67,16 @@ memberRoute.post(
     try {
       const ApplicantCol = await findApplications(req.body);
       return res.status(200).json(crs.STU200FAA(ApplicantCol));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 );
 
 memberRoute.post(
   "/fetch-all-members",
-  authorisationLevel(2),
+  authorisationLevel(["search-members"]),
   async (req, res) => {
     try {
       const members = await getMembers({
@@ -77,24 +85,26 @@ memberRoute.post(
         page: req.body.page || 1,
       });
       return res.status(200).json(crs.STU200FAS(members));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 );
 
 memberRoute.post(
-  "/fetch-student-by-id",
-  authorisationLevel(2),
+  "/fetch-one",
+  authorisationLevel(["view-member"]),
   async (req, res) => {
     try {
-      const studentDoc = await getMemberById(req.body._id, true);
+      const studentDoc = await Member.findById(req.body._id)
+        .populate("libraryCards")
+        .lean();
       if (studentDoc) return res.status(200).json(crs.STU200FSBI(studentDoc));
       return res.status(404).json(crs.STU404FSBI());
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 );
@@ -106,8 +116,8 @@ memberRoute.post(
   async (req, res) => {
     try {
       return res.status(200).json(crs.APP200FA(req.cust.applicantionDoc));
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
       return res.status(500).json(crs.SERR500REST());
     }
   }
@@ -126,38 +136,27 @@ memberRoute.post(
 
 memberRoute.post(
   "/count-total-members",
-  authorisationLevel(1),
+  authorisationLevel(),
   async (req, res) => {
     try {
       const numberOfStudentDocs = await countMemberDocs(req.body.filter);
       return res.status(200).json(crs.STU200CTS(numberOfStudentDocs));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 );
 
-memberRoute.post(
-  "/edit-existing-student",
-  authorisationLevel(4),
-  async (req, res) => {
-    try {
-      const studentDoc = await getMemberByRollNumber(req.body.rollNumber);
-      if (studentDoc) {
-        const { rollNumber } = await getMemberById(req.body._id);
-        if (studentDoc._doc.rollNumber !== rollNumber)
-          return res.status(409).json(crs.CONFL409CNS());
-      }
-
-      await updateMemberById(req.body._id, req.body);
-      return res.status(200).json(crs.STU200ES());
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
-    }
+memberRoute.post("/edit", authorisationLevel(4), async (req, res) => {
+  try {
+    await Member.findByIdAndUpdate(req.body.id, req.body);
+    return res.status(200).json(crs.STU200ES());
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
-);
+});
 
 memberRoute.post("/quick-search", async (req, res) => {
   try {
@@ -165,9 +164,9 @@ memberRoute.post("/quick-search", async (req, res) => {
     const result = await quickSearchMember(req.body);
     if (result.length === 0) return res.status(404).json(crs.SRH404GLB());
     return res.status(200).json(crs.SRH200GLB(result));
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 });
 
@@ -185,5 +184,100 @@ memberRoute.post(
     }
   }
 );
+
+memberRoute.post(
+  "/fetch/for-card",
+  authorisationLevel(["create-card"]),
+  async (req, res) => {
+    try {
+      const m = await Member.findOne({
+        membershipId: req.body.membershipId,
+        status: "ACTIVE",
+      })
+        .select("fullName imageUrl program role category rollNumber batch")
+        .lean();
+      if (!m) return res.status(200).json(crs.STU404FSBRN());
+      return res.status(200).json(crs.STU200FSBRN(m));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
+    }
+  }
+);
+
+memberRoute.post(
+  "/library-cards/create",
+  authorisationLevel(["create-card"]),
+  async (req, res) => {
+    const session = await mongoose.startSession();
+
+    try {
+      const m = await Member.findById(req.body._id)
+        .select("membershipId")
+        .populate("libraryCards", "cardNumber")
+        .lean();
+
+      const cardNumbers = (m.libraryCards || []).map((card) => {
+        return card.cardNumber % 100;
+      });
+
+      const maxCardNumber =
+        cardNumbers.length > 0 ? Math.max(...cardNumbers) : 0;
+
+      const newCardNumbers = cardNumberGenerator(
+        m.membershipId,
+        req.body.cardsCount,
+        maxCardNumber
+      );
+
+      const { staffId } = await Auth.findById(req.user.uid)
+        .select("staffId -_id")
+        .lean();
+
+      await session.withTransaction(async () => {
+        for (const cardNumber of newCardNumbers) {
+          const libraryCardDoc = await createLibraryCard(
+            {
+              cardNumber,
+              memberId: m._id,
+              category: req.body.category,
+              createdBy: staffId,
+            },
+            session
+          );
+          await addLibraryCardToMember(
+            libraryCardDoc[0].memberId,
+            libraryCardDoc[0]._id,
+            session
+          );
+        }
+      });
+      await session.commitTransaction();
+      return res.status(200).json(crs.STU200ALCTS());
+    } catch (error) {
+      createLog(error);
+      if (session.inTransaction()) await session.abortTransaction();
+      return res.status(500).json(crs.SERR500REST(error));
+    } finally {
+      await session.endSession();
+    }
+  }
+);
+
+memberRoute.post("/library-cards/fetch", async (req, res) => {
+  try {
+    const m = await Member.findById(req.body._id)
+      .select(
+        "fullName program specialization rollNumber membershipId imageUrl"
+      )
+      .populate({ path: "libraryCards", populate: { path: "createdBy" } })
+      .lean();
+
+    return res.status(200).json(crs.STU200ALCTS(m));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
+  }
+});
 
 module.exports = { memberRoute };

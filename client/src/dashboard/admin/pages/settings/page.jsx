@@ -6,11 +6,11 @@ const SettingsPage = () => {
   return (
     <div className="px-10">
       <h1 className="text-3xl font-semibold my-5">Settings Page</h1>
-      <div className="c-box flex gap-15 min-h-screen">
+      <div className="bg-white  rounded dark:bg-gray-900 flex gap-15 min-h-screen">
         <div className="basis-1/6">
           <Sidebar />
         </div>
-        <div className="basis-5/6">
+        <div className="basis-5/6 p-5">
           <SettingsRoutes />
         </div>
       </div>

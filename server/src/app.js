@@ -34,7 +34,7 @@ if (process.env.NODE_ENV !== "production") {
   app.use(
     cors({
       origin: function (origin, callback) {
-        const allowedOrigins = ["http://localhost:3000"];
+        const allowedOrigins = ["http://localhost", "http://192.168.1.4"];
         if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
@@ -50,6 +50,7 @@ app.use(limiter);
 app.use(cookieParser());
 app.use(express.json());
 
+app.use("/uploads", express.static("uploads"));
 app.use(express.static(path.join(__dirname, "..", "dist")));
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "dist", "index.html"));

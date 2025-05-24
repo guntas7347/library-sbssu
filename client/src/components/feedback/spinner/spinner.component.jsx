@@ -1,6 +1,6 @@
-export default function Spinner() {
+export default function Spinner({ center = false, height = "" }) {
   return (
-    <div role="status">
+    <div className={center && `flex justify-center items-center ${height}`}>
       <svg
         aria-hidden="true"
         class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"

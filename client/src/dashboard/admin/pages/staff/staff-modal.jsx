@@ -1,31 +1,40 @@
-import React, { useContext, useEffect, useState } from "react";
-import useToggle from "../../../../components/hooks/use-toggle";
-import { SnackBarContext } from "../../../../components/context/snackbar.context";
-import { fetchStaffById } from "../../hooks/http-requests.hooks.admin";
+import React, { useEffect, useState } from "react";
+import { useFeedback } from "../../../../components/context/snackbar.context";
+import server, { fetchStaffById } from "../../hooks/http-requests.hooks.admin";
 import Input from "../../../../components/forms/input";
+import TextArea from "../../../../components/forms/text-area";
+import ModalCloseButton from "../../../../components/buttons/svg-buttons/close-button";
+import Spinner from "../../../../components/feedback/spinner/spinner.component";
 
 const StaffModal = ({ id, onClose }) => {
-  const { setFeedback } = useContext(SnackBarContext);
+  const setFeedback = useFeedback();
 
-  const { getToggle, toggle } = useToggle(false);
-
-  const [staffData, setStaffData] = useState({ fullName: "", idNumber: null });
-
-  const { fullName, idNumber, email, level, active, createdAt } = staffData;
+  const [staffData, setStaffData] = useState();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const asyncFunc = async () => {
-      await fetchStaffById(id)
-        .then((res) => setStaffData(res))
-        .catch((err) => {
-          setFeedback([1, 2, err]);
+      await server.staff
+        .fetch(id)
+        .then((res) => {
+          const authData = res.authId;
+          delete res.authId;
+          let s = {
+            ...res,
+            ...authData,
+            rights: authData.rights
+              .map((item) => item.toUpperCase())
+              .join(", "),
+          };
+          setStaffData(s);
+          setLoading(false);
+        })
+        .catch((error) => {
+          setFeedback([1, 2, error]);
         });
     };
     asyncFunc();
   }, []);
-
-  const disabled = true;
-  const handleChange = () => {};
 
   return (
     <>
@@ -41,102 +50,118 @@ const StaffModal = ({ id, onClose }) => {
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                   Staff Details
                 </h3>
-                <button
-                  type="button"
-                  className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                  onClick={onClose}
-                >
-                  <svg
-                    className="w-3 h-3"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 14 14"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-                    />
-                  </svg>
-                  <span className="sr-only">Close modal</span>
-                </button>
+                <ModalCloseButton onClose={onClose} />
               </div>
-              <div className="p-4 md:p-5 ">
-                <div className="grid gap-6 mb-6 md:grid-cols-2">
+              {loading ? (
+                <div className="min-h-screen flex justify-center items-center">
+                  <Spinner />
+                </div>
+              ) : (
+                <div className="grid gap-6 mb-6 md:grid-cols-2 p-4 md:p-5">
                   <Input
-                    onChange={handleChange}
-                    disabled={disabled}
-                    label="Name"
-                    name="fullName"
-                    value={fullName}
+                    disabled={true}
+                    label="ID Number"
+                    value={staffData.idNumber}
                   />
                   <Input
-                    onChange={handleChange}
-                    disabled={disabled}
-                    label="Staff Id"
-                    name="idNumber"
-                    value={idNumber}
+                    disabled={true}
+                    label="Full Name"
+                    value={staffData.fullName}
                   />
                   <Input
-                    onChange={handleChange}
-                    disabled={disabled}
+                    disabled={true}
                     label="Email"
-                    name="email"
-                    value={email}
+                    value={staffData.email}
                   />
                   <Input
-                    onChange={handleChange}
-                    disabled={disabled}
-                    label="Level"
-                    name="level"
-                    value={level}
+                    disabled={true}
+                    label="Phone Number"
+                    value={staffData.phoneNumber}
                   />
                   <Input
-                    onChange={handleChange}
-                    disabled={disabled}
-                    label="Status"
-                    name="active"
-                    value={active}
+                    disabled={true}
+                    label="Date of Birth"
+                    value={
+                      staffData.dateOfBirth
+                        ? new Date(staffData.dateOfBirth).toLocaleDateString()
+                        : ""
+                    }
                   />
                   <Input
-                    onChange={handleChange}
-                    disabled={disabled}
-                    label="Added On"
-                    name="createdAt"
-                    value={createdAt}
-                    type="date"
+                    disabled={true}
+                    label="Gender"
+                    value={staffData.gender}
+                  />
+                  <TextArea
+                    disabled={true}
+                    className="UPPERCASE"
+                    label="Rights"
+                    value={staffData.rights}
+                  />
+                  <TextArea
+                    disabled={true}
+                    label="Address"
+                    value={staffData.address}
+                  />
+                  <Input
+                    disabled={true}
+                    label="Emergency Contact"
+                    value={staffData.emergencyContact}
+                  />
+                  <Input
+                    disabled={true}
+                    label="Employee ID"
+                    value={staffData.employeeId}
+                  />
+                  <Input
+                    disabled={true}
+                    label="Department"
+                    value={staffData.department}
+                  />
+                  <Input
+                    disabled={true}
+                    label="Designation"
+                    value={staffData.designation}
+                  />
+                  <Input
+                    disabled={true}
+                    label="Joining Date"
+                    value={
+                      staffData.joiningDate
+                        ? new Date(staffData.joiningDate).toLocaleDateString()
+                        : ""
+                    }
+                  />
+                  <Input
+                    disabled={true}
+                    label="Employment Status"
+                    value={staffData.employmentStatus}
+                  />
+                  <Input
+                    disabled={true}
+                    label="Profile Picture URL"
+                    value={staffData.profilePictureURL}
                   />
                 </div>
-                <div className="flex justify-between items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-                  <button
-                    type="button"
-                    className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-                  >
+              )}
+              {/* <div className="flex justify-between items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
+                  <button className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">
                     Mark as Inactive
                   </button>
 
                   {!getToggle ? (
-                    <button
-                      type="button"
-                      onClick={() => toggle()}
-                      className="c-btn-blue"
-                    >
+                    <button onClick={() => toggle()} className="c-btn-blue">
                       Edit
                     </button>
                   ) : (
                     <button
-                      type="button"
                       // onClick={handleEdit}
                       className="c-btn-blue"
                     >
                       Save Changes
                     </button>
                   )}
-                </div>
-              </div>
+                </div> */}
             </div>
           </div>
         </div>

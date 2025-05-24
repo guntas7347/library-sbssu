@@ -16,11 +16,10 @@ const TransactionsSchema = new Schema({
   category: { type: String, required: true },
   remark: { type: String, default: "NONE" },
   amount: { type: Number, required: true, min: 0 },
-  receiptNumber: { type: String, unique: true },
+  receiptNumber: { type: String, unique: true, sparse: true },
   paymentMethod: {
     type: String,
-    enum: ["CASH", "CARD", "UPI", "ONLINE", "NONE"],
-    default: "NONE",
+    enum: ["CASH", "ONLINE"],
   },
   closingBalance: { type: Number, required: true },
   createdAt: { type: Date, default: Date.now },

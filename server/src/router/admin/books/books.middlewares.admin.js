@@ -40,10 +40,10 @@ const createBook = async (req, res, next) => {
       }
     });
     next();
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
     if (session.inTransaction()) await session.abortTransaction();
-    return res.status(200).json(crs.SERR500REST(err));
+    return res.status(200).json(crs.SERR500REST(error));
   } finally {
     await session.endSession();
   }
@@ -70,11 +70,11 @@ const createAccession = async (req, res, next) => {
       }
     });
     next();
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
     if (session.inTransaction()) await session.abortTransaction();
-    if (err.code === 11000) return res.status(200).json(crs.BKS409ABA(err));
-    return res.status(200).json(crs.SERR500REST(err));
+    if (error.code === 11000) return res.status(200).json(crs.BKS409ABA(error));
+    return res.status(200).json(crs.SERR500REST(error));
   } finally {
     await session.endSession();
   }
@@ -91,7 +91,7 @@ const fetchBookByIsbn = async (req, res, next) => {
     if (!req.cust) req.cust = {};
     req.cust.bookDoc = bookDoc;
     next();
-  } catch (err) {
+  } catch (error) {
     return res.status(500).json(crs.SERR500REST());
   }
 };
@@ -107,8 +107,8 @@ const fetchBookAccByAccNum = async (req, res, next) => {
     if (!req.cust) req.cust = {};
     req.cust.bookAccessionDoc = bookAccessionDoc;
     next();
-  } catch (err) {
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -118,21 +118,21 @@ const fetchBookForIssue = async (req, res, next) => {
       accessionNumber: req.body.accessionNumber,
     })
       .populate("bookId", "title author -_id")
-      .select("accessionNumber status -_id")
+      .select("accessionNumber status category -_id")
       .lean();
 
     if (!d) return res.status(404).json(crs.MDW404FBBAN());
     if (!req.cust) req.cust = {};
     req.cust.book = {
-      accessionNumber: d.accessionNumber,
-      status: d.status,
-      title: d.bookId.title,
-      author: d.bookId.author,
+      ...d,
+      ...d.bookId,
     };
+    delete req.cust.book.bookId;
+
     next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -143,8 +143,8 @@ const verifyAccessionNumberAvailability = async (req, res, next) => {
     });
     if (bookAccessionDoc) return res.status(404).json(crs.BKS409ABA());
     next();
-  } catch (err) {
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -156,9 +156,9 @@ const checkAccessionsAvailability = async (req, res, next) => {
       if (doc) return res.status(404).json(crs.BKS409ABA());
     }
     next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -167,8 +167,8 @@ const verifyIsbnAvailability = async (req, res, next) => {
     const isbn = await getBook({ isbn: req.body.isbn });
     if (isbn && isbn.isbn) return res.status(409).json(crs.BKS409ANB());
     next();
-  } catch (err) {
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -193,9 +193,9 @@ const verifyIsbnExistance = async (req, res, next) => {
       return res.status(200).json(crs.BKS200ABA());
     }
     next();
-  } catch (err) {
+  } catch (error) {
     if (session.inTransaction()) await session.abortTransaction();
-    return res.status(200).json(crs.SERR500REST(err));
+    return res.status(200).json(crs.SERR500REST(error));
   } finally {
     await session.endSession();
   }

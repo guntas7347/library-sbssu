@@ -71,9 +71,6 @@ export const fetchStudentByRollNumber = (membershipId) =>
     "STU200FSBRN",
   ]);
 
-export const fetchMemberForIssue = (membershipId) =>
-  restCall("members/fetch-for-issue", { membershipId }, ["STU200FSBRN"]);
-
 export const allotLibraryCardToStudent = (cardDetails) =>
   restCall("members/allot-library-card-to-student", cardDetails, [
     "STU200ALCTS",
@@ -109,20 +106,14 @@ export const fetchBookDetails = (_id) =>
 export const editExistingBook = (e) =>
   restCall("books/edit-existing-book", e, "BKS200EB");
 
-export const fetchBookForIssue = (accessionNumber) =>
-  restCall("books/fetch-for-issue", { accessionNumber }, "BKS200FBBAN");
-
 export const fetchStudentById = (_id) =>
-  restCall("members/fetch-student-by-id", { _id }, "STU200FSBI");
+  restCall("members/fetch-one", { _id }, "STU200FSBI");
 
 export const quickSearchMember = (query) =>
   restCall("members/quick-search", query, ["SRH200GLB"]);
 
 export const markInactive = (_id) =>
   restCall("members/mark-inactive", { _id }, "MEB200MI");
-
-export const issueNewBook = (issueBookDetails) =>
-  restCall("books/issue-books/issue-new-book", issueBookDetails, "ISB200INB");
 
 export const fetchIssuedBookByAccessionNumber = (accessionNumber) =>
   restCall(
@@ -184,9 +175,6 @@ export const fetchAllStaff = (filter) =>
 export const fetchStaffById = (_id) =>
   restCall("staff/fetch-staff-by-id", { _id }, ["STF200FSBI"]);
 
-export const fetchProfile = () =>
-  restCall("staff/fetch-profile", {}, ["STF200FSBI"]);
-
 export const editStaff = (_id, update) =>
   restCall("staff/edit-staff", { _id, update }, ["STF201ESDI"]);
 
@@ -205,51 +193,7 @@ export const getNumberOfBookAccessions = () =>
 export const getNumberOfStudents = (filter = null) =>
   restCall("members/count-total-members", { filter }, "STU200CTS");
 
-//
-
-// export const fetchBookDetailsByIsbnApi = (isbn) => {
-//   return new Promise((resolve, reject) => {
-//     fetch(`https://openlibrary.org/isbn/${isbn}.json`, {})
-//       .then(async (res) => {
-//         const statusCode = res.status;
-//         const body = await res.json();
-//         if (statusCode === 200) {
-//           resolve(body);
-//           console.log(body);
-//         } else {
-//           resolve({ title: "", publish_date: "", publishers: [""] });
-//         }
-//       })
-//       .catch((error) =>
-//         resolve({ title: "", publish_date: "", publishers: [""] })
-//       );
-//   });
-// };
-
-// export const fetchWeather = async () => {
-//   return new Promise((resolve) => {
-//     fetch(
-//       `https://api.openweathermap.org/data/2.5/weather?lat=30.914519&lon=74.652159&appid=${OPEN_WEATHER_API_KEY}`
-//     )
-//       .then(async (res) => {
-//         const weather = await res.json();
-//         const otherResults = weather.weather[0];
-//         const result = {
-//           temp: (weather.main.temp - 273.15).toFixed(1),
-//           feels_like: (weather.main.feels_like - 273.15).toFixed(1),
-//           description: otherResults.description,
-//           icon: otherResults.icon,
-//           city: weather.name,
-//         };
-
-//         resolve(result);
-//       })
-//       .catch((err) => {
-//         console.log(err);
-//         resolve("Unable to Fetch");
-//       });
-//   });
-// };
+export const getLoginLogs = (e) => restCall("logger/logins", e, "LOG200LOGIN");
 
 const server = {
   book: {
@@ -265,6 +209,13 @@ const server = {
       restCall("members/quick-search", query, ["SRH200GLB"]),
     markInactive: (_id) =>
       restCall("members/mark-inactive", { _id }, "MEB200MI"),
+    fetchForCard: (membershipId) =>
+      restCall("members/fetch/for-card", { membershipId }, "STU200FSBRN"),
+    edit: (id, data) => restCall("members/edit", { id, ...data }, "STU200ES"),
+    allotCard: (e) =>
+      restCall("members/library-cards/create", e, "STU200ALCTS"),
+    fetchCards: (_id) =>
+      restCall("members/library-cards/fetch", { _id }, "STU200ALCTS"),
   },
   transactions: {
     fetchMember: (membershipId) =>
@@ -278,6 +229,24 @@ const server = {
   },
   staff: {
     create: (e) => restCall("staff/create", e, ["AUTH200AADM"]),
+    fetch: (_id) => restCall("staff/fetch", { _id }, ["STF200FSBI"]),
+    changeStatus: (_id, status) =>
+      restCall("staff/change-status", { _id, status }, ["STF201ESDI"]),
+    edit: (staffFields, authFields) =>
+      restCall("staff/edit", { staffFields, authFields }, ["STF201ESDI"]),
+    fetchProfile: () => restCall("staff/fetch-profile", {}, ["STF200FSBI"]),
+  },
+  issue: {
+    fetchBookForIssue: (accessionNumber) =>
+      restCall("books/fetch-for-issue", { accessionNumber }, "BKS200FBBAN"),
+    fetchMemberForIssue: (membershipId) =>
+      restCall("members/fetch-for-issue", { membershipId }, ["STU200FSBRN"]),
+    issueNewBook: (issueBookDetails) =>
+      restCall(
+        "books/issue-books/issue-new-book",
+        issueBookDetails,
+        "ISB200INB"
+      ),
   },
 };
 

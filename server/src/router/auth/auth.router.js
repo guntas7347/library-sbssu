@@ -6,13 +6,13 @@ const authRouter = express.Router();
 
 authRouter.use("/admin", adminRouter);
 
-authRouter.post("/sign-out", async (req, res) => {
+authRouter.post("/clear-session", async (req, res) => {
   try {
     res.cookie("session", null, { expires: new Date(0) });
     return res.status(200).json(crs.AUTH200SOUT());
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 });
 
@@ -28,9 +28,9 @@ authRouter.post("/verify-recaptcha", async (req, res) => {
     );
     const json = await response.json();
     return res.status(200).json(crs.AUTH200RECAPTCHA(json));
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 });
 

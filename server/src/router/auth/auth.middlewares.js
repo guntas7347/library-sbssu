@@ -1,6 +1,7 @@
 const crs = require("../../utils/custom-response-codes");
 const { checkPassword } = require("../../models/auth/functions");
 const { createJWT, encryptText } = require("./jwt");
+const { createLog } = require("../../utils/functions");
 
 const TOKEN_EXPIRY_MINUTES = 60;
 
@@ -10,9 +11,9 @@ const verifyPassword = async (req, res, next) => {
     const result = await checkPassword(password, hash);
     if (!result) return res.status(401).json(crs.AUTH401VPASS());
     next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -32,19 +33,20 @@ const setJwtCookie = async (req, res, next) => {
     res.cookie("session", encryptText(jwt), cookieOptions);
 
     next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
-const authorisationLevel = (rights) => {
+const authorisationLevel = (rights = ["open"]) => {
   return function (req, res, next) {
     try {
       if (!Array.isArray(rights)) rights = [rights];
       if (
         req.user.rights.some((right) => rights.includes(right)) ||
-        req.user.rights.includes("admin")
+        req.user.rights.includes("admin") ||
+        rights[0] === "open"
       )
         next();
       else return res.status(403).json(crs.ADM403JWT());

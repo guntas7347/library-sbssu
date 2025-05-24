@@ -1,27 +1,24 @@
-import { useContext, useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
 import {
   adminLoginWithCredentials,
-  signOut,
+  clearSession,
   // verifyReCaptcha,
 } from "../http-requests";
 
-import { SnackBarContext } from "../../components/context/snackbar.context";
+import { useFeedback } from "../../components/context/snackbar.context";
 // import ReCaptcha from "../../components/feedback/recaptcha/recaptcha.component";
 import Input from "../../components/forms/input";
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
-  const { setFeedback } = useContext(SnackBarContext);
+  const setFeedback = useFeedback();
 
   // const [reCaptchaVerified, setReCaptchaVerified] = useState(false);
 
-  const { formFields, handleChange } = useForm({
-    email: "",
-    password: "",
-  });
+  const { formFields, handleChange, setFields } = useForm();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -29,13 +26,15 @@ const AdminLoginPage = () => {
       .then(() => {
         navigate("/admin/dashboard");
       })
-      .catch((err) => setFeedback([1, 2, err]));
+      .catch((error) => {
+        setFeedback([1, 2, error]);
+      });
   };
 
   useEffect(() => {
     const asyncFunc = async () => {
-      await signOut().catch((err) => {
-        setFeedback([1, 2, err]);
+      await clearSession().catch((error) => {
+        setFeedback([1, 2, error]);
       });
     };
     asyncFunc();
@@ -44,7 +43,7 @@ const AdminLoginPage = () => {
   // const handleVerify = async (token) => {
   //   await verifyReCaptcha(token)
   //     .then((res) => setReCaptchaVerified(res.payload.success))
-  //     .catch((err) => setFeedback(err));
+  //     .catch((error) => setFeedback(error));
   // };
 
   return (
@@ -53,7 +52,7 @@ const AdminLoginPage = () => {
         <div className="self-start flex flex-row items-center gap-5">
           <img
             className="h-10 inline-block"
-            src="https://sbssu.ac.in/images/Tricolor.png"
+            src="/sbssu-logo.png"
             alt="sbssu logo"
           />
           <h1 className="text-3xl text-indigo-900 dark:text-indigo-100 font-bold inline-block">
@@ -62,18 +61,34 @@ const AdminLoginPage = () => {
         </div>
         <p className="text-xl font-bold">STAFF LOGIN</p>
 
-        <div className="flex flex-col gap-2">
+        <form
+          className="flex flex-col gap-2"
+          onSubmit={handleSubmit}
+          autoComplete="off"
+        >
           <Input
             label="Email Address"
             name="email"
             type="email"
             onChange={handleChange}
+            required={true}
           />
           <Input
             label="Password"
             name="password"
             type="password"
             onChange={handleChange}
+            required={true}
+          />
+          <Input
+            label="TOTP"
+            name="totp"
+            type="text"
+            onChange={(e) => {
+              setFields("totp", e.target.value.replace(/\D/g, "").slice(0, 6));
+            }}
+            required={true}
+            value={formFields.totp}
           />
 
           {/* <div className="flex justify-center">
@@ -82,14 +97,14 @@ const AdminLoginPage = () => {
           <button
             // disabled={!reCaptchaVerified}
             className="text-white mt-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
-            onClick={handleSubmit}
+            type="submit"
           >
             Sign In
           </button>
-        </div>
+        </form>
         <div className="flex  w-full justify-center">
           <div>
-            <Link to={"/forgot-password"}>Forgot password</Link>
+            <Link to={"/admin/forgot-password"}>Forgot password</Link>
           </div>
         </div>
       </div>

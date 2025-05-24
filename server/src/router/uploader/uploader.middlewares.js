@@ -16,15 +16,15 @@ const uploadCloudinaryImage = async (req, res) => {
         resource_type: "auto",
         folder: "images",
       },
-      (err, result) => {
-        if (err) return res.status(500).json(crs.SERR500REST(err));
+      (error, result) => {
+        if (error) return res.status(500).json(crs.SERR500REST(error));
         return res.status(500).json(crs.ULD201IMG({ imageUrl: result.url }));
       }
     );
     streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -38,8 +38,8 @@ const destroyImage = async (imageUrl) => {
 
     const publicId = extractPublicId(imageUrl);
     await cloudinary.uploader.destroy(publicId);
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
   }
 };
 
@@ -59,9 +59,9 @@ const deleteCloudinaryImage = async (req, res, next) => {
     req.cust.result = result;
 
     return next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 

@@ -1,27 +1,29 @@
 const express = require("express");
 const multer = require("multer");
 const crs = require("../../utils/custom-response-codes");
-const {
-  deleteCloudinaryImage,
-  uploadCloudinaryImage,
-} = require("./uploader.middlewares");
+const { createLog, uuidGenerator } = require("../../utils/functions");
 
 const uploadRouter = express.Router();
 
-const storage = multer.memoryStorage();
+const storage = multer.diskStorage({
+  destination: "uploads/profile/",
+  filename: function (req, file, cb) {
+    cb(null, uuidGenerator() + ".jpg");
+  },
+});
+
 const upload = multer({ storage });
 
-uploadRouter.post("/image", upload.single("file"), uploadCloudinaryImage);
+module.exports = { uploadRouter };
 
-uploadRouter.post("/delete-image", deleteCloudinaryImage, async (req, res) => {
+uploadRouter.post("/upload-image", upload.single("image"), async (req, res) => {
   try {
-    if (req.cust.result.result === "ok")
-      return res.status(500).json(crs.ULD200DELIMG());
-    return res.status(500).json(crs.SERR500REST());
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+    const path = "/profile/" + req.file.filename;
+    return res.status(201).json(crs.ULD201IMG(path));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 });
 
-module.exports = { uploadRouter };
+uploadRouter.post("/delete-image");

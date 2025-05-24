@@ -26,17 +26,18 @@ const {
   addTransaction,
 } = require("../../../models/transaction/transaction.controllers");
 const ReturnedBook = require("../../../models/returned-book/returned-books.schema");
+const { createLog } = require("../../../utils/functions");
 
 const processReturningBook = async (req, res, next) => {
   const session = await mongoose.startSession();
   try {
-    const issuedBook = req.cust.issuedBook._doc;
+    const issuedBook = req.cust.issuedBook;
     const { libraryCardId, bookAccessionId } = issuedBook;
     const StaffDoc = await getAuthAdminById(req.user.uid, "staffId -_id");
     const returningBookDetails = {
       ...issuedBook,
       returnDate: req.cust.returnDate,
-      returnedBy: StaffDoc._doc.staffId,
+      returnedBy: StaffDoc.staffId,
     };
     let returnedBookDoc = null;
     await session.withTransaction(async () => {
@@ -74,10 +75,10 @@ const processReturningBook = async (req, res, next) => {
     });
     req.cust.returnedBookId = returnedBookDoc[0]._id;
     next();
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
     if (session.inTransaction()) await session.abortTransaction();
-    return res.status(500).json(crs.SERR500REST(err));
+    return res.status(500).json(crs.SERR500REST(error));
   } finally {
     session.endSession();
   }
@@ -106,16 +107,16 @@ const sendReturnedConfirmationEmail = async (req, res, next) => {
     };
 
     transporter.sendMail({
-      from: "librarysbssu@gmail.com",
+      from: process.env.NODEMAILER_EMAIL,
       to: memberId.email,
       subject: "Confirmation: Book Return to SBSSU Central Library",
       html: generateEmailTemplate.returnBookConfirmation(emailContent),
     });
 
     next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.MDW500SRCE(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.MDW500SRCE(error));
   }
 };
 
@@ -145,9 +146,9 @@ const fetchReturnedBooks = async (req, res, next) => {
       totalPages: returnedBooksCol.totalPages,
     };
     return next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
@@ -195,9 +196,9 @@ const fetchReturnedBookDocById = async (req, res, next) => {
     if (!req.cust) req.cust = {};
     req.cust.returnedBook = returnedBook;
     next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 };
 

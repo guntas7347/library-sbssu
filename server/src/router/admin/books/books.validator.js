@@ -28,7 +28,8 @@ const validateAccessionNumber = async (req, res, next) => {
       .required()
       .validate(req.body.accessionNumber);
 
-    if (error) return res.status(400).json(crs.VAL400FAIL(error));
+    if (error)
+      return res.status(400).json(crs.VAL400FAIL(error.details[0].message));
     req.body.accessionNumber = value;
     return next();
   } catch (error) {

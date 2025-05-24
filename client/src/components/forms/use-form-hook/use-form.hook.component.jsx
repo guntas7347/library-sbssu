@@ -1,19 +1,19 @@
 import { useState } from "react";
 
-export const useForm = (defaultFormFields) => {
+export const useForm = (defaultFormFields = {}) => {
   const [formFields, setFormFields] = useState(defaultFormFields);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormFields({ ...formFields, [name]: value });
+    setFormFields((prev) => ({ ...prev, [name]: value }));
   };
 
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
   };
 
-  const setFields = (name, value) => {
-    setFormFields({ ...formFields, [name]: value });
+  const setFields = (name = "", value) => {
+    setFormFields((prev) => ({ ...prev, [name]: value }));
   };
 
   return {

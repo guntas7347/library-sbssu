@@ -10,16 +10,16 @@ import RightsSelector from "./components/rights-selector";
 const AddStaffModal = ({ onClose }) => {
   const setFeedback = useFeedback();
 
-  const { formFields, handleChange } = useForm({});
+  const { formFields, handleChange, setFields } = useForm({});
 
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
       const res = await server.staff.create(formFields);
-      setFeedback([1, 1, res]);
+      setFeedback(1, res);
       onClose();
     } catch (error) {
-      setFeedback([1, 2, error]);
+      setFeedback(2, error);
     }
   };
 
@@ -84,14 +84,19 @@ const AddStaffModal = ({ onClose }) => {
                       required={true}
                     />
                     <Input
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        setFields(
+                          "phoneNumber",
+                          e.target.value.replace(/[^0-9]/g, "").slice(0, 10)
+                        );
+                      }}
                       label="Phone Number"
-                      name="phoneNumber"
+                      value={formFields.phoneNumber}
                     />
                   </div>
-                  <hr className="h-px mt-7 mb-3 bg-gray-200 border-0 dark:bg-gray-600" />
+                  <hr className="c-hr" />
                   <RightsSelector onChange={handleChange} />
-                  <hr className="h-px mt-7 mb-3 bg-gray-200 border-0 dark:bg-gray-600" />
+                  <hr className="c-hr" />
                   <div className="grid gap-6 mb-6 md:grid-cols-2">
                     <Input
                       onChange={handleChange}
@@ -148,7 +153,7 @@ const AddStaffModal = ({ onClose }) => {
                       type="url"
                     />
                   </div>
-                  <hr className="h-px mt-7 mb-3 bg-gray-200 border-0 dark:bg-gray-600" />
+                  <hr className="c-hr" />
                   <div className="flex">
                     <button type="submit" className="c-btn-blue ml-auto">
                       Create

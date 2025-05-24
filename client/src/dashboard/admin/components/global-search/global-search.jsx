@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "../../../../components/forms/use-form-hook/use-form.hook.component";
 import { searchGlobally } from "../../hooks/http-requests.hooks.admin";
-import { SnackBarContext } from "../../../../components/context/snackbar.context";
+import { useFeedback } from "../../../../components/context/snackbar.context";
 import Icons from "../../../../components/icons";
-import BookModal from "../../pages/books/view-book/view-book.page.admin";
+import BookModal from "../../pages/books/view-book.modal";
 import MembersModal from "../../pages/members/member.modal";
 
 const ResultBar = ({ openModal, img, name, result, id }) => {
@@ -19,7 +19,7 @@ const ResultBar = ({ openModal, img, name, result, id }) => {
 };
 
 const GlobalSearchBar = () => {
-  const { setFeedback } = useContext(SnackBarContext);
+  const setFeedback = useFeedback();
 
   const [modal, setModal] = useState("");
   const [modalValue, setModalValue] = useState("");
@@ -37,7 +37,7 @@ const GlobalSearchBar = () => {
       const debounceFunction = setTimeout(async () => {
         await searchGlobally(`search=${search}`)
           .then((res) => setSearchResults(res))
-          .catch((err) => setFeedback([1, 2, err]));
+          .catch((error) => setFeedback([1, 2, error]));
       }, 1000);
 
       return () => clearTimeout(debounceFunction);
@@ -57,9 +57,9 @@ const GlobalSearchBar = () => {
           >
             <path
               stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
               d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
             />
           </svg>

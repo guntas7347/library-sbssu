@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Select from "../../../../../components/forms/select-input";
 
-const RightsSelector = ({ onChange }) => {
-  const [rights, setRights] = useState([]);
+const RightsSelector = ({ onChange, defaultRights = [] }) => {
+  const [rights, setRights] = useState(defaultRights);
 
   const handleAddRight = (e) => {
     const { value } = e.target;
@@ -41,37 +41,42 @@ const RightsSelector = ({ onChange }) => {
 
   return (
     <div>
-      <h1>Rights Selector</h1>
+      <h1 className="text-xl font-semibold">Add staff rights:-</h1>
       <div>
         <Select
           onChange={handleAddRight}
-          label="Right"
+          autoFire={false}
+          label="Rights"
           name="right"
           options={[
             "none",
             "admin",
             "view-member",
-            "search-member",
-            "export-member",
+            "search-members",
+            "export-members",
             "view-applicant",
-            "search-applicant",
+            "search-applicants",
             "approve-applicant",
-            "export-applicant",
+            "export-applicants",
+            "create-card",
             "view-book",
-            "search-book",
+            "search-books",
             "create-book",
             "create-accession",
-            "export-book",
+            "export-books",
             "view-issued-book",
-            "search-issued-book",
+            "search-issued-books",
             "issue-book",
-            "export-issued-book",
+            "export-issued-books",
             "view-returned-book",
-            "search-returned-book",
+            "search-returned-books",
             "return-book",
-            "export-returned-book",
+            "export-returned-books",
             "view-staff",
             "search-staff",
+            "view-transaction",
+            "search-transactions",
+            "create-transaction",
           ]}
         />
         <div className="grid grid-cols-2 gap-3 my-3">
@@ -81,7 +86,7 @@ const RightsSelector = ({ onChange }) => {
                 key={idx}
                 className="border px-2 py-1 rounded flex justify-between bg-gray-200 dark:bg-gray-500"
               >
-                <span className="capitalize">{right}</span>
+                <span className=" uppercase">{right}</span>
 
                 <button
                   className="cursor-pointer"

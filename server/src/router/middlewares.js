@@ -20,15 +20,16 @@ const verifyJwtMiddleware = (req, res, next) => {
     }
     req.user = jwt;
     next();
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.ERR500JWT(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.ERR500JWT(error));
   }
 };
 
 const verifyStaff = async (req, res, next) => {
   try {
     const { role, rights } = await Auth.findById(req.user.uid).lean();
+    if (!role) return res.status(401).json(crs.ADM401JWT());
     req.user.role = role;
     req.user.rights = rights;
     if (role === "ADMIN" || role === "STAFF") {

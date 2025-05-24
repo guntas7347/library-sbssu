@@ -1,55 +1,24 @@
-import * as React from "react";
-import Backdrop from "@mui/material/Backdrop";
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
-import Fade from "@mui/material/Fade";
-import Button from "@mui/material/Button";
-import Typography from "@mui/material/Typography";
-import { useState } from "react";
+import React from "react";
+import ModalCloseButton from "../buttons/svg-buttons/close-button";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
-
-export default function TransitionsModal({ title, body }) {
-  const [open, setOpen] = useState(true);
-
-  const handleClose = () => setOpen(false);
-
+const Modal = ({ onClose, children, title }) => {
   return (
     <div>
-      <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        open={open}
-        onClose={handleClose}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 500,
-          },
-        }}
-      >
-        <Fade in={open}>
-          <Box sx={style}>
-            <Typography id="transition-modal-title" variant="h6" component="h2">
-              {title}
-            </Typography>
-            <Typography id="transition-modal-description" sx={{ mt: 2 }}>
-              {body}
-            </Typography>
-          </Box>
-        </Fade>
-      </Modal>
+      <div className=" flex inset-0 overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full bg-black/50">
+        <div className="relative p-4 w-full max-w-2xl max-h-full">
+          <div className="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
+            <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {title}
+              </h3>
+              <ModalCloseButton onClose={onClose} />
+            </div>
+            <div className="p-4 md:p-5">{children}</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default Modal;

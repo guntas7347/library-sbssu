@@ -1,10 +1,5 @@
 import { API_URL } from "../keys";
 
-const logResponseToConsole = ({ status, message, payload }, success = true) =>
-  success
-    ? console.log({ status, message, payload })
-    : console.error({ status, message, payload });
-
 const postOptions = (obj) => {
   return {
     method: "POST",
@@ -30,7 +25,6 @@ export const restCall = (url, obj, crs = null) => {
         if (crs.includes(response.status)) {
           resolve(response);
         } else {
-          // logResponseToConsole(response, false);
           reject(response.message);
         }
       })
@@ -41,33 +35,60 @@ export const restCall = (url, obj, crs = null) => {
 };
 
 export const adminLoginWithCredentials = (userCredentials) => {
-  return restCall("auth/admin/login", userCredentials, "AUTH200ADM");
+  return restCall("public/auth/admin/login", userCredentials, "AUTH200ADM");
 };
 
 export const createAdminAuth = (userCredentials) => {
-  return restCall("auth/admin/signup", userCredentials);
+  return restCall("public/auth/admin/signup", userCredentials);
 };
 
 export const verifyAuthRole = (role) => {
   return restCall("auth-secured/ping", { role }, "AUTH200PING");
 };
 
+export const clearSession = () => {
+  return restCall("public/auth/clear-session", {}, "AUTH200SOUT");
+};
+
 export const signOut = () => {
-  return restCall("auth/sign-out", {}, "AUTH200SOUT");
+  return restCall("auth-secured/sign-out", {}, "AUTH200SOUT");
 };
 
 export const verifyReCaptcha = (token) =>
-  restCall("auth/verify-recaptcha", { token }, "AUTH200RECAPTCHA");
+  restCall("public/auth/verify-recaptcha", { token }, "AUTH200RECAPTCHA");
 
 export const resetPasswordAdminDispatchLink = (d) =>
-  restCall("auth/admin/dispatch-reset-link", d, "AUTH200LDPS");
+  restCall("public/auth/admin/dispatch-reset-link", d, "AUTH200LDPS");
 
 export const resetPasswordAdminVerifyLink = (type, code) =>
-  restCall("auth/admin/verify-reset-link", { type, code }, "AUTH200LVFS");
+  restCall(
+    "public/auth/admin/verify-reset-link",
+    { type, code },
+    "AUTH200LVFS"
+  );
 
-export const resetPasswordAdmin = (password, code) =>
-  restCall("auth/admin/reset-password", { password, code }, "AUTH200RAP");
+export const getPrograms = () =>
+  restCall("public/settings/fetch/programs", {}, "SET200GET");
 
-export const deleteImageFromCloud = (imageData) => {
-  return restCall("upload/delete-image", imageData, "ULD200DELIMG");
+export const createApplication = (e) =>
+  restCall("public/member/join", e, "STU201CNA");
+
+export const fetchApplication = (_id, type = "url") =>
+  restCall("public/member/fetch", { _id, type }, "STU200FA");
+
+export const deleteApplication = (gh) =>
+  restCall("public/member/delete", { gh }, "STU201DA");
+
+export const resetPasswordAdmin = (password, totp, code) =>
+  restCall(
+    "public/auth/admin/reset-password",
+    { password, totp, code },
+    "AUTH200RAP"
+  );
+
+export const uploadImage = (formData) => {
+  return fetch(`${API_URL}/public/upload/upload-image`, {
+    method: "POST",
+    body: formData,
+  });
 };

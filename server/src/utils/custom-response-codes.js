@@ -2,6 +2,23 @@ const createCustomResponseObject = (status, message, payload = null) => {
   return { status, message, payload };
 };
 
+function handleMongoError(error) {
+  if (error.code === 11000) {
+    // Get the field name from the error message using regex
+    const fieldMatch = error.message.match(/index:\s+([^\s]+)_\d+\s/);
+    const valueMatch = error.message.match(/dup key:\s+\{ :\s+"(.+?)" \}/);
+
+    const field = fieldMatch ? fieldMatch[1] : "field";
+    const value = valueMatch ? valueMatch[1] : "value";
+
+    return `${
+      field.charAt(0).toUpperCase() + field.slice(1)
+    } "${value}" already exists. Please use a different ${field}.`;
+  }
+  // Return generic error if not 11000
+  return "Something went wrong. Please try again.";
+}
+
 const crs = {
   ULD201IMG: (payload = null) =>
     createCustomResponseObject(
@@ -53,10 +70,13 @@ const crs = {
     createCustomResponseObject("VAL400FAIL", "Invalid Input", payload),
   ISB403PD: (payload = null) =>
     createCustomResponseObject("ISB403PD", "Issue not permitted", payload),
-
+  LOG200LOGIN: (payload = null) =>
+    createCustomResponseObject("LOG200LOGIN", "Login logs fetched", payload),
   SERR500REST: (payload = null) =>
     createCustomResponseObject("SERR500REST", "Internal Server Error", payload),
   CUSTOMRES: (res = "") => createCustomResponseObject("CUSTOMRES", res, null),
+  MONGO11000ERR: (error = "") =>
+    createCustomResponseObject("MONGO11000ERR", handleMongoError(error), null),
   STU404FSBRN: (payload = null) =>
     createCustomResponseObject("STU404FSBRN", "Member not found", payload),
   STU200FSBRN: (payload = null) =>
@@ -129,6 +149,12 @@ const crs = {
     createCustomResponseObject("ERR500JWT", "Unable to Authenticate", payload),
   STU200FAS: (payload = null) =>
     createCustomResponseObject("STU200FAS", "Members fetched", payload),
+  STU201CNA: (payload = null) =>
+    createCustomResponseObject("STU201CNA", "Application created", payload),
+  STU200FA: (payload = null) =>
+    createCustomResponseObject("STU200FA", "Application fetched", payload),
+  STU201DA: (payload = null) =>
+    createCustomResponseObject("STU201DA", "Application deleted", payload),
   STU200FAA: (payload = null) =>
     createCustomResponseObject("STU200FAA", "Applications fetched", payload),
   BKS409ANB: (payload = null) =>
@@ -172,7 +198,7 @@ const crs = {
   MDW401VBBB: (payload = null) =>
     createCustomResponseObject(
       "MDW401VBBB",
-      "This Library Card doesn't issue Book Bank Books",
+      "Issue compatibility error",
       payload
     ),
   MDW409VLCA: (payload = null) =>
@@ -406,13 +432,13 @@ const crs = {
   AUTH200RAPV: (payload = null) =>
     createCustomResponseObject("AUTH200RAPV", "Otp Verified", payload),
   AUTH401RAPV: (payload = null) =>
-    createCustomResponseObject("AUTH401RAPV", "Invalid OTP", payload),
+    createCustomResponseObject("AUTH401RAPV", "Invalid TOTP", payload),
   AUTH200RAP: (payload = null) =>
     createCustomResponseObject("AUTH200RAP", "Password Changed", payload),
   AUTH402RAPV: (payload = null) =>
     createCustomResponseObject(
       "AUTH402RAPV",
-      "Account Locked due to miltiple incorrect OTP inputs",
+      "Account Locked due to multiple incorrect OTP inputs",
       payload
     ),
   ISB200CIBD: (payload = null) =>

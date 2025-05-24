@@ -11,7 +11,7 @@ const BookSchema = new Schema({
   source: { type: String, required: false },
   cost: { type: Number, required: false },
   callNumber: { type: Number, required: false },
-  createdAt: { type: Date, default: new Date() },
+  createdAt: { type: Date, default: Date.now },
   accessionNumbers: [{ type: Schema.Types.ObjectId, ref: "Accession" }],
 });
 

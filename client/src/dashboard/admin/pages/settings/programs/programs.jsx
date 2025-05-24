@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Input from "../../../../../components/forms/input";
 import server from "../../../hooks/http-requests.hooks.admin";
-import { SnackBarContext } from "../../../../../components/context/snackbar.context";
+import { useFeedback } from "../../../../../components/context/snackbar.context";
 import Spinner from "../../../../../components/feedback/spinner/spinner.component";
 
 const ProgramsSettings = () => {
-  const { setFeedback } = useContext(SnackBarContext);
+  const setFeedback = useFeedback();
 
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,10 +51,10 @@ const ProgramsSettings = () => {
         key: "PRO-SPZ-LIST",
         value: programs,
       });
-      setFeedback([1, 1, res]);
+      setFeedback(1, res);
       setLoading(true);
     } catch (error) {
-      setFeedback([1, 2, error]);
+      setFeedback(2, error);
     }
   };
 
@@ -65,7 +65,7 @@ const ProgramsSettings = () => {
         setPrograms(res.value);
         setLoading(false);
       } catch (error) {
-        setFeedback([1, 2, error]);
+        setFeedback(2, error);
       }
     };
     f();
@@ -88,7 +88,12 @@ const ProgramsSettings = () => {
               <Input
                 label="Program"
                 value={p.name}
-                onChange={(e) => handleProgramChange(idx, e.target.value)}
+                onChange={(e) => {
+                  handleProgramChange(
+                    idx,
+                    e.target.value.toUpperCase().replace(/[^a-zA-Z-]/g, "")
+                  );
+                }}
               />
               <button
                 type="button"
@@ -113,7 +118,11 @@ const ProgramsSettings = () => {
                   <Input
                     value={s.name}
                     onChange={(e) =>
-                      handleSpecializationChange(idx, sIdx, e.target.value)
+                      handleSpecializationChange(
+                        idx,
+                        sIdx,
+                        e.target.value.toUpperCase().replace(/[^a-zA-Z-]/g, "")
+                      )
                     }
                   />
                   <button
@@ -131,9 +140,9 @@ const ProgramsSettings = () => {
                       viewBox="0 0 24 24"
                     >
                       <path
-                        fill-rule="evenodd"
+                        fillRule="evenodd"
                         d="M8.586 2.586A2 2 0 0 1 10 2h4a2 2 0 0 1 2 2v2h3a1 1 0 1 1 0 2v12a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V8a1 1 0 0 1 0-2h3V4a2 2 0 0 1 .586-1.414ZM10 6h4V4h-4v2Zm1 4a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Zm4 0a1 1 0 1 0-2 0v8a1 1 0 1 0 2 0v-8Z"
-                        clip-rule="evenodd"
+                        clipRule="evenodd"
                       />
                     </svg>
                   </button>

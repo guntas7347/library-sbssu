@@ -1,9 +1,9 @@
 import { fetchAllBooks } from "../../hooks/http-requests.hooks.admin";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { processDataForBooks } from "../../../../utils/functions";
-import { SnackBarContext } from "../../../../components/context/snackbar.context";
+import { useFeedback } from "../../../../components/context/snackbar.context";
 import Table from "../../../../components/table/button-table";
-import BookModal from "./view-book/view-book.page.admin";
+import BookModal from "./view-book.modal";
 import SearchBarMenu from "../../../../components/forms/search-bar-menu";
 import AddBookModal from "./add-book.modal";
 import AddAccessionModal from "./add-accession.modal";
@@ -11,7 +11,7 @@ import BookButtonSVG from "../../../../components/buttons/svg-buttons/book-svg.b
 import AccessionButtonSVG from "../../../../components/buttons/svg-buttons/accession-svg.button";
 
 const SearchBooksPage = () => {
-  const { setFeedback } = useContext(SnackBarContext);
+  const setFeedback = useFeedback();
 
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
@@ -45,8 +45,8 @@ const SearchBooksPage = () => {
           ])
         );
       })
-      .catch((err) => {
-        setFeedback([1, 2, err]);
+      .catch((error) => {
+        setFeedback([1, 2, error]);
       });
   };
 

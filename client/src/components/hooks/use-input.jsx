@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const useInput = (defaultFormField) => {
+const useInput = (defaultFormField = { value: "" }) => {
   const [formField, setFormField] = useState(defaultFormField);
 
   const handleChange = (e) => {
@@ -12,7 +12,11 @@ const useInput = (defaultFormField) => {
     setFormField({ value: "" });
   };
 
-  return { formField, handleChange, resetFormField };
+  const setField = (value) => {
+    setFormField({ value });
+  };
+
+  return { formField, handleChange, resetFormField, setField };
 };
 
 export default useInput;

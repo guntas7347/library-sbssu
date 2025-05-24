@@ -12,27 +12,32 @@ const {
 } = require("../../../models/auth/aduth_admin.controllers");
 const { default: mongoose } = require("mongoose");
 const { joi_staff_create } = require("./staff.validator");
+const Staff = require("../../../models/staff/staff.schema");
+const { create2FA } = require("../../auth/admin/admin.auth.middlewares");
+const Auth = require("../../../models/auth/auth.schema");
+const { createLog } = require("../../../utils/functions");
 
 const staffRouter = express.Router();
 
 staffRouter.post(
   "/create",
-  authorisationLevel(6),
+  authorisationLevel(["admin"]),
   joi_staff_create,
+  create2FA,
   createStaff,
   async (req, res) => {
     try {
       return res.status(200).json(crs.AUTH200AADM());
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
-);
+); //create
 
 staffRouter.post(
   "/search-all-staff",
-  authorisationLevel(2),
+  authorisationLevel(["search-staff"]),
   async (req, res) => {
     try {
       const staffCol = await getStaffs();
@@ -47,77 +52,89 @@ staffRouter.post(
       }
 
       return res.status(200).json(crs.STF200FAS(staffArray));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
-);
+); //search-all-staff
 
 staffRouter.post(
-  "/fetch-staff-by-id",
-  authorisationLevel(2),
+  "/fetch",
+  authorisationLevel(["view-staff"]),
   async (req, res) => {
     try {
-      const staffDoc = await getStaff({ _id: req.body._id });
-      return res.status(200).json(
-        crs.STF200FSBI({
-          ...staffDoc[0]._doc,
-          level: staffDoc[0].authId.level,
-          active: staffDoc[0].authId.active,
-        })
-      );
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+      const staffDoc = await Staff.findById(req.body._id)
+        .populate({ path: "authId", select: "rights email active -_id" })
+        .lean();
+      return res.status(200).json(crs.STF200FSBI(staffDoc));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
-);
+); //fetch
 
-staffRouter.post("/fetch-profile", authorisationLevel(1), async (req, res) => {
+staffRouter.post("/fetch-profile", authorisationLevel(), async (req, res) => {
   try {
-    const staffDoc = await getStaff({ authId: req.user.uid });
-    return res.status(200).json(
-      crs.STF200FSBI({
-        ...staffDoc[0]._doc,
-        level: staffDoc[0].authId.level,
-        active: staffDoc[0].authId.active,
-      })
-    );
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+    const d = await Staff.findOne({ authId: req.user.uid })
+      .populate("authId", "email rights active -_id")
+      .lean();
+    const staffDoc = {
+      ...d,
+      ...d.authId,
+      rights: d.authId.rights.map((item) => item.toUpperCase()).join(", "),
+    };
+    return res.status(200).json(crs.STF200FSBI(staffDoc));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
-});
+}); //fetch-profile
 
-staffRouter.post("/edit-staff", authorisationLevel(6), async (req, res) => {
+staffRouter.post("/edit", authorisationLevel(["admin"]), async (req, res) => {
   const session = await mongoose.startSession();
   try {
-    const staffUpdateData = {
-      email: req.body.update.email,
-      idNumber: req.body.update.idNumber,
-      fullName: req.body.update.fullName,
-      userName: req.body.update.fullName,
-      level: req.body.update.level,
-    };
-    console.log({ _id: req.body.update.authId });
     await session.withTransaction(async () => {
-      await updateStaffById(req.body._id, staffUpdateData, session);
-      await updateAuthAdmin(
-        { _id: req.body.update.authId },
-        staffUpdateData,
-        session
+      const { authId } = await Staff.findByIdAndUpdate(
+        req.body.staffFields._id,
+        req.body.staffFields
       );
+      await Auth.findByIdAndUpdate(authId, req.body.authFields);
     });
     await session.commitTransaction();
     return res.status(200).json(crs.STF201ESDI());
-  } catch (err) {
-    createLog(err);
+  } catch (error) {
+    createLog(error);
     if (session.inTransaction()) await session.abortTransaction();
-    return res.status(500).json(crs.SERR500REST(err));
+    if (error.code === 11000)
+      return res.status(200).json(crs.MONGO11000ERR(error));
+    return res.status(500).json(crs.SERR500REST(error));
   } finally {
     await session.endSession();
   }
 });
+
+staffRouter.post(
+  "/change-status",
+  authorisationLevel(["admin"]),
+  async (req, res) => {
+    try {
+      const { authId } = await Staff.findById(req.body._id)
+        .select("authId")
+        .lean();
+      if (req.body.status === "active")
+        await Auth.findByIdAndUpdate(authId, { active: true });
+
+      if (req.body.status === "inactive")
+        await Auth.findByIdAndUpdate(authId, { active: false });
+
+      return res.status(200).json(crs.STF201ESDI());
+    } catch (error) {
+      createLog(error);
+      return res.status(500).json(crs.SERR500REST(error));
+    }
+  }
+);
 
 module.exports = { staffRouter };

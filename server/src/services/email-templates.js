@@ -5,7 +5,7 @@ const mailGenerator = new Mailgen({
   product: {
     name: "Library SBSSU",
     link: "https://sbssu.ac.in/",
-    logo: "https://sbssu.ac.in/images/Tricolor.png",
+    logo: "/sbssu-logo.png",
   },
 });
 

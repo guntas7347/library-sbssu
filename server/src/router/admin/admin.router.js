@@ -11,14 +11,17 @@ const {
 const { authorisationLevel } = require("../auth/auth.middlewares");
 const { transactionsRouter } = require("./transactions/transactions.router");
 const { settingsRouter } = require("./settings/settings.router.admin");
+const { createLog } = require("../../utils/functions");
+const { logRouter } = require("./logger/logger.router");
 
 const adminRouter = express.Router();
 
 adminRouter.use("/members", memberRoute);
 adminRouter.use("/books", booksRouter);
 adminRouter.use("/staff", staffRouter);
+adminRouter.use("/logger", authorisationLevel(["admin"]), logRouter);
 adminRouter.use("/transactions", transactionsRouter);
-adminRouter.use("/settings", authorisationLevel(6), settingsRouter);
+adminRouter.use("/settings", settingsRouter);
 
 adminRouter.post("/search", authorisationLevel(2), async (req, res) => {
   try {
@@ -26,9 +29,9 @@ adminRouter.post("/search", authorisationLevel(2), async (req, res) => {
     const books = await searchBooks(req.query);
     const accessions = await searchAccessions(req.query);
     return res.status(200).json(crs.SRH200GLB({ members, books, accessions }));
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 });
 
@@ -49,9 +52,9 @@ adminRouter.post("/get-weather", async (req, res) => {
     };
 
     return res.status(200).json(crs.API200WEATHER(result));
-  } catch (err) {
-    createLog(err);
-    return res.status(500).json(crs.SERR500REST(err));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR500REST(error));
   }
 });
 

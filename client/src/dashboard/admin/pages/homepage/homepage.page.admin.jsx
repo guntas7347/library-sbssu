@@ -5,17 +5,15 @@ import TotalReturns from "./components/total-returns";
 import TotalMembers from "./components/total-members";
 import TotalBooks from "./components/total-books";
 import { AuthContext } from "../../../../components/context/auth.content";
+import Button from "../../../../components/buttons/interactive-button";
 
 const Homepage = () => {
-  const { userName } = useContext(AuthContext);
-
+  const { user } = useContext(AuthContext);
   return (
     <div>
       <div className="flex my-5 justify-between gap-3 flex-col md:flex-row">
         <div>
-          <h1 className="text-4xl font-bold mb-2">
-            Welcome {userName.split(" ")[0]},
-          </h1>
+          <h1 className="text-4xl font-bold mb-2">Welcome {user.name},</h1>
           <span>
             All systes are running smoothly! You have{" "}
             <a href="">0 unread alerts</a>

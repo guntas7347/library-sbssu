@@ -25,23 +25,23 @@ const returnBookRouter = express.Router();
 
 returnBookRouter.post(
   "/count-returned-books",
-  authorisationLevel(1),
+  authorisationLevel(),
   async (req, res) => {
     try {
       const numberOfReturnedBookDocs = await countReturnedBookDocs(
         req.body.filter
       );
       return res.status(200).json(crs.REB200CRBD(numberOfReturnedBookDocs));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 );
 
 returnBookRouter.post(
   "/return-issued-book",
-  authorisationLevel(1),
+  authorisationLevel(["return-book"]),
   validateObjectId,
   fetchIssuedBookById,
   calculateFine,
@@ -51,37 +51,37 @@ returnBookRouter.post(
   async (req, res) => {
     try {
       return res.status(200).json(crs.ISB200RIB());
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 ); //return-issued-book
 
 returnBookRouter.post(
   "/fetch-all-returned-books",
-  authorisationLevel(2),
+  authorisationLevel(["search-returned-books"]),
   fetchReturnedBooks,
   async (req, res) => {
     try {
       return res.status(200).json(crs.ISB200FARB(req.cust.returnedBooks));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 ); //fetch-all-returned-books
 
 returnBookRouter.post(
   "/fetch-returned-book",
-  authorisationLevel(2),
+  authorisationLevel(["view-returned-book"]),
   fetchReturnedBookDocById,
   async (req, res) => {
     try {
       return res.status(200).json(crs.ISB200FRB(req.cust.returnedBook));
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 ); //fetch-returned-book
@@ -118,9 +118,9 @@ returnBookRouter.post(
       res.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
 
       res.status(200).send(excelBuffer);
-    } catch (err) {
-      console.log(err);
-      return res.status(500).json(crs.SERR500REST(err));
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json(crs.SERR500REST(error));
     }
   }
 ); //fetch-all-returned-books
