@@ -23,12 +23,12 @@ const IssueCompatibility = () => {
         const res = await server.settings.fetchSetting("ISSUE-COMPATIBILITY");
         const res1 = await server.settings.fetchSetting("LIB-CARD-CATEGORIES");
         const res2 = await server.settings.fetchSetting("ACN-CATEGORIES");
-        setCompatibility(res.value);
-        setCardCategores(res1.value);
-        setBookCategories(res2.value);
+        setCompatibility(res.p.value);
+        setCardCategores(res1.p.value);
+        setBookCategories(res2.p.value);
         setLoading(false);
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
       }
     })();
   }, [loading]);
@@ -58,10 +58,10 @@ const IssueCompatibility = () => {
         key: "ISSUE-COMPATIBILITY",
         value: compatibility,
       });
-      setFeedback(1, res);
+      setFeedback(1, res.m);
       setLoading(true);
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
     }
   };
   return (

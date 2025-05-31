@@ -17,8 +17,8 @@ const TotalMembers = () => {
             $gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 30),
           },
         });
-        setTotalStudents(result1);
-        setPast30DaysAddedStudents(result2);
+        setTotalStudents(result1.p);
+        setPast30DaysAddedStudents(result2.p);
         setLoading(false);
       } catch (error) {
         console.log(error);

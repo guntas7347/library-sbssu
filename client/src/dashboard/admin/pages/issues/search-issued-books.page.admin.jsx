@@ -19,24 +19,24 @@ const SearchIssuedBooks = () => {
 
   const handleFetch = async (e) => {
     setCurrentFilter({ ...currentFilter, ...e });
-
-    await fetchAllIssuedBooks({ ...currentFilter, ...e })
-      .then((res) => {
-        setTotalPages(res.totalPages);
-        setRowData(
-          processData(res.issuedBooksArray, [
-            "_id",
-            "accessionNumber",
-            "bookTitle",
-            "cardNumber",
-            "issueDate",
-            "rollNumber",
-            "studentName",
-          ])
-        );
-        if (res.length === 0) setFeedback([1, 2, "No data found"]);
-      })
-      .catch((error) => setFeedback([1, 2, error]));
+    try {
+      const res = await fetchAllIssuedBooks({ ...currentFilter, ...e });
+      setTotalPages(res.p.totalPages);
+      setRowData(
+        processData(res.p.issuedBooksArray, [
+          "_id",
+          "accessionNumber",
+          "bookTitle",
+          "cardNumber",
+          "issueDate",
+          "rollNumber",
+          "studentName",
+        ])
+      );
+    } catch (error) {
+      setRowData([]);
+      setFeedback(2, error.m);
+    }
   };
 
   const handleDownload = async () => {

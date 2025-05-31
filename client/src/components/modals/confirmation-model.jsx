@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 const ConfirmationModal = ({
   title = "",
@@ -8,8 +8,31 @@ const ConfirmationModal = ({
   onYes,
   children,
   show = true,
+  table = [],
 }) => {
-  if (!show) return;
+  const clickLocked = useRef(false);
+  useEffect(() => {
+    if (!show) return;
+
+    document.body.classList.add("overflow-hidden");
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, [show]);
+
+  if (!show) return null;
+
+  const handleYesClick = () => {
+    if (clickLocked.current) return;
+    clickLocked.current = true;
+
+    onYes();
+    onClose(true);
+
+    setTimeout(() => {
+      clickLocked.current = false;
+    }, 1000);
+  };
 
   return (
     <div>
@@ -18,7 +41,7 @@ const ConfirmationModal = ({
           <div className="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
             <button
               type="button"
-              className="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+              className="absolute cursor-pointer top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
               onClick={() => onClose()}
             >
               <svg
@@ -57,21 +80,32 @@ const ConfirmationModal = ({
               <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
                 {title}
               </h3>
+              {table.length !== 0 && (
+                <>
+                  {table.map((r, i) => {
+                    return (
+                      <div key={i} className="grid grid-cols-2 text-start">
+                        {r.map((td, i) => {
+                          return <span key={i}>{td}</span>;
+                        })}
+                      </div>
+                    );
+                  })}
+                </>
+              )}
               <div>{children}</div>
               <button
-                onClick={() => {
-                  onYes();
-                  onClose();
-                }}
+                onClick={handleYesClick}
                 type="button"
-                className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
+                disabled={clickLocked.current}
+                className="text-white mt-5 cursor-pointer bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center"
               >
                 {yes}
               </button>
               <button
                 onClick={() => onClose()}
                 type="button"
-                className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+                className="py-2.5 px-5 cursor-pointer ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
               >
                 {no}
               </button>

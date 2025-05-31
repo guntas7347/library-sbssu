@@ -4,12 +4,22 @@ import { useFeedback } from "../../../../../../components/context/snackbar.conte
 import { useForm } from "../../../../../../components/forms/use-form-hook/use-form.hook.component";
 import Input from "../../../../../../components/forms/input";
 import Spinner from "../../../../../../components/feedback/spinner/spinner.component";
+import ControlButtonCounter from "../../../../../../components/forms/counter/control-button";
 
 const AALCL = () => {
   const setFeedback = useFeedback();
-  const [laoding, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  const { formFields, handleChange, setFormFields } = useForm();
+  const { formFields, setFormFields, setFields } = useForm();
+
+  const ControlledCounterField = ({ label, name }) => (
+    <ControlButtonCounter
+      label={label}
+      defaultValue={formFields[name]}
+      onChange={(value) => setFields(name, value)}
+      message={false}
+    />
+  );
 
   const handleSave = async () => {
     try {
@@ -17,10 +27,10 @@ const AALCL = () => {
         key: "AALCL",
         value: formFields,
       });
-      setFeedback(1, res);
+      setFeedback(1, res.m);
       setLoading(true);
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
     }
   };
 
@@ -28,15 +38,15 @@ const AALCL = () => {
     (async () => {
       try {
         const res = await server.settings.fetchSetting("AALCL");
-        setFormFields(res.value);
+        setFormFields(res.p.value);
         setLoading(false);
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
       }
     })();
-  }, [laoding]);
+  }, [loading]);
 
-  if (laoding)
+  if (loading)
     return (
       <div className="min-h-96 flex justify-center items-center">
         <Spinner />
@@ -50,71 +60,32 @@ const AALCL = () => {
           Auto alloted general library cards limit:-
         </h3>
         <div className="grid grid-cols-4 gap-x-20 gap-y-7 mt-3">
-          <Input
-            label="UG GENERAL"
-            type="number"
-            value={formFields.ug_gen}
-            name="ug_gen"
-            onChange={handleChange}
-          />
-          <Input
-            label="UG SC/ST"
-            type="number"
-            value={formFields.ug_scst}
-            name="ug_scst"
-            onChange={handleChange}
-          />
-          <Input
-            label="UG OTHER"
-            type="number"
-            value={formFields.ug_other}
-            name="ug_other"
-            onChange={handleChange}
-          />
-          <div />
-          <Input
-            label="PG GENERAL"
-            type="number"
-            value={formFields.pg_gen}
-            name="pg_gen"
-            onChange={handleChange}
-          />
-          <Input
-            label="PG SC/ST"
-            type="number"
-            value={formFields.pg_scst}
-            name="pg_scst"
-            onChange={handleChange}
-          />
-          <Input
-            label="PG OTHER"
-            type="number"
-            value={formFields.pg_other}
-            name="pg_other"
-            onChange={handleChange}
-          />
-          <div />
-          <Input
-            label="TEACHER REGULAR"
-            type="number"
-            value={formFields.teacher_regular}
-            name="teacher_regular"
-            onChange={handleChange}
-          />
-          <Input
-            label="TEACHER ADHOC"
-            type="number"
-            value={formFields.teacher_adhoc}
-            name="teacher_adhoc"
-            onChange={handleChange}
-          />
-          <Input
-            label="NON TEACHING STAFF"
-            type="number"
-            value={formFields.non_teaching_staff}
-            name="non_teaching_staff"
-            onChange={handleChange}
-          />{" "}
+          <>
+            <ControlledCounterField label="UG GENERAL" name="ug_gen" />
+            <ControlledCounterField label="UG SC/ST" name="ug_scst" />
+            <ControlledCounterField label="UG OTHER" name="ug_other" />
+
+            <div />
+
+            <ControlledCounterField label="PG GENERAL" name="pg_gen" />
+            <ControlledCounterField label="PG SC/ST" name="pg_scst" />
+            <ControlledCounterField label="PG OTHER" name="pg_other" />
+
+            <div />
+
+            <ControlledCounterField
+              label="TEACHER REGULAR"
+              name="teacher_regular"
+            />
+            <ControlledCounterField
+              label="TEACHER ADHOC"
+              name="teacher_adhoc"
+            />
+            <ControlledCounterField
+              label="NON TEACHING STAFF"
+              name="non_teaching_staff"
+            />
+          </>
         </div>
       </div>
 

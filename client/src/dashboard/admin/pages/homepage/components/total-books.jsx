@@ -10,7 +10,7 @@ const TotalBooks = () => {
     const asyncFunc = async () => {
       try {
         const result = await getNumberOfBookAccessions();
-        setTotalBooks(result);
+        setTotalBooks(result.p);
         setLoading(false);
       } catch (error) {
         console.log(error);

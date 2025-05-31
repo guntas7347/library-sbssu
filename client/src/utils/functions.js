@@ -1,4 +1,5 @@
 import queryString from "query-string";
+import { UPLOADS_PATH } from "../keys";
 
 export const sortObjectUsingKeys = (object, keysArray) => {
   const sortedOject = {};
@@ -172,3 +173,7 @@ export function getCookieValue(name) {
       ?.split("=")[1] || null
   );
 }
+
+export const imagePathUrl = (imageUrl) => {
+  return imageUrl ? UPLOADS_PATH + imageUrl : UPLOADS_PATH + "/sample-user.jpg";
+};

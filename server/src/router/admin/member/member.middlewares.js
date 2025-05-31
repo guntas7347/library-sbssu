@@ -26,6 +26,7 @@ const { generateEmailTemplate } = require("../../../services/email-templates");
 const libraryCards = require("../../../models/library-cards/library-cards.schema");
 const Member = require("../../../models/member/member.schema");
 const Auth = require("../../../models/auth/auth.schema");
+const LibraryCard = require("../../../models/library-cards/library-cards.schema");
 
 const fetchStudentByRollNumber = async (req, res, next) => {
   try {
@@ -117,82 +118,202 @@ const fetchApplicationById = async (req, res, next) => {
   }
 };
 
+// const processDecision = async (req, res, next) => {
+//   const session = await mongoose.startSession();
+//   try {
+//     const { applicantionDocId: Id } = req.cust;
+//     if (req.body.decision === "REJECT") {
+//       const memberDoc = await Member.findByIdAndUpdate(
+//         Id,
+//         { status: "REJECTED" },
+//         { session }
+//       );
+//       const { fullName, email } = memberDoc;
+//       req.cust.decision = false;
+//       req.cust.fullName = fullName;
+//       req.cust.email = email;
+//       return next();
+//     } else {
+//       await session.withTransaction(async () => {
+//         const memberDoc = await Member.findByIdAndUpdate(
+//           Id,
+//           {
+//             status: "ACTIVE",
+//             membershipId: generateMembershipId(await getLatestMembershipId()),
+//           },
+//           { session, new: true }
+//         );
+
+//         // auto assigning library cards
+//         const { membershipId, fullName, email, role, category } = memberDoc;
+//         const cardLimit = await getLibraryCardLimit(role, category);
+//         const cardNumbers = cardNumberGenerator(membershipId, cardLimit);
+//         req.cust.fullName = fullName;
+//         req.cust.membershipId = membershipId;
+//         req.cust.email = email;
+//         req.cust.libraryCards = cardNumbers;
+
+//         const { staffId } = await Auth.findById(req.user.uid)
+//           .select("staffId -_id")
+//           .lean();
+
+//         for (const cardNumber of cardNumbers) {
+//           const libraryCardDoc = await createLibraryCard(
+//             {
+//               cardNumber,
+//               memberId: memberDoc.id,
+//               createdBy: staffId,
+//               autoAlloted: true,
+//             },
+//             session
+//           );
+//           await addLibraryCardToMember(
+//             libraryCardDoc[0].memberId,
+//             libraryCardDoc[0]._id,
+//             session
+//           );
+//         }
+//       });
+//       await session.commitTransaction();
+//     }
+//     req.cust.decision = true;
+//     next();
+//   } catch (error) {
+//     createLog(error);
+//     if (session.inTransaction()) await session.abortTransaction();
+//     return res.status(500).json(crs.SERR500REST(error));
+//   } finally {
+//     await session.endSession();
+//   }
+// };
+
 const processDecision = async (req, res, next) => {
   const session = await mongoose.startSession();
+
   try {
-    const { applicantionDocId: Id } = req.cust;
-    if (req.body.decision === "REJECT") {
-      await session.withTransaction(async () => {
-        await updateMemberById(Id, { status: "REJECTED" });
-      });
-      await session.commitTransaction();
-      return res.status(200).json(crs.APP200RPA());
-    } else {
-      await session.withTransaction(async () => {
-        const memberDoc = await updateMemberById(
-          Id,
+    const { applicantionDocId: memberId } = req.cust;
+    const { decision } = req.body;
+
+    // Handle REJECTION
+    if (decision === "REJECT") {
+      const memberDoc = await Member.findByIdAndUpdate(
+        memberId,
+        { status: "REJECTED" },
+        { session, new: true }
+      );
+
+      if (!memberDoc) {
+        throw new Error("Member not found for rejection.");
+      }
+
+      const { fullName, email } = memberDoc;
+
+      req.cust = {
+        ...req.cust,
+        decision: false,
+        fullName,
+        email,
+      };
+
+      return next();
+    }
+
+    // Handle APPROVAL
+    await session.withTransaction(async () => {
+      const latestMembershipId = await getLatestMembershipId();
+      const generatedMembershipId = generateMembershipId(latestMembershipId);
+
+      const updatedMember = await Member.findByIdAndUpdate(
+        memberId,
+        {
+          status: "ACTIVE",
+          membershipId: generatedMembershipId,
+        },
+        { session, new: true }
+      );
+
+      if (!updatedMember) {
+        throw new Error("Member not found for approval.");
+      }
+
+      const {
+        membershipId,
+        fullName,
+        email,
+        role,
+        category,
+        id: updatedMemberId,
+      } = updatedMember;
+
+      const cardLimit = await getLibraryCardLimit(role, category);
+      const cardNumbers = cardNumberGenerator(membershipId, cardLimit);
+
+      const { staffId } = await Auth.findById(req.user.uid)
+        .select("staffId -_id")
+        .lean();
+
+      for (const cardNumber of cardNumbers) {
+        const [libraryCard] = await createLibraryCard(
           {
-            status: "ACTIVE",
-            membershipId: generateMembershipId(await getLatestMembershipId()),
+            cardNumber,
+            memberId: updatedMemberId,
+            createdBy: staffId,
+            autoAlloted: true,
           },
           session
         );
 
-        // auto assigning library cards
-        const { membershipId, fullName, email, role, category } = memberDoc;
-        const cardLimit = await getLibraryCardLimit(role, category);
-        const cardNumbers = cardNumberGenerator(membershipId, cardLimit);
-        if (!req.cust) req.cust = {};
-        req.cust.fullName = fullName;
-        req.cust.membershipId = membershipId;
-        req.cust.email = email;
-        req.cust.libraryCards = cardNumbers;
+        await addLibraryCardToMember(
+          libraryCard.memberId,
+          libraryCard._id,
+          session
+        );
+      }
 
-        const { staffId } = await Auth.findById(req.user.uid)
-          .select("staffId -_id")
-          .lean();
+      req.cust = {
+        ...req.cust,
+        decision: true,
+        fullName,
+        email,
+        membershipId,
+        libraryCards: cardNumbers,
+      };
+    });
 
-        for (const cardNumber of cardNumbers) {
-          const libraryCardDoc = await createLibraryCard(
-            {
-              cardNumber,
-              memberId: memberDoc.id,
-              createdBy: staffId,
-              autoAlloted: true,
-            },
-            session
-          );
-          await addLibraryCardToMember(
-            libraryCardDoc[0].memberId,
-            libraryCardDoc[0]._id,
-            session
-          );
-        }
-      });
-      await session.commitTransaction();
-    }
     next();
   } catch (error) {
     createLog(error);
-    if (session.inTransaction()) await session.abortTransaction();
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
     return res.status(500).json(crs.SERR500REST(error));
   } finally {
     await session.endSession();
   }
 };
 
-const sendApprovalEmail = (req, res, next) => {
+const sendApprovalRejectionEmail = (req, res, next) => {
   try {
-    transporter.sendMail({
-      from: process.env.NODEMAILER_EMAIL,
-      to: req.cust.email,
-      subject: "Your Library Account is Approved – Start Issuing Books Now!",
-      html: generateEmailTemplate.approvalEmail(
-        req.cust.fullName,
-        req.cust.membershipId,
-        req.cust.libraryCards
-      ),
-    });
+    if (req.cust.decision)
+      transporter.sendMail({
+        from: process.env.NODEMAILER_EMAIL,
+        to: req.cust.email,
+        subject:
+          "Your Library application is Approved. Start Issuing Books Now!",
+        html: generateEmailTemplate.approvalEmail(
+          req.cust.fullName,
+          req.cust.membershipId,
+          req.cust.libraryCards
+        ),
+      });
+    else
+      transporter.sendMail({
+        from: process.env.NODEMAILER_EMAIL,
+        to: req.cust.email,
+        subject: "Your Library application has been Rejected",
+        html: generateEmailTemplate.rejectionEmail(req.cust.fullName),
+      });
+
     next();
   } catch (error) {
     createLog(error);
@@ -204,24 +325,76 @@ const checkIssues = async (req, res, next) => {
   try {
     //
     const a = await libraryCards.find({ memberId: req.body._id });
-    const available = !a.some((card) => card.status !== "available");
+    const available = !a.some((card) => card.status === "ISSUED");
     if (available) return next();
     return res.status(500).json(crs.MEB409MILU());
   } catch (error) {
-    console.log(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };
 
 const checkPendingDues = async (req, res, next) => {
   try {
-    //
-    const m = await Member.findById(req.body._id).select("balance -_id");
-    if (m.balance === 0) return next();
-    return res.status(500).json(crs.MEB409MIPD());
+    const m = await Member.findById(req.body._id).select(
+      "balance fullName membershipId email -_id"
+    );
+    if (m.balance !== 0) return res.status(500).json(crs.MEB409MIPD());
+    if (!req.cust) req.cust = {};
+    req.cust.email = m.email;
+    req.cust.fullName = m.fullName;
+    req.cust.membershipId = m.membershipId;
+    next();
   } catch (error) {
-    console.log(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
+  }
+};
+
+const issueNoDue = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  try {
+    await session.withTransaction(async () => {
+      const m = await Member.findByIdAndUpdate(
+        req.body._id,
+        { status: "CLEARED" },
+        { session }
+      ).lean();
+
+      const cardsArray = m.libraryCards;
+      for (const cardId of cardsArray)
+        await LibraryCard.findByIdAndUpdate(
+          cardId,
+          { status: "CLEARED" },
+          { session }
+        );
+    });
+    await session.commitTransaction();
+    next();
+  } catch (error) {
+    createLog(error);
+    if (session.inTransaction()) await session.abortTransaction();
+    return res.status(500).json(crs.SERR500REST(error));
+  } finally {
+    await session.endSession();
+  }
+};
+
+const sendNoDueConfirmationEmail = (req, res, next) => {
+  try {
+    transporter.sendMail({
+      from: process.env.NODEMAILER_EMAIL,
+      to: req.cust.email,
+      subject: "No-Due Clearance Confirmation",
+      html: generateEmailTemplate.noDueConfirmationEmail(
+        req.cust.fullName,
+        req.cust.membershipId
+      ),
+    });
+    next();
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.MAIL500ERR(error));
   }
 };
 
@@ -232,7 +405,9 @@ module.exports = {
   allotLibraryCard,
   verifyRollNumberAvailability,
   fetchStudentByMembershipId,
-  sendApprovalEmail,
+  sendApprovalRejectionEmail,
   checkIssues,
   checkPendingDues,
+  issueNoDue,
+  sendNoDueConfirmationEmail,
 };

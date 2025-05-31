@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "../../../../components/forms/use-form-hook/use-form.hook.component";
 import { searchGlobally } from "../../hooks/http-requests.hooks.admin";
 import { useFeedback } from "../../../../components/context/snackbar.context";
-import Icons from "../../../../components/icons";
 import BookModal from "../../pages/books/view-book.modal";
 import MembersModal from "../../pages/members/member.modal";
+import { BinSVG, BookSVG, UserSVG } from "../../../../components/svg/svg-icons";
 
-const ResultBar = ({ openModal, img, name, result, id }) => {
+const ResultBar = ({ openModal, name, result, id, icon }) => {
   return (
     <div
       className="w-full max-w-xs hover:bg-gray-100 dark:hover:text-blue-400 dark:hover:bg-gray-900 h-10 text-sm truncate whitespace-nowrap overflow-hidden cursor-pointer p-4 rounded-lg flex gap-1 justify-start items-center"
       onClick={() => openModal(name, id)}
     >
-      <Icons name={img} />
-      <p>{result}</p>
+      {icon}
+      <p className=" truncate w-56">{result}</p>
     </div>
   );
 };
@@ -36,8 +36,8 @@ const GlobalSearchBar = () => {
     if (showSearchResults) {
       const debounceFunction = setTimeout(async () => {
         await searchGlobally(`search=${search}`)
-          .then((res) => setSearchResults(res))
-          .catch((error) => setFeedback([1, 2, error]));
+          .then((res) => setSearchResults(res.p))
+          .catch((error) => setFeedback(2, error.m));
       }, 1000);
 
       return () => clearTimeout(debounceFunction);
@@ -46,10 +46,10 @@ const GlobalSearchBar = () => {
 
   return (
     <>
-      <div class="relative">
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+      <div className="relative">
+        <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
           <svg
-            class="w-4 h-4 text-gray-500 dark:text-gray-400"
+            className="w-4 h-4 text-gray-500 dark:text-gray-400"
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -67,29 +67,14 @@ const GlobalSearchBar = () => {
         {Object.keys(searchResults).length !== 0 && (
           <div className="absolute end-3 inset-y-0  flex items-center ps-3">
             <button
+              type="button"
               className="cursor-pointer"
               onClick={() => {
                 resetFormFields();
                 setSearchResults({});
               }}
             >
-              <svg
-                className="w-4 h-4 text-gray-500 dark:text-gray-400"
-                aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"
-                />
-              </svg>
+              <BinSVG />
             </button>
           </div>
         )}
@@ -101,14 +86,15 @@ const GlobalSearchBar = () => {
           name="search"
           value={search}
           onChange={handleChange}
-        />{" "}
+          autoComplete="off"
+        />
         <div
           onClick={() => {
             resetFormFields();
             setSearchResults({});
           }}
           className={`absolute z-1  ${
-            showSearchResults ? "flex" : "flex"
+            showSearchResults ? "flex" : "hidden"
           } w-full flex-col  text-sm bg-white border border-gray-100 rounded-lg shadow-md dark:border-gray-700 dark:bg-gray-700`}
         >
           {Object.keys(searchResults).map((key, index) => {
@@ -120,7 +106,7 @@ const GlobalSearchBar = () => {
                       <ResultBar
                         result={result.fullName}
                         id={result._id}
-                        img={"user"}
+                        icon={<UserSVG />}
                         name="MEMBER"
                         openModal={(modalName, modalValue) => {
                           setModalValue(modalValue);
@@ -136,7 +122,7 @@ const GlobalSearchBar = () => {
                       <ResultBar
                         result={result.title}
                         id={result._id}
-                        img={"book"}
+                        icon={<BookSVG />}
                         name="BOOK"
                         openModal={(modalName, modalValue) => {
                           setModalValue(modalValue);
@@ -152,7 +138,7 @@ const GlobalSearchBar = () => {
                       <ResultBar
                         result={result.bookId.title}
                         id={result.bookId._id}
-                        img={"book"}
+                        icon={<BookSVG />}
                         name="BOOK"
                         openModal={(modalName, modalValue) => {
                           setModalValue(modalValue);
@@ -167,8 +153,6 @@ const GlobalSearchBar = () => {
               }
             });
           })}
-
-          {}
         </div>
         {modal === "MEMBER" && (
           <MembersModal

@@ -12,6 +12,7 @@ const ReturnedBooksSchema = new Schema({
     required: true,
   },
   issueDate: { type: Date, required: true },
+  dueDate: { type: Date, required: true },
   returnDate: { type: Date, required: true },
   fine: {
     type: Schema.Types.ObjectId,

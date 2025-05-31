@@ -16,31 +16,17 @@ const BookModal = ({ id, onClose }) => {
       try {
         const res = await fetchBookDetails(id);
         setBookData({
-          ...res,
-          accessionNumbers: createAccessionNumbersString(res.accessionNumbers),
+          ...res.p,
+          accessionNumbers: createAccessionNumbersString(
+            res.p.accessionNumbers
+          ),
         });
         setLoading(false);
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
         onClose();
       }
     })();
-    const asyncFunc = async () => {
-      await fetchBookDetails(id)
-        .then((book) => {
-          setBookData({
-            ...book,
-            accessionNumbers: createAccessionNumbersString(
-              book.accessionNumbers
-            ),
-          });
-          setLoading(false);
-        })
-        .catch(() => {
-          setBookData({ title: "Book not found" });
-        });
-    };
-    asyncFunc();
   }, [id]);
 
   const createAccessionNumbersString = (array = []) => {
@@ -87,7 +73,7 @@ const BookModal = ({ id, onClose }) => {
           label="Created At"
           defaultValue={new Date(bookData.createdAt).toLocaleString()}
         />
-        <Input disabled={true} label="ISBN" defaultValue={bookData.pages} />
+        <Input disabled={true} label="ISBN" defaultValue={bookData.isbn} />
       </div>
     </Modal>
   );

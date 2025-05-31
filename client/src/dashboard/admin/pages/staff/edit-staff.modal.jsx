@@ -8,6 +8,8 @@ import server from "../../hooks/http-requests.hooks.admin";
 import RightsSelector from "./components/rights-selector";
 import LoadingModal from "../../../../components/modals/loading-modal";
 import Modal from "../../../../components/modals/modal.component";
+import { uploadImage } from "../../../http-requests";
+import ImageCropper from "../../../../components/forms/image-upload/image-cropper";
 
 const EditStaffModal = ({ onClose, id }) => {
   const setFeedback = useFeedback();
@@ -15,8 +17,11 @@ const EditStaffModal = ({ onClose, id }) => {
   const [staffData, setStaffData] = useState({});
   const [authData, setAuthData] = useState({});
 
-  const { formFields: staffFields, handleChange: handleStaffFieldChange } =
-    useForm({}); // for staff
+  const {
+    formFields: staffFields,
+    handleChange: handleStaffFieldChange,
+    setFields,
+  } = useForm({}); // for staff
 
   const { formFields: authFields, handleChange: handleAuthFieldChange } =
     useForm({}); // for auth
@@ -28,10 +33,10 @@ const EditStaffModal = ({ onClose, id }) => {
         { ...staffFields, _id: staffData._id },
         authFields
       );
-      setFeedback(1, res);
+      setFeedback(1, res.m);
       onClose();
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
     }
   };
 
@@ -42,32 +47,45 @@ const EditStaffModal = ({ onClose, id }) => {
         onClose();
       }
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
     }
   };
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const asyncFunc = async () => {
-      await server.staff
-        .fetch(id)
-        .then((res) => {
-          const authData = res.authId;
-          delete res.authId;
-          delete res.createdAt;
-          setStaffData(res);
-          setAuthData(authData);
-          setLoading(false);
-        })
-        .catch((error) => {
-          setFeedback([1, 2, error]);
-        });
-    };
-    asyncFunc();
+    (async () => {
+      try {
+        const res = await server.staff.fetch(id);
+        const authData = res.p.authId;
+        delete res.p.authId;
+        delete res.p.createdAt;
+        setStaffData(res.p);
+        setAuthData(authData);
+        setLoading(false);
+      } catch (error) {
+        setFeedback(2, error.m);
+      }
+    })();
   }, []);
 
   if (loading) return <LoadingModal onClose={onClose} title="Edit Staff" />;
+
+  const handleImageUpload = async (formData) => {
+    try {
+      if (!formData) return setFields("imageUrl", null);
+
+      const res = await uploadImage(formData);
+      const data = await res.json();
+
+      if (data.s === "ULD201IMG") {
+        setFields("imageUrl", data.p);
+        setFeedback(1, data.m);
+      } else setFeedback(2, data.m);
+    } catch (error) {
+      setFeedback(2, error.m);
+    }
+  };
 
   return (
     <Modal title="Edit Staff" onClose={onClose}>
@@ -96,11 +114,11 @@ const EditStaffModal = ({ onClose, id }) => {
             required={true}
             defaultValue={authData.email}
           />
-          <Input
-            onChange={handleStaffFieldChange}
-            label="Phone Number"
-            name="phoneNumber"
-            defaultValue={staffData.phoneNumber}
+          <ImageCropper
+            onUpload={(e) => handleImageUpload(e)}
+            label="Profile Picture"
+            required={true}
+            defaultFileName={staffData.imageUrl}
           />
         </div>
         <hr className="c-hr" />
@@ -169,10 +187,9 @@ const EditStaffModal = ({ onClose, id }) => {
           />
           <Input
             onChange={handleStaffFieldChange}
-            label="Profile Picture URL"
-            name="profilePictureURL"
-            type="url"
-            defaultValue={staffData.profilePictureURL}
+            label="Phone Number"
+            name="phoneNumber"
+            defaultValue={staffData.phoneNumber}
           />
         </div>
 

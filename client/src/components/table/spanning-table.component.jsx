@@ -2,12 +2,12 @@ const SpanningTable = ({ rows, imageUrl = null }) => {
   return (
     <table>
       <tbody>
-        {rows.map((row, index) => {
+        {rows.map((row, idx) => {
           return (
-            <tr key={index}>
-              {row.map((td, index) => {
+            <tr key={idx}>
+              {row.map((td, idx) => {
                 return (
-                  <td className="text-left w-96" key={index}>
+                  <td className="text-left w-96" key={idx}>
                     {td}
                   </td>
                 );

@@ -19,7 +19,7 @@ const getTransactionMW = async (req, res) => {
       })
     );
   } catch (error) {
-    console.log(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };
@@ -34,7 +34,7 @@ const addTransactionMW = async (req, res, next) => {
     });
     next();
   } catch (error) {
-    console.log(error);
+    createLog(error);
     if (session.inTransaction()) await session.abortTransaction();
     return res.status(500).json(crs.SERR500REST(error));
   } finally {
@@ -65,7 +65,7 @@ const sendTransactionEmail = async (req, res, next) => {
     });
     next();
   } catch (error) {
-    console.log(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };

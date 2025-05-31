@@ -9,6 +9,7 @@ import { UPLOADS_PATH } from "../../../../keys";
 import Modal from "../../../../components/modals/modal.component";
 import LoadingModal from "../../../../components/modals/loading-modal";
 import ConfirmationModal from "../../../../components/modals/confirmation-model";
+import Button from "../../../../components/buttons/interactive-button";
 
 const ApproveModal = ({ id, onClose }) => {
   const setFeedback = useFeedback();
@@ -16,6 +17,7 @@ const ApproveModal = ({ id, onClose }) => {
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState(false);
   const [btn, setBtn] = useState(true);
+  const [btn1, setBtn1] = useState(true);
 
   const [decisionTaken, setDecisionTaken] = useState(false);
 
@@ -23,11 +25,10 @@ const ApproveModal = ({ id, onClose }) => {
     (async () => {
       try {
         const res = await fetchStudentById(id);
-
-        setData(res);
+        setData(res.p);
         setLoading(false);
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
         onClose();
       }
     })();
@@ -37,23 +38,23 @@ const ApproveModal = ({ id, onClose }) => {
     setBtn(false);
     try {
       const res = await processApplication({ decision: "APPROVE", _id: id });
-      setFeedback(1, res);
+      setFeedback(1, res.m);
       setDecisionTaken(true);
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
     }
   };
   const handleReject = async () => {
-    setBtn(false);
+    setBtn1(false);
     if (confirm(`Are you sure of it to REJECT the appliction?`))
       try {
         const res = await processApplication({ decision: "REJECT", _id: id });
-        setFeedback(1, res);
+        setFeedback(1, res.m);
         setDecisionTaken(true);
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
       }
-    else setBtn(true);
+    else setBtn1(true);
   };
 
   if (loading)
@@ -62,6 +63,12 @@ const ApproveModal = ({ id, onClose }) => {
   const imagePath = data.imageUrl
     ? UPLOADS_PATH + data.imageUrl
     : UPLOADS_PATH + "/sample-user.jpg";
+
+  const showButtons = () => {
+    if (decisionTaken) return false;
+    if (data.status === "APPLIED") return true;
+    return false;
+  };
 
   return (
     <>
@@ -148,24 +155,19 @@ const ApproveModal = ({ id, onClose }) => {
             value={data.phoneNumber}
           />
         </div>
-        {!decisionTaken && (
+        {showButtons() && (
           <div className="flex justify-end items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
-            <button
-              type="button"
+            <Button
               onClick={async () => await handleReject()}
-              disabled={!btn}
-              className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-            >
-              Reject
-            </button>
-            <button
-              type="button"
+              disabled={!btn1}
+              className="c-btn-red"
+              label="Reject"
+            />
+            <Button
               onClick={() => setAlert(true)}
               disabled={!btn}
-              className="c-btn-blue"
-            >
-              Approve
-            </button>
+              label="Approve"
+            />
           </div>
         )}
       </Modal>

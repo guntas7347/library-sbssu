@@ -17,7 +17,7 @@ const StaffSchema = new Schema({
   designation: { type: String, required: false },
   joiningDate: { type: Date, required: false },
   employmentStatus: { type: String, required: false },
-  profilePictureURL: { type: String, required: false },
+  imageUrl: { type: String, required: false },
   createdAt: { type: Date, default: Date.now },
 });
 

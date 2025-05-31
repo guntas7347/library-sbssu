@@ -3,10 +3,12 @@ import React, { useState } from "react";
 const ControlButtonCounter = ({
   minVal = 0,
   maxValue = 10,
+  label = "Choose quantity:",
   message = `Please select a number from ${minVal} to ${maxValue}.`,
   onChange,
+  defaultValue = minVal,
 }) => {
-  const [count, setCount] = useState(minVal);
+  const [count, setCount] = useState(+defaultValue);
 
   const handleIncrement = () => {
     if (count < maxValue) {
@@ -22,6 +24,19 @@ const ControlButtonCounter = ({
     }
   };
 
+  const handleChange = (e) => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      if (value <= maxValue) {
+        setCount(+e.target.value);
+        onChange(+e.target.value);
+      } else {
+        setCount(+maxValue);
+        onChange(+maxValue);
+      }
+    }
+  };
+
   return (
     <div>
       <form className="max-w-xs mx-auto">
@@ -29,7 +44,7 @@ const ControlButtonCounter = ({
           for="quantity-input"
           className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
         >
-          Choose quantity:
+          {label}
         </label>
         <div className="relative flex items-center max-w-[8rem]">
           <button
@@ -58,7 +73,8 @@ const ControlButtonCounter = ({
             className="bg-gray-50 border-x-0 border-gray-300 h-11 text-center text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full py-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="999"
             value={count}
-            disabled
+            onChange={handleChange}
+            name="counter"
             required
           />
           <button
@@ -83,12 +99,14 @@ const ControlButtonCounter = ({
             </svg>
           </button>
         </div>
-        <p
-          id="helper-text-explanation"
-          className="mt-2 text-sm text-gray-500 dark:text-gray-400"
-        >
-          {message}
-        </p>
+        {message !== false && (
+          <p
+            id="helper-text-explanation"
+            className="mt-2 text-sm text-gray-500 dark:text-gray-400"
+          >
+            {message}
+          </p>
+        )}
       </form>
     </div>
   );

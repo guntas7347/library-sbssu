@@ -64,12 +64,12 @@ const processReturningBook = async (req, res, next) => {
       await deleteIssuedBook(issuedBook._id, session);
       await updateLibraryCardById(
         libraryCardId,
-        { status: "available" },
+        { status: "AVAILABLE" },
         session
       );
       await updateBookAccession(
         bookAccessionId,
-        { status: "available" },
+        { status: "AVAILABLE" },
         session
       );
     });

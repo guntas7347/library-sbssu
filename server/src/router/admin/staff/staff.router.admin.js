@@ -29,7 +29,7 @@ staffRouter.post(
     try {
       return res.status(200).json(crs.AUTH200AADM());
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -53,7 +53,7 @@ staffRouter.post(
 
       return res.status(200).json(crs.STF200FAS(staffArray));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -69,7 +69,7 @@ staffRouter.post(
         .lean();
       return res.status(200).json(crs.STF200FSBI(staffDoc));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }

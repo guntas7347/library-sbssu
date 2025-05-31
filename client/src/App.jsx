@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
-import DashboardRoutes from "./dashboard/dashboard.routes";
+import AdminRoutes from "./dashboard/dashboard.routes";
 import Footer from "./components/footer/footer.component";
 import AdminLoginPage from "./dashboard/login-page/login-page.page.admin";
 import AdminForgotPassword from "./dashboard/login-page/forgot-password.page.admin";
@@ -18,16 +18,7 @@ const App = () => {
       <div>
         <Routes>
           <Route path="/*" element={<PublicRoutes />} />
-          <Route path="/admin" element={<AdminLoginPage />} />
-          <Route
-            path="/admin/forgot-password"
-            element={<AdminForgotPassword />}
-          />
-          <Route
-            path="/admin/reset-password/*"
-            element={<ResetPasswordPage />}
-          />
-          <Route path="/admin/*" element={<DashboardRoutes />} />
+          <Route path="/admin/*" element={<AdminRoutes />} />
         </Routes>
       </div>
       <Footer />

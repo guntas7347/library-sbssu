@@ -4,8 +4,8 @@ import Input from "../../../../components/forms/input";
 import Modal from "../../../../components/modals/modal.component";
 import LoadingModal from "../../../../components/modals/loading-modal";
 import { useFeedback } from "../../../../components/context/snackbar.context";
-import { UPLOADS_PATH } from "../../../../keys";
 import LibraryCardsModal from "./library-cards.modal";
+import { imagePathUrl } from "../../../../utils/functions";
 
 const MembersModal = ({ id, onClose }) => {
   const setFeedback = useFeedback();
@@ -18,14 +18,14 @@ const MembersModal = ({ id, onClose }) => {
       try {
         const res = await fetchStudentById(id);
         const libraryCardsString = mergeArrayElementsToString(
-          res.libraryCards.map((libraryCard) => {
+          res.p.libraryCards.map((libraryCard) => {
             return libraryCard.cardNumber;
           })
         );
-        setData({ ...res, libraryCards: libraryCardsString });
+        setData({ ...res.p, libraryCards: libraryCardsString });
         setLoading(false);
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
         onClose();
       }
     })();
@@ -53,13 +53,8 @@ const MembersModal = ({ id, onClose }) => {
 
   if (loading) return <LoadingModal onClose={onClose} title="Member details" />;
 
-  const imagePath = data.imageUrl
-    ? UPLOADS_PATH + data.imageUrl
-    : UPLOADS_PATH + "/sample-user.jpg";
-
   return (
     <>
-      {" "}
       <Modal title="Member details" onClose={onClose}>
         <div className="grid gap-6 mb-6 md:grid-cols-2">
           <div className="grid gap-6">
@@ -87,10 +82,10 @@ const MembersModal = ({ id, onClose }) => {
             <img
               className="border border-black"
               crossOrigin="anonymous"
-              src={imagePath}
+              src={imagePathUrl(data.imageUrl)}
               alt="image"
             />
-          </div>{" "}
+          </div>
           <Input
             disabled={true}
             label="Roll Number"
@@ -127,7 +122,7 @@ const MembersModal = ({ id, onClose }) => {
             label="Academic Program"
             name="program"
             value={data.program}
-          />{" "}
+          />
           <Input
             disabled={true}
             label="Academic Specialization"
@@ -160,6 +155,7 @@ const MembersModal = ({ id, onClose }) => {
             name="createdAt"
             value={new Date(data.createdAt).toLocaleString()}
           />
+          <Input label="Status" disabled={true} value={data.status} />
           <div>
             <label
               htmlFor="first_name"

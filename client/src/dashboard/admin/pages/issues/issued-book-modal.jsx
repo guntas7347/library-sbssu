@@ -15,10 +15,10 @@ const IssuedBookModal = ({ id, onClose }) => {
     (async () => {
       try {
         const res = await fetchIssuedBook(id);
-        setBookData(res);
+        setBookData(res.p);
         setLoading(false);
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
         onClose();
       }
     })();

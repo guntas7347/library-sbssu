@@ -13,17 +13,15 @@ const SearchStaffPage = () => {
   const setFeedback = useFeedback();
 
   const [rowData, setRowData] = useState([]);
-
   const [modal, setModal] = useState([]);
 
   const handleFetch = async () => {
-    await fetchAllStaff()
-      .then((res) =>
-        setRowData(processData(res, ["_id", "idNumber", "fullName", "rights"]))
-      )
-      .catch((error) => {
-        setFeedback([1, 2, error]);
-      });
+    try {
+      const res = await fetchAllStaff();
+      setRowData(processData(res.p, ["_id", "idNumber", "fullName", "rights"]));
+    } catch (error) {
+      setFeedback(2, error.m);
+    }
   };
 
   return (

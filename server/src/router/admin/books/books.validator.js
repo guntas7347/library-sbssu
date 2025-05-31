@@ -33,7 +33,7 @@ const validateAccessionNumber = async (req, res, next) => {
     req.body.accessionNumber = value;
     return next();
   } catch (error) {
-    console.error(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };
@@ -45,7 +45,7 @@ const validateBook = async (req, res, next) => {
     req.body.book = value;
     return next();
   } catch (error) {
-    console.error(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };
@@ -65,7 +65,7 @@ const validate_books_accession_create = async (req, res, next) => {
     req.body = value;
     return next();
   } catch (error) {
-    console.error(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };

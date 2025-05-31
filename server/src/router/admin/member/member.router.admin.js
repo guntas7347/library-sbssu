@@ -12,9 +12,11 @@ const crs = require("../../../utils/custom-response-codes");
 const {
   fetchApplicationById,
   processDecision,
-  sendApprovalEmail,
+  sendApprovalRejectionEmail,
   checkIssues,
   checkPendingDues,
+  issueNoDue,
+  sendNoDueConfirmationEmail,
 } = require("./member.middlewares");
 
 const { authorisationLevel } = require("../../auth/auth.middlewares");
@@ -54,7 +56,7 @@ memberRoute.post(
         .status(200)
         .json(crs.STU200FSBRN({ imageUrl: d.imageUrl, data }));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -65,10 +67,11 @@ memberRoute.post(
   authorisationLevel(2),
   async (req, res) => {
     try {
-      const ApplicantCol = await findApplications(req.body);
-      return res.status(200).json(crs.STU200FAA(ApplicantCol));
+      const d = await findApplications(req.body);
+      if (d.length === 0) return res.status(200).json(crs.SRH404GLB());
+      return res.status(200).json(crs.STU200FAA(d));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -84,9 +87,12 @@ memberRoute.post(
         filterValue: req.body.value,
         page: req.body.page || 1,
       });
+      if (members.studentsArray.length === 0)
+        return res.status(200).json(crs.SRH404GLB());
+
       return res.status(200).json(crs.STU200FAS(members));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -103,7 +109,7 @@ memberRoute.post(
       if (studentDoc) return res.status(200).json(crs.STU200FSBI(studentDoc));
       return res.status(404).json(crs.STU404FSBI());
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -117,7 +123,7 @@ memberRoute.post(
     try {
       return res.status(200).json(crs.APP200FA(req.cust.applicantionDoc));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST());
     }
   }
@@ -128,9 +134,10 @@ memberRoute.post(
   authorisationLevel(3),
   fetchApplicationById,
   processDecision,
-  sendApprovalEmail,
+  sendApprovalRejectionEmail,
   async (req, res) => {
-    return res.status(200).json(crs.APP200APA());
+    if (req.cust.decision) return res.status(200).json(crs.APP200APA());
+    else return res.status(200).json(crs.APP200RPA());
   }
 ); //process-application
 
@@ -142,7 +149,7 @@ memberRoute.post(
       const numberOfStudentDocs = await countMemberDocs(req.body.filter);
       return res.status(200).json(crs.STU200CTS(numberOfStudentDocs));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -153,7 +160,7 @@ memberRoute.post("/edit", authorisationLevel(4), async (req, res) => {
     await Member.findByIdAndUpdate(req.body.id, req.body);
     return res.status(200).json(crs.STU200ES());
   } catch (error) {
-    console.log(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 });
@@ -171,15 +178,16 @@ memberRoute.post("/quick-search", async (req, res) => {
 });
 
 memberRoute.post(
-  "/mark-inactive",
+  "/issue-no-due",
   checkIssues,
   checkPendingDues,
+  issueNoDue,
+  sendNoDueConfirmationEmail,
   async (req, res) => {
     try {
-      await updateMemberById(req.body._id, { status: "INACTIVE" });
       return res.status(200).json(crs.MEB200MI());
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -199,7 +207,7 @@ memberRoute.post(
       if (!m) return res.status(200).json(crs.STU404FSBRN());
       return res.status(200).json(crs.STU200FSBRN(m));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }

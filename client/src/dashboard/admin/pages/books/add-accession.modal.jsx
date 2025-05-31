@@ -9,6 +9,7 @@ import server from "../../hooks/http-requests.hooks.admin";
 import { useFeedback } from "../../../../components/context/snackbar.context";
 import Modal from "../../../../components/modals/modal.component";
 import ConfirmationModal from "../../../../components/modals/confirmation-model";
+import Button from "../../../../components/buttons/interactive-button";
 
 const AddAccessionModal = ({ onClose }) => {
   const setFeedback = useFeedback();
@@ -24,24 +25,27 @@ const AddAccessionModal = ({ onClose }) => {
   const [data, setData] = useState([]);
 
   const [acnCategories, setAcnCategories] = useState([""]);
+  const [btn, setBtn] = useState(false);
 
   const handleCreate = async () => {
     try {
+      setBtn(true);
       const res = await server.book.addAccessions(formFields);
-      console.log(res);
-      setFeedback(1, res);
+      setFeedback(1, res.m);
+      onClose();
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
+      setBtn(false);
     }
   };
 
   const handleSearch = async () => {
     try {
       const res = await server.book.fetchForAddAccession(formField.value);
-      setData(res);
-      setFields("_id", res._id);
+      setData(res.p);
+      setFields("_id", res.p._id);
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
     }
   };
 
@@ -49,9 +53,9 @@ const AddAccessionModal = ({ onClose }) => {
     (async () => {
       try {
         const res = await server.settings.fetchSetting("ACN-CATEGORIES");
-        setAcnCategories(res.value);
+        setAcnCategories(res.p.value);
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
       }
     })();
   }, []); // fetch accession categories
@@ -65,6 +69,7 @@ const AddAccessionModal = ({ onClose }) => {
             action="submit"
             onSubmit={(e) => {
               e.preventDefault();
+              if (!formFields.accessionNumbers) return;
               setShowAlertDialog(true);
             }}
           >
@@ -108,6 +113,7 @@ const AddAccessionModal = ({ onClose }) => {
                     label="Accession Category"
                     name="category"
                     options={acnCategories}
+                    value={formFields.category}
                   />
                   <TextArea
                     value={accessionNumbers}
@@ -120,18 +126,18 @@ const AddAccessionModal = ({ onClose }) => {
                     }}
                     label="Accession Numbers (comma seperated)"
                     name="accessionNumbers"
+                  />{" "}
+                  <hr className="h-px mt-7 mb-3 bg-gray-200 border-0 dark:bg-gray-600" />
+                  <Button
+                    label="Confirm"
+                    spinner={btn}
+                    passive={false}
+                    disabled={accessionNumbers === ""}
+                    type="submit"
                   />
                 </>
               )}
             </div>
-            <hr className="h-px mt-7 mb-3 bg-gray-200 border-0 dark:bg-gray-600" />
-            <button
-              type="submit"
-              className="c-btn-blue"
-              disabled={accessionNumbers === ""}
-            >
-              Create
-            </button>
           </form>
         </div>
       </Modal>
@@ -146,7 +152,9 @@ const AddAccessionModal = ({ onClose }) => {
             <span> {data.title} </span>
             <span> Book author:</span>
             <span> {data.author} </span>
-            <span> Accession Numbers:</span>
+            <span> Accession categories:</span>
+            <span> {formFields.category} </span>
+            <span> Accession numbers:</span>
             <span> {accessionNumbers} </span>
           </div>
         </ConfirmationModal>

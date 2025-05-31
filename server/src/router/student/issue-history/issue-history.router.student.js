@@ -33,7 +33,7 @@ issueHistoryRouter.post("/fetch-issued-history", async (req, res) => {
       .status(200)
       .json({ success: true, payload: data, status: "Operation Successful" });
   } catch (error) {
-    console.log(error);
+    createLog(error);
     return res
       .status(500)
       .json({ success: true, payload: error, status: "Operation Failed" });

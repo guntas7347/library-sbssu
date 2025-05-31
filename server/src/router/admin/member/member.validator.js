@@ -14,7 +14,7 @@ const validateMembershipId = async (req, res, next) => {
       return res.status(400).json(crs.VAL400FAIL(error.details[0].message));
     return next();
   } catch (error) {
-    console.error(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };

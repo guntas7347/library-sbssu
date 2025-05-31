@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const crs = require("../utils/custom-response-codes");
+const { createLog } = require("../utils/functions");
 
 const validateObjectId = async (req, res, next) => {
   try {
@@ -14,7 +15,7 @@ const validateObjectId = async (req, res, next) => {
     if (error) return res.status(400).json(crs.VAL400FAIL(error));
     return next();
   } catch (error) {
-    console.error(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };
@@ -39,7 +40,7 @@ const validateStrongPassword = async (req, res, next) => {
 
     return next();
   } catch (error) {
-    console.error(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };
@@ -68,13 +69,12 @@ const validateLoginCreds = async (req, res, next) => {
 
     const { error } = schema.validate(req.body);
 
-    console.log(error);
     if (error)
       return res.status(400).json(crs.VAL400FAIL(error.details[0].message));
 
     return next();
   } catch (error) {
-    console.error(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };

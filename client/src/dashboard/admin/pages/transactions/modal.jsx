@@ -17,10 +17,10 @@ const TransactionModal = ({ id, onClose }) => {
     (async () => {
       try {
         const res = await fetchTransaction(id);
-        setData(res);
+        setData(res.p);
         setLoading(false);
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
         onClose();
       }
     })();

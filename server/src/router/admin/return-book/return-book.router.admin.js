@@ -33,7 +33,7 @@ returnBookRouter.post(
       );
       return res.status(200).json(crs.REB200CRBD(numberOfReturnedBookDocs));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -46,13 +46,13 @@ returnBookRouter.post(
   fetchIssuedBookById,
   calculateFine,
   processReturningBook,
-  sendReturnedConfirmationEmail,
-  sendTransactionEmail,
+  // sendReturnedConfirmationEmail,
+  // sendTransactionEmail,
   async (req, res) => {
     try {
       return res.status(200).json(crs.ISB200RIB());
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -66,7 +66,7 @@ returnBookRouter.post(
     try {
       return res.status(200).json(crs.ISB200FARB(req.cust.returnedBooks));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -80,7 +80,7 @@ returnBookRouter.post(
     try {
       return res.status(200).json(crs.ISB200FRB(req.cust.returnedBook));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -119,7 +119,7 @@ returnBookRouter.post(
 
       res.status(200).send(excelBuffer);
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }

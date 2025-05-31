@@ -2,53 +2,40 @@ import { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
-import {
-  adminLoginWithCredentials,
-  clearSession,
-  // verifyReCaptcha,
-} from "../http-requests";
+import { adminLoginWithCredentials, clearSession } from "../http-requests";
 
 import { useFeedback } from "../../components/context/snackbar.context";
-// import ReCaptcha from "../../components/feedback/recaptcha/recaptcha.component";
 import Input from "../../components/forms/input";
 
 const AdminLoginPage = () => {
   const navigate = useNavigate();
   const setFeedback = useFeedback();
 
-  // const [reCaptchaVerified, setReCaptchaVerified] = useState(false);
-
   const { formFields, handleChange, setFields } = useForm();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    await adminLoginWithCredentials(formFields)
-      .then(() => {
-        navigate("/admin/dashboard");
-      })
-      .catch((error) => {
-        setFeedback([1, 2, error]);
-      });
+    try {
+      await adminLoginWithCredentials(formFields);
+      navigate("/admin/dashboard");
+    } catch (error) {
+      setFeedback(2, error.m);
+    }
   };
 
   useEffect(() => {
-    const asyncFunc = async () => {
-      await clearSession().catch((error) => {
-        setFeedback([1, 2, error]);
-      });
-    };
-    asyncFunc();
+    (async () => {
+      try {
+        await clearSession();
+      } catch (error) {
+        setFeedback(2, error.m);
+      }
+    })();
   }, []);
 
-  // const handleVerify = async (token) => {
-  //   await verifyReCaptcha(token)
-  //     .then((res) => setReCaptchaVerified(res.payload.success))
-  //     .catch((error) => setFeedback(error));
-  // };
-
   return (
-    <div className="h-screen flex flex-row justify-center items-center">
-      <div className="c-box min-h-96 flex flex-col gap-5">
+    <div className="h-screen flex flex-row justify-center py-2">
+      <div className="c-box flex flex-col gap-5">
         <div className="self-start flex flex-row items-center gap-5">
           <img
             className="h-10 inline-block"

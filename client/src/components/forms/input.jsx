@@ -2,7 +2,7 @@ import React from "react";
 
 const Input = ({
   label,
-  name,
+  name = label,
   onChange,
   type = "text",
   disabled = false,

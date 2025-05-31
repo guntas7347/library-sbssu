@@ -16,17 +16,10 @@ export const restCall = (url, obj, crs = null) => {
     fetch(`${API_URL}/${url}`, postOptions(obj))
       .then(async (res) => {
         if (!Array.isArray(crs)) crs = [crs];
-        if (crs.length === 0) {
-          reject(`CRS UNDEFINED at ${url}`);
-          return;
-        }
 
         const response = await res.json();
-        if (crs.includes(response.status)) {
-          resolve(response);
-        } else {
-          reject(response.message);
-        }
+        if (crs.includes(response.s)) resolve(response);
+        else reject(response);
       })
       .catch(async () => {
         reject("Could not connect to Server");

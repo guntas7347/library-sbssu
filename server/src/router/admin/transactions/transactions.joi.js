@@ -1,6 +1,7 @@
 const Joi = require("joi");
 const mongoose = require("mongoose");
 const crs = require("../../../utils/custom-response-codes");
+const { createLog } = require("../../../utils/functions");
 
 const transactionJoiSchema = Joi.object({
   memberId: Joi.string()
@@ -44,13 +45,13 @@ const transactionJoiSchema = Joi.object({
 const addTransactionJoi = async (req, res, next) => {
   try {
     const { error } = transactionJoiSchema.validate(req.body);
-    console.log(error);
+
     if (error)
       return res.status(400).json(crs.VAL400FAIL(error.details[0].message));
-    console.log(error);
+
     return next();
   } catch (error) {
-    console.error(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };

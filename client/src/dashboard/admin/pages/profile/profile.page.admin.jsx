@@ -15,11 +15,10 @@ const ProfilePage = () => {
     (async () => {
       try {
         const res = await server.staff.fetchProfile();
-        setProfileData(res);
-        console.log(res);
+        setProfileData(res.p);
         setLoading(false);
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
       }
     })();
   }, []);

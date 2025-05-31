@@ -34,7 +34,7 @@ const finesRouter = express.Router();
 
 //       return res.status(200).json(crs.FIN200FAF(finesData));
 //     } catch (error) {
-//       console.log(error);
+//       createLog(error);
 //       return res.status(500).json(crs.SERR500REST(error));
 //     }
 //   }
@@ -54,7 +54,7 @@ const finesRouter = express.Router();
 //     };
 //     return res.status(200).json(crs.FIN200FFBI(data));
 //   } catch (error) {
-//     console.log(error);
+//     createLog(error);
 //     return res.status(500).json(crs.SERR500REST(error));
 //   }
 // });
@@ -69,7 +69,7 @@ const finesRouter = express.Router();
 //       });
 //       return res.status(200).json(crs.FIN200ARN());
 //     } catch (error) {
-//       console.log(error);
+//       createLog(error);
 //       return res.status(500).json(crs.SERR500REST(error));
 //     }
 //   }

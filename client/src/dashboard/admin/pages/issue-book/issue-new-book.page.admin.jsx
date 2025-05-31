@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import server from "../../hooks/http-requests.hooks.admin";
 import { useForm } from "../../../../components/forms/use-form-hook/use-form.hook.component";
 import CustomTableSelect from "../../../../components/table/custom-table-select.component";
@@ -9,6 +9,7 @@ import ConfirmationModal from "../../../../components/modals/confirmation-model"
 import SearchBar from "../../../../components/forms/search-bar";
 import { UPLOADS_PATH } from "../../../../keys";
 import Button from "../../../../components/buttons/interactive-button";
+import Select from "../../../../components/forms/select-input";
 
 const IssueNewBookPage = () => {
   const setFeedback = useFeedback();
@@ -17,6 +18,7 @@ const IssueNewBookPage = () => {
   const [showMemberTable, setShowMemberTable] = useState(false);
   const [bookRowData, setBookRowData] = useState([]);
   const [studentRowData, setMemberRowData] = useState([]);
+  const [issueDays, setIssueDays] = useState([]);
 
   const [imageUrl, setImgUrl] = useState(null);
 
@@ -36,13 +38,13 @@ const IssueNewBookPage = () => {
       const res = await server.issue.fetchBookForIssue(acn);
       setBookRowData(
         rowsArray(
-          [res],
+          [res.p],
           ["title", "author", "accessionNumber", "category", "status"]
         )
       );
       setShowBookTable(true);
     } catch (error) {
-      setFeedback([1, 2, error]);
+      setFeedback(2, error.m);
     }
   };
 
@@ -51,13 +53,13 @@ const IssueNewBookPage = () => {
       const res = await server.issue.fetchMemberForIssue(membershipId);
       setShowMemberTable(true);
 
-      const imagePath = res.imageUrl
-        ? UPLOADS_PATH + res.imageUrl
+      const imagePath = res.p.imageUrl
+        ? UPLOADS_PATH + res.p.imageUrl
         : UPLOADS_PATH + "/sample-user.jpg";
 
       setImgUrl(imagePath);
       setMemberRowData(
-        rowsArray(res.data, [
+        rowsArray(res.p.data, [
           "membershipId",
           "fullName",
           "cardNumber",
@@ -66,8 +68,7 @@ const IssueNewBookPage = () => {
         ])
       );
     } catch (error) {
-      console.log(error);
-      setFeedback(2, error);
+      setFeedback(2, error.m);
     }
   };
 
@@ -94,13 +95,14 @@ const IssueNewBookPage = () => {
       accessionNumber: selectedAccessionNumber,
       cardNumber: selectedCardNumber,
       issueDate: formFields.issueDate,
+      issueDuration: formFields.issueDuration,
     };
     try {
       const res = await server.issue.issueNewBook(issueBookDetails);
-      setFeedback(1, res);
+      setFeedback(1, res.m);
       setIssuing(false);
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
       setIssuing(false);
     }
   };
@@ -116,6 +118,17 @@ const IssueNewBookPage = () => {
       return false;
     } else return true;
   };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await server.settings.fetchSetting("ISSUE-DURATION");
+        setIssueDays(res.p.value);
+      } catch (error) {
+        setFeedback(2, error.m);
+      }
+    })();
+  }, []);
 
   return (
     <>
@@ -186,7 +199,7 @@ const IssueNewBookPage = () => {
 
         <div className="mt-10">
           <form>
-            <div className="grid grid-cols-3 gap-5 items-center justify-center">
+            <div className="grid grid-cols-4 gap-5 items-center justify-center">
               <Input
                 disabled
                 label="Card Number"
@@ -207,7 +220,17 @@ const IssueNewBookPage = () => {
                 type="date"
                 onChange={handleChange}
                 max={yesterdayDate()}
-                required={false}
+                value={new Date(formFields.issueDate)
+                  .toISOString()
+                  .slice(0, 10)}
+              />
+              <Select
+                label="Issue duration days"
+                name="issueDuration"
+                type="number"
+                onChange={handleChange}
+                options={issueDays}
+                value={formFields.issueDuration}
               />
             </div>
             <div className="mt-5 flex flex-row justify-center items-center">
@@ -215,9 +238,7 @@ const IssueNewBookPage = () => {
                 disabled={disableIssueButton()}
                 label="Issue Now"
                 spinner={issuing}
-                passive={false}
                 onClick={() => setAlert(true)}
-                type="button"
               />
             </div>
           </form>
@@ -229,16 +250,13 @@ const IssueNewBookPage = () => {
         onYes={handleIssueNewBook}
         title="Are you sure of it to issue book?"
         show={alert}
-      >
-        <div className="grid grid-cols-2 text-start mb-5">
-          <span> Accession Number:</span>
-          <span> {selectedAccessionNumber} </span>
-          <span> Library Card Number: </span>
-          <span> {selectedCardNumber} </span>
-          <span> Issue Date: </span>
-          <span> {new Date(formFields.issueDate).toDateString()} </span>
-        </div>
-      </ConfirmationModal>
+        table={[
+          ["Accession Number:", selectedAccessionNumber],
+          ["Library Card Number:", selectedCardNumber],
+          ["Issue Date:", new Date(formFields.issueDate).toDateString()],
+          ["Issue Duration", `${formFields.issueDuration} days`],
+        ]}
+      ></ConfirmationModal>
     </>
   );
 };

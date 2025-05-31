@@ -21,34 +21,31 @@ const SearchReturnedBooks = () => {
 
   const handleFetch = async (e) => {
     setCurrentFilter({ ...currentFilter, ...e });
-
-    await fetchAllReturnedBooks({ ...currentFilter, ...e })
-      .then((res) => {
-        setTotalPages(res.totalPages);
-        setRowData(
-          processData(res.returnedBooksArray, [
-            "_id",
-            "accessionNumber",
-            "bookTitle",
-            "cardNumber",
-            "issueDate",
-            "returnDate",
-            "rollNumber",
-            "studentName",
-            "fine",
-          ])
-        );
-        if (res.length === 0) {
-          setFeedback([1, 2, "No data found"]);
-        }
-      })
-      .catch((error) => setFeedback([1, 2, error]));
+    try {
+      const res = await fetchAllReturnedBooks({ ...currentFilter, ...e });
+      setTotalPages(res.p.totalPages);
+      setRowData(
+        processData(res.p.returnedBooksArray, [
+          "_id",
+          "accessionNumber",
+          "bookTitle",
+          "cardNumber",
+          "issueDate",
+          "returnDate",
+          "rollNumber",
+          "studentName",
+          "fine",
+        ])
+      );
+    } catch (error) {
+      setFeedback(2, error.m);
+    }
   };
 
   const handleDownload = async () => {
     await downloadAllReturnedBooks(currentFilter)
       .then((res) => {
-        setFeedback(1, res);
+        setFeedback(1, res.m);
       })
       .catch((error) => setFeedback([1, 2, error]));
   };
@@ -120,10 +117,8 @@ const SearchReturnedBooks = () => {
                 </button>
               )}
             </div>
-            {modal !== "" ? (
+            {modal !== "" && (
               <ReturnedBookModal id={modal} onClose={() => setModal("")} />
-            ) : (
-              <div />
             )}
           </div>
         </div>

@@ -6,7 +6,7 @@ mongoose.connection.once("open", () => {
 });
 
 mongoose.connection.on("error", (error) => {
-  console.log(error);
+  createLog(error);
 });
 
 // mongoose.set("debug", (collectionName, method, query, doc) => {

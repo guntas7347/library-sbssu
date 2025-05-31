@@ -16,8 +16,8 @@ const TotalReturns = () => {
             $gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
           },
         });
-        setPast7dayReturns(result2);
-        setTotalReturns(result1);
+        setPast7dayReturns(result2.p);
+        setTotalReturns(result1.p);
         setLoading(false);
       } catch (error) {
         console.log(error);

@@ -1,6 +1,5 @@
 import { useForm } from "../../components/forms/use-form-hook/use-form.hook.component";
 import { resetPasswordAdminDispatchLink } from "../http-requests";
-import { useContext } from "react";
 import { useFeedback } from "../../components/context/snackbar.context";
 import { Link, useNavigate } from "react-router-dom";
 import Input from "../../components/forms/input";
@@ -16,14 +15,13 @@ const AdminForgotPassword = () => {
   });
 
   const handleReset = async () => {
-    await resetPasswordAdminDispatchLink(formFields)
-      .then((res) => {
-        setFeedback([1, 1, res.message]);
-        navigate("/admin");
-      })
-      .catch((error) => {
-        setFeedback([1, 2, error]);
-      });
+    try {
+      const res = await resetPasswordAdminDispatchLink(formFields);
+      setFeedback(1, res.m);
+      navigate("/admin");
+    } catch (error) {
+      setFeedback(2, error.m);
+    }
   };
 
   return (

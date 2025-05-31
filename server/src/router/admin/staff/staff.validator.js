@@ -19,19 +19,20 @@ const staffValidationSchema = Joi.object({
   designation: Joi.string().optional().allow(""),
   joiningDate: Joi.date().optional().allow(null),
   employmentStatus: Joi.string().optional().allow(""),
-  profilePictureURL: Joi.string().uri().optional().allow(""),
+  imageUrl: Joi.string().optional().allow(""),
   role: Joi.string().valid("STAFF").optional().default("STAFF"),
   rights: Joi.array().items(Joi.string().required()).min(1).required(),
 });
 
 const joi_staff_create = async (req, res, next) => {
   try {
+    console.log(req.body);
     const { error, value } = staffValidationSchema.validate(req.body);
     if (error) return res.status(400).json(crs.CUSTOMRES(error.message));
     req.body = value;
     return next();
   } catch (error) {
-    console.error(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };

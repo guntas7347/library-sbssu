@@ -11,7 +11,7 @@ const calculateClosingBalance = async (memberId, amount, transactionType) => {
       ? currentBalance - Number(amount)
       : currentBalance + Number(amount);
   } catch (error) {
-    console.log(error);
+    createLog(error);
   }
 };
 
@@ -49,7 +49,7 @@ const createReturnFine = async (
 
     return TransactionDoc;
   } catch (error) {
-    console.log(error);
+    createLog(error);
   }
 };
 

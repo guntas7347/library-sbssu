@@ -16,10 +16,10 @@ const IssuePermission = () => {
     (async () => {
       try {
         const res = await server.settings.fetchSetting("ISSUE-PERMISSION");
-        setFormFields(res.value);
+        setFormFields(res.p.value);
         setLoading(false);
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
       }
     })();
   }, [loading]);
@@ -34,10 +34,10 @@ const IssuePermission = () => {
         key: "ISSUE-PERMISSION",
         value: formFields,
       });
-      setFeedback(1, res);
+      setFeedback(1, res.m);
       setLoading(true);
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
     }
   };
 

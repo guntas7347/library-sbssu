@@ -13,7 +13,16 @@ const LibraryCardsSchema = new Schema({
   },
   status: {
     type: String,
-    default: "available",
+    default: "AVAILABLE",
+    enum: [
+      "AVAILABLE",
+      "ISSUED",
+      "INACTIVE",
+      "REVOKED",
+      "EXPIRED",
+      "ARCHIVED",
+      "CLEARED",
+    ],
   },
   category: {
     type: String,

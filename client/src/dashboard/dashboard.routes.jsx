@@ -3,8 +3,12 @@ import ProtectedRoute from "../components/protected-route/protected-toute.compon
 import { Suspense, lazy } from "react";
 import Spinner from "../components/feedback/spinner/spinner.component";
 import Page404 from "../components/404/404";
+import AdminLoginPage from "./login-page/login-page.page.admin";
+import AdminForgotPassword from "./login-page/forgot-password.page.admin";
+import ResetPasswordPage from "./login-page/reset-password";
+import NavbarPublic from "./public/navbar-public";
 
-const AdminRoutes = lazy(() => import("./admin/routes/admin-routes"));
+const AdminLazy = lazy(() => import("./admin/routes/admin-routes"));
 
 const CenteredSpinner = () => {
   return (
@@ -14,16 +18,17 @@ const CenteredSpinner = () => {
   );
 };
 
-const DashboardRoutes = () => {
+const AdminRoutes = () => {
   return (
     <div>
       <Routes>
+        <Route index element={<AdminRouteLogin />} />
         <Route
           path="/dashboard/*"
           element={
             <ProtectedRoute role={["STAFF"]}>
               <Suspense fallback={<CenteredSpinner />}>
-                <AdminRoutes />
+                <AdminLazy />
               </Suspense>
             </ProtectedRoute>
           }
@@ -34,4 +39,18 @@ const DashboardRoutes = () => {
   );
 };
 
-export default DashboardRoutes;
+const AdminRouteLogin = () => {
+  return (
+    <div>
+      <NavbarPublic />
+      <Routes>
+        <Route index element={<AdminLoginPage />} />
+        <Route path="/forgot-password" element={<AdminForgotPassword />} />
+        <Route path="/reset-password/*" element={<ResetPasswordPage />} />
+        <Route path="*" element={<Page404 />} />
+      </Routes>
+    </div>
+  );
+};
+
+export default AdminRoutes;

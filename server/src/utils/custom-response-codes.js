@@ -1,5 +1,5 @@
-const createCustomResponseObject = (status, message, payload = null) => {
-  return { status, message, payload };
+const createCustomResponseObject = (s, m, p = null) => {
+  return { s, m, p };
 };
 
 function handleMongoError(error) {
@@ -23,7 +23,7 @@ const crs = {
   ULD201IMG: (payload = null) =>
     createCustomResponseObject(
       "ULD201IMG",
-      "Image created successfully",
+      "Image uploaded successfully",
       payload
     ),
   ULD200DELIMG: (payload = null) =>
@@ -82,11 +82,7 @@ const crs = {
   STU200FSBRN: (payload = null) =>
     createCustomResponseObject("STU200FSBRN", "Member found", payload),
   MEB200MI: (payload = null) =>
-    createCustomResponseObject(
-      "MEB200MI",
-      "Member marked as inactive",
-      payload
-    ),
+    createCustomResponseObject("MEB200MI", "No due issued", payload),
   MEB409MILU: (payload = null) =>
     createCustomResponseObject("MEB409MILU", "Library Cards not free", payload),
   MEB409MIPD: (payload = null) =>
@@ -207,12 +203,19 @@ const crs = {
       "Library Card not available",
       payload
     ),
+  MAIL500ERR: (payload = null) =>
+    createCustomResponseObject(
+      "MAIL500ERR",
+      "Operation successful but Confirmation Email could not be sent",
+      payload
+    ),
   MDW500APM: (payload = null) =>
     createCustomResponseObject(
       "MDW500APM",
       "Member approved but Confirmation Email could not be sent",
       payload
     ),
+
   MDW500SICE: (payload = null) =>
     createCustomResponseObject(
       "MDW500SICE",

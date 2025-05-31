@@ -3,7 +3,7 @@ const Member = require("../../../models/member/member.schema");
 const { joi_applicantDetails } = require("./member-joi");
 const crs = require("../../../utils/custom-response-codes");
 const { encryptText, decrptText } = require("../../auth/jwt");
-const { createLog } = require("../../../utils/functions");
+const { createLog, generateAndSavePDF } = require("../../../utils/functions");
 
 const public_memberRouter = express.Router();
 
@@ -12,10 +12,13 @@ public_memberRouter.post("/join", joi_applicantDetails, async (req, res) => {
     const prevApl = await Member.findOne().sort({ _id: -1 });
     let prevAppId = 10000;
     if (prevApl) prevAppId = prevApl.applicationId;
-    const { _id } = await Member.create({
+    const application = await Member.create({
       ...req.body,
       applicationId: prevAppId + 1,
     });
+    const { _id } = application;
+    // const path = await generateAndSavePDF(application, _id, req);
+    // console.log(path);
 
     const cookieOptions = {
       // secure: true, // only use for production

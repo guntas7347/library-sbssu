@@ -2,6 +2,8 @@ const fs = require("fs");
 var xl = require("excel4node");
 const { v4: uuidv4 } = require("uuid");
 const { fetchSettings } = require("../models/setting/setting.controller");
+const { default: puppeteer } = require("puppeteer");
+const path = require("path");
 
 // const { books1 } = require("../../books1");
 
@@ -257,13 +259,14 @@ const getLibraryCardLimit = async (
   }
 };
 
-const getBookReturnPeriodDays = async (
+const getFinePerDay = async (
   role = "STUDENT UG",
-  memberCategory = "GENERAL",
-  bookCategory = "general"
+  memberCategory = "GENERAL"
 ) => {
   try {
-    const { value: issueDuration } = await fetchSettings("ISSUE-DURATION");
+    const { value: finePerDayRates } = await fetchSettings(
+      "LATE-FEE-FINE-PER-DAY"
+    );
 
     const keyMap = {
       "STUDENT UG": {
@@ -282,15 +285,14 @@ const getBookReturnPeriodDays = async (
     };
 
     if (role === "STUDENT UG" || role === "STUDENT PG") {
-      if (bookCategory === "BOOK BANK") return 183; // Override
       const key = keyMap[role]?.[memberCategory];
-      return issueDuration[key] ?? 0;
+      return finePerDayRates[key] ?? 0;
     }
 
     const key = keyMap[role];
-    return issueDuration[key] ?? 0;
+    return finePerDayRates[key] ?? 0;
   } catch (error) {
-    console.error("Error fetching issue duration:", error);
+    console.error("Error fetching fine per day:", error);
     return 0;
   }
 };
@@ -375,6 +377,246 @@ const addLibraryCardsValueToObject = (obj) => {
   return array;
 };
 
+async function generateAndSavePDF(applicationData, gh, req) {
+  const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
+    applicationData.imageUrl
+  }`;
+
+  const htmlContent = generateLibraryFormHTML(applicationData, imageUrl);
+
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+
+  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+
+  const pdfBuffer = await page.pdf({
+    format: "A4",
+    printBackground: true,
+  });
+
+  await browser.close();
+
+  // Save PDF file to uploads folder
+  const filePath = path.join(
+    __dirname,
+    "..",
+    "..",
+    "uploads",
+    `application/${gh}.pdf`
+  );
+  await fs.promises.writeFile(filePath, pdfBuffer);
+
+  return `application/${gh}.pdf`;
+}
+
+function generateLibraryFormHTML(data, imagePath) {
+  return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    @page { size: A4; margin: 20mm; }
+    body {
+      font-family: Arial, sans-serif;
+      background: white;
+      color: black;
+      margin: 0;
+      padding: 0;
+      width: 210mm;
+      height: 297mm;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+    .container {
+      padding: 40px 40px;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header img {
+      height: 40px;
+    }
+    .header h1 {
+      color: #4c51bf; /* indigo-900 */
+      font-weight: bold;
+      font-size: 24px;
+      margin: 0;
+    }
+    hr {
+      border: 1px solid black;
+      margin: 12px 0 24px 0;
+    }
+    .title {
+      font-size: 36px;
+      font-weight: bold;
+      margin-top: 20px;
+      text-align: center;
+    }
+    .print-date {
+      margin-top: 20px;
+      text-align: right;
+      font-weight: 600;
+    }
+    .content-flex {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      gap: 20px;
+    }
+    .table-wrapper {
+      flex-grow: 1;
+    }.rules {
+  page-break-before: always;
+  page-break-inside: avoid;
+}
+
+table, .signature-section {
+  page-break-inside: avoid;
+}
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    td {
+      border: 1px solid black;
+      padding: 8px 12px;
+      text-align: left;
+      width: 50%;
+    }
+    .image-wrapper {
+      width: 33%;
+      border: 1px solid black;
+      overflow: hidden;
+    }
+    .image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .signature-section {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 120px;
+      font-weight: bold;
+    }
+    .signature-box {
+      width: 180px;
+      text-align: center;
+    }
+    .signature-box hr {
+      border: 1px solid black;
+      margin-bottom: 8px;
+    }
+    .rules {
+      margin-top: 80px;
+      font-weight: normal;
+      font-size: 14px;
+      text-align: left;
+    }
+    .rules h2 {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .rules p {
+      margin: 6px 0;
+    }
+    .rules span {
+      font-weight: bold;
+    }
+    .footer {
+      margin-top: auto;
+      border-top: 1px solid black;
+      padding: 20px 0 0 0;
+      font-weight: bold;
+      text-align: center;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="https://your-domain.com/sbssu-logo.png" alt="sbssu logo" />
+      <h1>SBSSU Central Library</h1>
+    </div>
+    <hr />
+    <div class="title">Library Form</div>
+    <div class="print-date">Print Date: ${new Date().toLocaleDateString()}</div>
+
+    <div class="content-flex">
+      <div class="table-wrapper">
+        <table>
+          <tbody>
+            <tr><td>Application ID</td><td>${data.applicationId}</td></tr>
+            <tr><td>User Type</td><td>${data.role}</td></tr>
+            <tr><td>Roll Number</td><td>${data.rollNumber}</td></tr>
+            <tr><td>Name</td><td>${data.fullName}</td></tr>
+            <tr><td>Father's Name</td><td>${data.fatherName}</td></tr>
+            <tr><td>Gender</td><td>${data.gender}</td></tr>
+            <tr><td>Date Of Birth</td><td>${new Date(
+              data.dob
+            ).toDateString()}</td></tr>
+            <tr><td>${
+              data.role === "STUDENT UG" || data.role === "STUDENT PG"
+                ? "Program"
+                : "Designation"
+            }</td><td>${data.program}</td></tr>
+            <tr><td>Specialization</td><td>${data.specialization}</td></tr>
+            <tr><td>Batch</td><td>${data.batch}</td></tr>
+            <tr><td>Email</td><td>${data.email}</td></tr>
+            <tr><td>Phone Number</td><td>${data.phoneNumber}</td></tr>
+            <tr><td>Application Date</td><td>${new Date(
+              data.createdAt
+            ).toDateString()}</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="image-wrapper">
+        <img src="${imagePath}" alt="Applicant Image" crossorigin="anonymous" />
+      </div>
+    </div>
+
+    <div class="signature-section">
+      <div class="signature-box">
+        <hr />
+        <p>${data.fullName}</p>
+      </div>
+      <div class="signature-box">
+        <hr />
+        <p>HOD</p>
+      </div>
+    </div>
+
+    <div class="rules">
+      <h2>Library Rules:-</h2>
+      <p><span>1.</span> Books are issued for 14 days.</p>
+      <p><span>2.</span> A fine of ₹1 per day is charged for late returns.</p>
+      <p><span>3.</span> Each student can have up to two library cards, with one book issued per card.</p>
+      <p><span>4.</span> Borrowers must replace any damaged or lost books.</p>
+      <p><span>5.</span> Books can be renewed once, provided there are no reservations.</p>
+      <p><span>6.</span> Library cards are for the exclusive use of the student to whom they are issued.</p>
+      <p><span>7.</span> Please maintain silence and respectful behavior in the library.</p>
+      <p><span>8.</span> Report lost library cards immediately; a fee may be charged for a replacement.</p>
+    </div>
+
+    <div class="footer">
+      SHAHEED BHAGAT SINGH STATE UNIVERSITY CENTRAL LIBRARY
+    </div>
+  </div>
+</body>
+</html>
+  `;
+}
+
 module.exports = {
   checkDateGap,
   createDateGap,
@@ -389,9 +631,10 @@ module.exports = {
   cardNumberGenerator,
   generateMembershipId,
   getLibraryCardLimit,
-  getBookReturnPeriodDays,
+  getFinePerDay,
   createLog,
   isIssueAllowed,
   handleMongoError,
   addLibraryCardsValueToObject,
+  generateAndSavePDF,
 };

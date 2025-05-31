@@ -5,7 +5,7 @@ const createSettings = async (req) => {
     await Setting.create(req);
     console.log("CREATED SETTINGS: " + req.value);
   } catch (error) {
-    console.log(error);
+    createLog(error);
   }
 }; //disable in production
 

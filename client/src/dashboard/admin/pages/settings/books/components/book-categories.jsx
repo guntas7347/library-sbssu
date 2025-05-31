@@ -31,10 +31,10 @@ const BookCategories = () => {
         key: "ACN-CATEGORIES",
         value: categories,
       });
-      setFeedback(1, res);
+      setFeedback(1, res.m);
       setLoading(true);
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
     }
   };
 
@@ -42,10 +42,10 @@ const BookCategories = () => {
     (async () => {
       try {
         const res = await server.settings.fetchSetting("ACN-CATEGORIES");
-        setCategories(res.value);
+        setCategories(res.p.value);
         setLoading(false);
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
       }
     })();
   }, [loading]);

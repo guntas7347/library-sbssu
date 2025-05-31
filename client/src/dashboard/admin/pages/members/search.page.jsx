@@ -7,8 +7,9 @@ import SearchBarMenu from "../../../../components/forms/search-bar-menu";
 import MembersModal from "./member.modal";
 import EditMemberModal from "./edit-member.modal";
 import SvgButton from "../../../../components/buttons/svg-button";
-import { MastercardSVG } from "../../../../components/svg/svg-icons";
+import { FilterSVG, MastercardSVG } from "../../../../components/svg/svg-icons";
 import AddCardModal from "./add-card.modal";
+import FiltersModal from "./filters.modal";
 
 const SearchMembersPage = () => {
   const setFeedback = useFeedback();
@@ -25,9 +26,9 @@ const SearchMembersPage = () => {
     setCurrentFilter({ ...currentFilter, ...e });
     await fetchAllStudents({ ...currentFilter, ...e })
       .then((res) => {
-        setTotalPages(res.totalPages);
+        setTotalPages(res.p.totalPages);
         setRowData(
-          processData(res.studentsArray, [
+          processData(res.p.studentsArray, [
             "_id",
             "membershipId",
             "fullName",
@@ -36,12 +37,9 @@ const SearchMembersPage = () => {
             "batch",
           ])
         );
-        if (res.length === 0) {
-          setFeedback([1, 2, "No data found"]);
-        }
       })
       .catch((error) => {
-        setFeedback([1, 2, error]);
+        setFeedback(2, error.m);
       });
   };
 
@@ -52,7 +50,12 @@ const SearchMembersPage = () => {
           <h1 className="text-3xl font-semibold my-5">Members</h1>
           <div className="c-box">
             <div class="flex justify-center items-center ">
-              <div className="basis-1/3" />
+              <div className="basis-1/3">
+                <SvgButton
+                  svg={<FilterSVG />}
+                  onClick={() => setModal(["filter"])}
+                />
+              </div>
               <div className="basis-1/3">
                 <SearchBarMenu
                   onSearch={(e) => {
@@ -106,6 +109,9 @@ const SearchMembersPage = () => {
           )}
           {modal[0] === "add-card" && (
             <AddCardModal onClose={() => setModal(["", ""])} />
+          )}
+          {modal[0] === "filter" && (
+            <FiltersModal onClose={() => setModal(["", ""])} />
           )}
         </div>
       </div>

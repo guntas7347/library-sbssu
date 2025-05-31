@@ -10,6 +10,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 
 const { router } = require("./router/router");
+const { default: puppeteer } = require("puppeteer");
 
 const app = express();
 
@@ -34,7 +35,11 @@ if (process.env.NODE_ENV !== "production") {
   app.use(
     cors({
       origin: function (origin, callback) {
-        const allowedOrigins = ["http://localhost", "http://192.168.1.4"];
+        const allowedOrigins = [
+          "http://localhost:8080",
+          "http://localhost",
+          "http://192.168.1.10",
+        ];
         if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true);
         } else {
@@ -60,6 +65,7 @@ app.use(
   "/api",
   (req, res, next) => {
     console.log("Incoming req at: " + req.url);
+    req.cust = {};
     next();
   },
   router

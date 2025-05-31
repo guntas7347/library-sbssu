@@ -34,7 +34,7 @@ const memberApplicationSchema = Joi.object({
 const joi_applicantDetails = async (req, res, next) => {
   try {
     const { error, value } = memberApplicationSchema.validate(req.body);
-
+    createLog(error);
     if (error)
       return res.status(400).json(crs.VAL400FAIL(error.details[0].message));
     req.body = value;

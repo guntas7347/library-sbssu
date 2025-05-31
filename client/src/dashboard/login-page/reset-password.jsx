@@ -25,21 +25,18 @@ const ResetPasswordPage = () => {
   const { formFields, handleChange } = useForm();
 
   useEffect(() => {
-    const asyncFunc = async () => {
-      await resetPasswordAdminVerifyLink("admin", code)
-        .then((res) => {
-          setFeedback([1, 1, res.message]);
-          setQrData(res.payload);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          setFeedback([1, 2, error]);
-          setIsLoading(false);
-          setValidLink(false);
-        });
-    };
-
-    asyncFunc();
+    (async () => {
+      try {
+        const res = await resetPasswordAdminVerifyLink("admin", code);
+        setFeedback([1, 1, res.m]);
+        setQrData(res.p);
+        setIsLoading(false);
+      } catch (error) {
+        setFeedback(2, error.m);
+        setIsLoading(false);
+        setValidLink(false);
+      }
+    })();
   }, []);
 
   const handleChangePassword = async (e) => {
@@ -67,10 +64,10 @@ const ResetPasswordPage = () => {
         formFields.totp,
         code
       );
-      setFeedback([1, 1, res.message]);
+      setFeedback([1, 1, res.m]);
       navigate("/admin");
     } catch (error) {
-      setFeedback([1, 2, error]);
+      setFeedback(2, error.m);
     }
   };
 
@@ -121,9 +118,12 @@ const ResetPasswordPage = () => {
               <div className="flex gap-5 items-center">
                 <div className="flex flex-col gap-3">
                   <h3 className="max-w-56">
-                    Scan below QR with Authenticator app and enter the code
+                    Scan below QR with Google Authenticator app and enter the
+                    code
                   </h3>
-                  <img src={qrData} alt="auth-qr" />
+                  <div className="bg-white p-0 rounded shadow flex justify-center items-center">
+                    <img src={qrData} alt="auth-qr" className="size-40" />
+                  </div>{" "}
                 </div>
                 <Input
                   label="Code"

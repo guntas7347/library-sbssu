@@ -10,6 +10,7 @@ import { UPLOADS_PATH } from "../../../../keys";
 import { useForm } from "../../../../components/forms/use-form-hook/use-form.hook.component";
 import ControlButtonCounter from "../../../../components/forms/counter/control-button";
 import ConfirmationModal from "../../../../components/modals/confirmation-model";
+import Button from "../../../../components/buttons/interactive-button";
 
 const AddCardModal = ({ onClose }) => {
   const setFeedback = useFeedback();
@@ -23,17 +24,17 @@ const AddCardModal = ({ onClose }) => {
   const { formFields, handleChange, setFields } = useForm({ cardsCount: 1 });
 
   const handleCreate = async () => {
-    setBtn(false);
+    setBtn(true);
     try {
       const res = await server.member.allotCard({
         ...formFields,
         _id: data._id,
       });
-
-      setFeedback(1, res);
+      setFeedback(1, res.m);
       onClose();
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
+      setBtn(false);
     }
   };
 
@@ -41,10 +42,10 @@ const AddCardModal = ({ onClose }) => {
     try {
       const res = await server.member.fetchForCard(formField.value);
       const res2 = await server.settings.fetchSetting("LIB-CARD-CATEGORIES");
-      setCategories(res2.value);
-      setData(res);
+      setCategories(res2.p.value);
+      setData(res.p);
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
     }
   };
 
@@ -114,14 +115,12 @@ const AddCardModal = ({ onClose }) => {
               />
             </div>
             <hr className="h-px mt-7 mb-3 bg-gray-200 border-0 dark:bg-gray-600" />
-            <button
-              type="button"
-              className="c-btn-blue"
+            <Button
+              label="Confirm"
+              spinner={btn}
+              passive={false}
               onClick={() => setAlert(true)}
-              disabled={btn}
-            >
-              Create
-            </button>
+            />
           </>
         )}
       </Modal>
@@ -130,18 +129,12 @@ const AddCardModal = ({ onClose }) => {
         onYes={handleCreate}
         show={alert}
         title="Are you sure of it to allot library cards?"
-      >
-        <div className="grid grid-cols-2 text-start mb-5">
-          <span>Member name</span>
-          <span>{data.fullName}</span>
-          <span>Member Cast</span>
-          <span>{data.category}</span>
-          <span>Cards</span>
-          <span>
-            {formFields.cardsCount} cards ({formFields.category})
-          </span>
-        </div>
-      </ConfirmationModal>
+        table={[
+          ["Member name", data.fullName],
+          ["Member Cast", data.category],
+          ["Cards", `${formFields.cardsCount} ${formFields.category} cards`],
+        ]}
+      ></ConfirmationModal>
     </>
   );
 };

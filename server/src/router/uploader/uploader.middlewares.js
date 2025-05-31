@@ -1,68 +1,46 @@
-const cloudinary = require("cloudinary").v2;
-const streamifier = require("streamifier");
+const fs = require("fs");
+const path = require("path");
+const puppeteer = require("puppeteer");
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+async function generateAndSavePDF(applicationData, gh) {
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          @page { size: A4; margin: 20mm; }
+          body { font-family: Arial, sans-serif; }
+          .title { text-align: center; font-size: 24px; font-weight: bold; }
+        </style>
+      </head>
+      <body>
+        <div class="title">Library Form</div>
+        <p>Application ID: ${gh}</p>
+        <!-- Add more application details here -->
+      </body>
+    </html>
+  `;
 
-const crs = require("../../utils/custom-response-codes");
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
 
-const uploadCloudinaryImage = async (req, res) => {
-  try {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        resource_type: "auto",
-        folder: "images",
-      },
-      (error, result) => {
-        if (error) return res.status(500).json(crs.SERR500REST(error));
-        return res.status(500).json(crs.ULD201IMG({ imageUrl: result.url }));
-      }
-    );
-    streamifier.createReadStream(req.file.buffer).pipe(uploadStream);
-  } catch (error) {
-    createLog(error);
-    return res.status(500).json(crs.SERR500REST(error));
-  }
-};
+  await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
-const destroyImage = async (imageUrl) => {
-  try {
-    const extractPublicId = (url) => {
-      const urlArray = url.split("/");
-      const publicIdWithExtention = urlArray[urlArray.length - 1];
-      return "images/" + publicIdWithExtention.split(".")[0];
-    };
+  const pdfBuffer = await page.pdf({
+    format: "A4",
+    printBackground: true,
+  });
 
-    const publicId = extractPublicId(imageUrl);
-    await cloudinary.uploader.destroy(publicId);
-  } catch (error) {
-    createLog(error);
-  }
-};
+  await browser.close();
 
-const deleteCloudinaryImage = async (req, res, next) => {
-  try {
-    const extractPublicId = (url) => {
-      const urlArray = url.split("/");
-      const publicIdWithExtention = urlArray[urlArray.length - 1];
-      return "images/" + publicIdWithExtention.split(".")[0];
-    };
+  // Save PDF file to uploads folder
+  const filePath = path.join(
+    __dirname,
+    "..",
+    "uploads",
+    `applications/${gh}.pdf`
+  );
+  await fs.promises.writeFile(filePath, pdfBuffer);
 
-    const publicId = extractPublicId(req.body.imageUrl);
-
-    const result = await cloudinary.uploader.destroy(publicId);
-
-    if (!req.cust) req.cust = {};
-    req.cust.result = result;
-
-    return next();
-  } catch (error) {
-    createLog(error);
-    return res.status(500).json(crs.SERR500REST(error));
-  }
-};
-
-module.exports = { uploadCloudinaryImage, deleteCloudinaryImage, destroyImage };
+  return filePath;
+}

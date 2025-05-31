@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./table.styles.scss";
 import { BadgeCheckSVG, CloseCircleSVG } from "../svg/svg-icons";
 
 const CustomTableSelect = ({
@@ -65,19 +64,28 @@ const CustomTableSelect = ({
                     />
                   </td>
                   {row.map((td, index) => {
-                    if (td === "available")
+                    if (td === "AVAILABLE")
                       return (
                         <td key={index} className="px-6 py-4">
                           <span className="flex gap-2">
-                            Available {td === "available" && <BadgeCheckSVG />}
+                            {td} <BadgeCheckSVG />
                           </span>
                         </td>
                       );
-                    if (td === "issued")
+                    if (
+                      [
+                        "ISSUED",
+                        "INACTIVE",
+                        "REVOKED",
+                        "EXPIRED",
+                        "ARCHIVED",
+                        "CLEARED",
+                      ].includes(td)
+                    )
                       return (
                         <td key={index} className="px-6 py-4">
                           <span className="flex gap-2">
-                            Issued {td === "issued" && <CloseCircleSVG />}{" "}
+                            {td} <CloseCircleSVG />
                           </span>
                         </td>
                       );

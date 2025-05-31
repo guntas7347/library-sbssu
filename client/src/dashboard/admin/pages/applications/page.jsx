@@ -20,26 +20,22 @@ const ApplicationsPage = () => {
 
   const handleFetch = async (e) => {
     setCurrentFilter({ ...currentFilter, ...e });
-
-    await fetchAllApplications({ ...currentFilter, ...e })
-      .then((res) => {
-        setRowData(
-          rowsArray(res, [
-            "_id",
-            "role",
-            "rollNumber",
-            "fullName",
-            "program",
-            "batch",
-          ])
-        );
-        if (res.length === 0) {
-          setFeedback([1, 2, "No data found"]);
-        }
-      })
-      .catch((error) => {
-        setFeedback([1, 2, error]);
-      });
+    try {
+      const res = await fetchAllApplications({ ...currentFilter, ...e });
+      setRowData(
+        rowsArray(res.p, [
+          "_id",
+          "role",
+          "applicationId",
+          "fullName",
+          "program",
+          "batch",
+        ])
+      );
+    } catch (error) {
+      setFeedback(2, error.m);
+      setRowData([]);
+    }
   };
 
   return (
@@ -59,7 +55,7 @@ const ApplicationsPage = () => {
                 <Table
                   cols={[
                     "User Type",
-                    "Roll Number",
+                    "Application ID",
                     "Name",
                     "Program/Desigination",
                     "Batch",
@@ -77,16 +73,8 @@ const ApplicationsPage = () => {
                 />
               </div>
             </div>
-            {modal !== "" ? (
-              <ApproveModal
-                id={modal}
-                onClose={() => {
-                  setModal("");
-                  handleFetch({ name: "allCategories" });
-                }}
-              />
-            ) : (
-              <div />
+            {modal !== "" && (
+              <ApproveModal id={modal} onClose={() => setModal("")} />
             )}
           </div>
         </div>

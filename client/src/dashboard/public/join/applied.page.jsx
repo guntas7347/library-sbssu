@@ -26,19 +26,19 @@ const AppliedPage = () => {
     (async () => {
       try {
         if (Object.keys(params).length === 0) {
+          if (!gh) throw Error("No application trace");
           const res = await fetchApplication(gh, "cookie");
-          if (!res.payload) throw new Error("No application");
-          setData(res.payload);
+          if (!res.p) throw new Error("No application");
+          setData(res.p);
           setLoading(false);
         } else {
           if (!params.gh) throw new Error("No GH");
           const res = await fetchApplication(params.gh);
-          if (!res.payload) throw new Error("No application");
-          setData(res.payload);
+          if (!res.p) throw new Error("No application");
+          setData(res.p);
           setLoading(false);
         }
       } catch (error) {
-        console.log(error);
         navigate("/");
         setFeedback(2, "No application found");
       }
@@ -65,10 +65,10 @@ const AppliedPage = () => {
     ) {
       try {
         const res = await deleteApplication(gh);
-        setFeedback(1, res.message);
+        setFeedback(1, res.m);
         navigate("/");
       } catch (error) {
-        setFeedback(2, error);
+        setFeedback(2, error.m);
       }
     }
   };

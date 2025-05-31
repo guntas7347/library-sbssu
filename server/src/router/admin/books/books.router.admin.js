@@ -45,7 +45,7 @@ booksRouter.post(
     try {
       return res.status(200).json(crs.BKS200ANB());
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -93,7 +93,7 @@ booksRouter.post(
 
       return res.status(200).json(crs.BKS200FBBI(d.bookId));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -108,7 +108,7 @@ booksRouter.post(
     try {
       return res.status(200).json(crs.BKS200ABA());
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -127,7 +127,7 @@ booksRouter.post(
 
       return res.status(200).json(crs.BKS200FAB(booksArray));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -142,7 +142,7 @@ booksRouter.post(
       if (bookDoc == null) return res.status(404).json(crs.BKS404FBDBI());
       return res.status(200).json(crs.BKS200FBDBI(bookDoc));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -156,7 +156,7 @@ booksRouter.post(
     try {
       return res.status(200).json(crs.BKS200FBBI(req.cust.bookDoc));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -205,7 +205,7 @@ booksRouter.post(
     try {
       return res.status(200).json(crs.BKS200FBBAN(req.cust.book));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -235,7 +235,7 @@ booksRouter.post(
       await updateBookById(req.body._id, req.body);
       return res.status(200).json(crs.BKS200EB());
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }

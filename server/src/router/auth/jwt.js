@@ -9,7 +9,7 @@ const createJWT = (token = {}, expiry = 60 * 60) => {
 const verifyJwt = (token) => {
   return jwt.verify(token, process.env.JWT_SECRET, (error, decoded) => {
     if (error) {
-      console.log(error);
+      createLog(error);
       return null;
     } else {
       return decoded;
@@ -69,5 +69,6 @@ module.exports = { createJWT, verifyJwt, encryptText, decrptText };
 //   // Generate a random 256-bit (32-byte) key for AES-256 encryption
 //   const encryptionKey = crypto.randomBytes(32).toString("hex"); // 32 bytes = 256 bits
 //   console.log("CRYPTO_ENCRYPTION_KEY = ", encryptionKey);
+//   }
 
 // secretKeysGenerator();

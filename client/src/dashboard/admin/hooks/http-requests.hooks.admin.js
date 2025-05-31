@@ -36,16 +36,9 @@ export const restCall = (url = "", obj = {}, crs = [], blob = false) => {
         }
 
         const response = await res.json();
-        if (crs.includes(response.status)) {
-          if (response.payload === null) {
-            resolve(response.message);
-          } else {
-            resolve(response.payload);
-          }
-        } else {
-          // logResponseToConsole(response, false);
-          reject(response.message);
-        }
+        if (crs.includes(response.s)) {
+          resolve(response);
+        } else reject(response);
       })
       .catch(() => {
         if (blob) {
@@ -113,7 +106,7 @@ export const quickSearchMember = (query) =>
   restCall("members/quick-search", query, ["SRH200GLB"]);
 
 export const markInactive = (_id) =>
-  restCall("members/mark-inactive", { _id }, "MEB200MI");
+  restCall("members/issue-no-due", { _id }, "MEB200MI");
 
 export const fetchIssuedBookByAccessionNumber = (accessionNumber) =>
   restCall(
@@ -122,17 +115,13 @@ export const fetchIssuedBookByAccessionNumber = (accessionNumber) =>
     "ISB200FIBBAN"
   );
 
-export const returnIssuedBook = (returningBookDetails) =>
-  restCall(
-    "books/return-books/return-issued-book",
-    returningBookDetails,
-    "ISB200RIB"
-  );
+export const returnIssuedBook = (_id) =>
+  restCall("books/return-books/return-issued-book", { _id }, "ISB200RIB");
 
-export const issueBookFine = (returningBookDetails) =>
+export const issueBookFine = (_id) =>
   restCall(
     "books/issue-books/calculate-issue-book-fine",
-    returningBookDetails,
+    { _id },
     "ISB200CIBF"
   );
 

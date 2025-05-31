@@ -11,7 +11,7 @@ const settingsRouter = express.Router();
 
 // Setting.create({
 //   group: "issue",
-//   key: "ISSUE-COMPATIBILITY",
+//   key: "LATE-FEE-FINE-PER-DAY",
 //   value: {
 //     GENERAL: ["GENERAL"],
 //     "BOOK-BANK": ["BOOK-BANK"],

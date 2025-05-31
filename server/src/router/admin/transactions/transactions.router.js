@@ -43,7 +43,7 @@ transactionsRouter.post(
         })
       );
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -65,7 +65,7 @@ transactionsRouter.post(
     try {
       return res.status(200).json(crs.TRN200AT());
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -88,7 +88,7 @@ transactionsRouter.post(
       if (!m) return res.status(404).json(crs.TRN404FM());
       return res.status(200).json(crs.TRN200FM(m));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }

@@ -25,29 +25,22 @@ const SearchBooksPage = () => {
   const handleFetch = async (e) => {
     setCurrentFilter({ ...currentFilter, ...e });
 
-    await fetchAllBooks({ ...currentFilter, ...e })
-      .then((res) => {
-        if (res.booksArray.length === 0) {
-          setFeedback([1, 2, "No Data Found"]);
-          setRowData([]);
-          return;
-        }
-
-        setTotalPages(res.totalPages);
-        setRowData(
-          processDataForBooks(res.booksArray, [
-            "_id",
-            "accessionNumber",
-            "title",
-            "author",
-            "placeAndPublishers",
-            "publicationYear",
-          ])
-        );
-      })
-      .catch((error) => {
-        setFeedback([1, 2, error]);
-      });
+    try {
+      const res = await fetchAllBooks({ ...currentFilter, ...e });
+      setTotalPages(res.p.totalPages);
+      setRowData(
+        processDataForBooks(res.p.booksArray, [
+          "_id",
+          "accessionNumber",
+          "title",
+          "author",
+          "placeAndPublishers",
+          "publicationYear",
+        ])
+      );
+    } catch (error) {
+      setFeedback(2, error.m);
+    }
   };
 
   return (

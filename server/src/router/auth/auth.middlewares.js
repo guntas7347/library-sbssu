@@ -51,7 +51,7 @@ const authorisationLevel = (rights = ["open"]) => {
         next();
       else return res.status(403).json(crs.ADM403JWT());
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.ERR500JWT(error));
     }
   };

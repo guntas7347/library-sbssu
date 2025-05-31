@@ -38,7 +38,7 @@ const verifyStaff = async (req, res, next) => {
       return res.status(401).json(crs.ADM401JWT());
     }
   } catch (error) {
-    console.log(error);
+    createLog(error);
     return res.status(500).json(crs.ERR500JWT(error));
   }
 };

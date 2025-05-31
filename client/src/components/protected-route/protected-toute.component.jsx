@@ -13,10 +13,10 @@ const ProtectedRoute = ({ redirectPath = "/", children, role = [] }) => {
     const asyncFunc = async () => {
       await verifyAuthRole(role)
         .then((res) => {
-          if (role.includes(res.payload.role)) {
+          if (role.includes(res.p.role)) {
             setUser({
-              name: res.payload.staffId.fullName,
-              email: res.payload.email,
+              name: res.p.staffId.fullName,
+              email: res.p.email,
             });
             setSession(true);
             setIsLoading(false);
@@ -27,7 +27,7 @@ const ProtectedRoute = ({ redirectPath = "/", children, role = [] }) => {
           }
         })
         .catch((error) => {
-          console.log(error);
+          console.log(error.m);
           setIsLoading(false);
         });
     };

@@ -4,7 +4,7 @@ const createPasswordHash = async (password) => {
   return new Promise((resolve, reject) => {
     bcrypt.hash(password, 10, (error, hash) => {
       if (error) {
-        console.error(error);
+        createLog(error);
         reject(error);
       } else {
         resolve(hash);

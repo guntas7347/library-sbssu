@@ -1,18 +1,12 @@
 const mongoose = require("mongoose");
 const crs = require("../../../utils/custom-response-codes");
 const {
-  getBookAccessionByAccessionNumber,
   updateBookAccession,
-  getAccession,
 } = require("../../../models/book-accessions/book-accessions.controllers");
 const {
-  getLibraryCardByCardNumber,
   updateLibraryCardById,
-  getLibraryCard,
 } = require("../../../models/library-cards/library-cards.controllers");
-const {
-  getAuthAdminById,
-} = require("../../../models/auth/aduth_admin.controllers");
+
 const {
   createIssueBook,
   getIssuedBookForReturning,
@@ -22,9 +16,9 @@ const {
 const {
   createDateGap,
   checkDateGap,
-  getBookReturnPeriodDays,
   createLog,
   isIssueAllowed,
+  getFinePerDay,
 } = require("../../../utils/functions");
 const { transporter } = require("../../../services/nodemailer");
 const { generateEmailTemplate } = require("../../../services/email-templates");
@@ -33,8 +27,6 @@ const LibraryCard = require("../../../models/library-cards/library-cards.schema"
 const IssuedBook = require("../../../models/issue-book/issue-book.schema");
 const Auth = require("../../../models/auth/auth.schema");
 const Setting = require("../../../models/setting/setting.schema");
-
-const FINE_PER_DAY = 1;
 
 const verifyBookAccessionAvailability = async (req, res, next) => {
   try {
@@ -46,7 +38,7 @@ const verifyBookAccessionAvailability = async (req, res, next) => {
 
     if (!bookAccession) return res.status(404).json();
     const { status, _id, category } = bookAccession;
-    if (status != "available") return res.status(409).json(crs.MDW409VBAA());
+    if (status != "AVAILABLE") return res.status(409).json(crs.MDW409VBAA());
     if (!req.cust) req.cust = {};
     req.cust.bookAccessionId = _id;
     req.cust.bookCategory = category;
@@ -68,7 +60,7 @@ const verifyLibraryCardAvailability = async (req, res, next) => {
 
     if (!card) return res.status(404).json();
     const { status, _id, category } = card;
-    if (status != "available") return res.status(409).json(crs.MDW409VLCA());
+    if (status != "AVAILABLE") return res.status(409).json(crs.MDW409VLCA());
     if (!req.cust) req.cust = {};
     req.cust.libraryCardId = _id;
     req.cust.cardCategory = category;
@@ -101,22 +93,6 @@ const checkIssueCompatibility = async (req, res, next) => {
   }
 };
 
-const verifyBookBank = async (req, res, next) => {
-  try {
-    if (
-      (req.cust.cardCategory === "BOOK-BANK" &&
-        req.cust.bookCategory === "BOOK-BANK") ||
-      (req.cust.cardCategory !== "BOOK-BANK" &&
-        req.cust.bookCategory !== "BOOK-BANK")
-    )
-      return next();
-    else return res.status(401).json(crs.MDW401VBBB());
-  } catch (error) {
-    createLog(error);
-    return res.status(500).json(crs.SERR500REST(error));
-  }
-};
-
 const processIssuingBook = async (req, res, next) => {
   const session = await mongoose.startSession();
   try {
@@ -124,15 +100,21 @@ const processIssuingBook = async (req, res, next) => {
       .select("staffId -_id")
       .lean();
     const { bookAccessionId, libraryCardId } = req.cust;
+
+    const dueDate = createDateGap(req.body.issueDate, req.body.issueDuration);
+    if (!req.cust) req.cust = {};
+    req.cust.dueDate = dueDate;
+
     const issueBookDetails = {
       bookAccessionId,
       libraryCardId,
       issueDate: req.body.issueDate,
       issuedBy: adminDoc.staffId,
+      dueDate,
     };
     await session.withTransaction(async () => {
-      await updateBookAccession(bookAccessionId, { status: "issued" }, session);
-      await updateLibraryCardById(libraryCardId, { status: "issued" }, session);
+      await updateBookAccession(bookAccessionId, { status: "ISSUED" }, session);
+      await updateLibraryCardById(libraryCardId, { status: "ISSUED" }, session);
       await createIssueBook(issueBookDetails, session);
     });
     await session.commitTransaction();
@@ -150,31 +132,20 @@ const sendIssuedConfirmationEmail = async (req, res, next) => {
   try {
     const { accessionNumber, cardNumber, issueDate } = req.body;
     const bookDoc = await Accession.findOne({ accessionNumber })
-      .populate({
-        path: "bookId",
-      })
+      .populate("bookId")
       .lean();
 
     const Libdoc = await LibraryCard.findOne({
       cardNumber,
     })
-      .populate({
-        path: "memberId",
-        select: "category role fullName email",
-      })
+      .populate("memberId", "category role fullName email")
       .lean();
-
-    const BOOK_RETURN_PERIOD_DAYS = await getBookReturnPeriodDays(
-      Libdoc.memberId.role,
-      Libdoc.memberId.category,
-      bookDoc.category
-    );
 
     const emailContent = {
       name: Libdoc.memberId.fullName,
       accessionNumber,
       issueDate: new Date(issueDate).toDateString(),
-      dueDate: createDateGap(issueDate, BOOK_RETURN_PERIOD_DAYS).toDateString(),
+      dueDate: req.cust.dueDate.toDateString(),
       cardNumber,
       title: bookDoc.bookId.title,
       author: bookDoc.bookId.author,
@@ -202,12 +173,15 @@ const fetchIssuedBookByAccessionNumber = async (req, res) => {
       .lean();
 
     if (!accessionDoc) return res.status(404).json(crs.MDW404FIBBAN());
-    if (accessionDoc.status === "available")
+    if (accessionDoc.status === "AVAILABLE")
       return res.status(409).json(crs.MDW409FIBBAN());
 
     const issuedBookDoc = await getIssuedBook({
       bookAccessionId: accessionDoc._id,
     });
+
+    const { dueDate, issueDate } = issuedBookDoc;
+    const issueDuration = checkDateGap(issueDate, dueDate);
 
     const { cardNumber, memberId } = issuedBookDoc.libraryCardId;
     const { bookId } = issuedBookDoc.bookAccessionId;
@@ -217,7 +191,9 @@ const fetchIssuedBookByAccessionNumber = async (req, res) => {
       ...bookId,
       libraryCard: cardNumber,
       ...memberId,
-      issueDate: issuedBookDoc.issueDate,
+      issueDate,
+      dueDate,
+      issueDuration,
       issuedBy: issuedBookDoc.issuedBy.fullName,
     };
     return res.status(200).json(crs.ISB200FIBBAN(issuedBook));
@@ -246,14 +222,16 @@ const fetchIssuedBookById = async (req, res, next) => {
 const calculateFine = async (req, res, next) => {
   try {
     const returnDate = new Date();
-    const { issueDate } = req.cust.issuedBook;
+    const { issueDate, dueDate, libraryCardId } = req.cust.issuedBook;
     let dateGap = checkDateGap(issueDate, returnDate);
-    const BOOK_RETURN_PERIOD_DAYS = await getBookReturnPeriodDays(
-      req.cust.role,
-      req.cust.cast,
-      req.cust.category
+    const issueDuration = checkDateGap(issueDate, dueDate);
+
+    const FINE_PER_DAY = await getFinePerDay(
+      libraryCardId.memberId.role,
+      libraryCardId.memberId.category
     );
-    dateGap -= BOOK_RETURN_PERIOD_DAYS;
+
+    dateGap -= issueDuration;
     if (dateGap < 0) dateGap = 0;
     req.cust.fine = dateGap * FINE_PER_DAY;
     req.cust.returnDate = returnDate;

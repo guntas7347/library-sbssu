@@ -2,8 +2,12 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useForm } from "../../../components/forms/use-form-hook/use-form.hook.component";
 import Input from "../../../components/forms/input";
 import Select from "../../../components/forms/select-input";
-import ImageUploader from "../../../components/forms/image-upload/image-uploader";
-import { createApplication, getPrograms } from "../../http-requests";
+import ImageCropper from "../../../components/forms/image-upload/image-cropper";
+import {
+  createApplication,
+  getPrograms,
+  uploadImage,
+} from "../../http-requests";
 import { useFeedback } from "../../../components/context/snackbar.context";
 import Button from "../../../components/buttons/interactive-button";
 import { useNavigate } from "react-router-dom";
@@ -41,13 +45,11 @@ const JoinPage = () => {
     setApplying(true);
     if (applying) return;
     try {
-      const m = await createApplication(formFields);
-      setFeedback(1, m.message);
-      setTimeout(() => {
-        navigate("/join/applied");
-      }, 1000);
+      const res = await createApplication(formFields);
+      setFeedback(1, res.m);
+      navigate("/join/applied");
     } catch (error) {
-      setFeedback(2, error);
+      setFeedback(2, error.m);
     }
   };
 
@@ -72,8 +74,12 @@ const JoinPage = () => {
 
   useEffect(() => {
     (async () => {
-      const p = await getPrograms();
-      setProgramsArr(p.payload);
+      try {
+        const p = await getPrograms();
+        setProgramsArr(p.p);
+      } catch (error) {
+        console.log(error);
+      }
     })();
   }, []);
 
@@ -92,22 +98,81 @@ const JoinPage = () => {
   }, [formFields.program]);
 
   const autofillTestData = () => {
-    setFields("fullName", "John Doe");
-    setFields("fatherName", "Robert Doe");
-    setFields("rollNumber", "123456");
-    setFields("gender", "MALE");
-    setFields("dob", "2000-01-01");
-    setFields("category", "GENERAL");
-    setFields("role", "STUDENT UG");
-    setFields("program", programs()[0]);
-    setFields("specialization", specializations()[0]);
+    const roles = [
+      "STUDENT UG",
+      "STUDENT PG",
+      "TEACHER REGULAR",
+      "TEACHER ADHOC",
+      "NON TEACHING STAFF",
+    ];
+
+    const categories = ["GENERAL", "SC/ST", "OTHER"];
+    const genders = ["MALE", "FEMALE"];
+
+    const maleImages = [
+      "074df890f8484e9783104044fe53b6e2",
+      "61b0b77cd1c746fd937e5a4fb67773de",
+      "0845e89ff353458eabd4bf77c0d8c32d",
+    ];
+
+    const femaleImages = [
+      "90fe44c4df3f4e318c091964c1d17b45",
+      "675f4614c0604921a87a64819d14ae58",
+    ];
+
+    const getRandomItem = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+    const getRandomDOB = () => {
+      const start = new Date("1990-01-01").getTime();
+      const end = new Date("2005-01-01").getTime();
+      const randomTime = start + Math.random() * (end - start);
+      return new Date(randomTime).toISOString().split("T")[0]; // YYYY-MM-DD
+    };
+
+    const gender = getRandomItem(genders);
+    const imagePool = gender === "MALE" ? maleImages : femaleImages;
+    const randomProgramIndex = Math.floor(Math.random() * 3);
+    const program = programs()[randomProgramIndex] ?? programs()[0];
+
+    const randomSpecializationIndex = Math.floor(Math.random() * 3);
+    const specialization =
+      specializations()[randomSpecializationIndex] ?? specializations()[0];
+
+    setFields("fullName", `Test User ${Math.floor(Math.random() * 1000)}`);
+    setFields("fatherName", `Father ${Math.floor(Math.random() * 1000)}`);
+    setFields("rollNumber", `${Math.floor(100000 + Math.random() * 900000)}`);
+    setFields("gender", gender);
+    setFields("dob", getRandomDOB());
+    setFields("category", getRandomItem(categories));
+    setFields("role", getRandomItem(roles));
+    setFields("program", program);
+    setFields("specialization", specialization);
     setFields("batch", 2024);
-    setFields("email", "john.doe@example.com");
-    setFields("phoneNumber", "9876543210");
-    setFields("imageUrl", "/profile/0845e89ff353458eabd4bf77c0d8c32d.jpg"); // assume this path is valid for testing
+    setFields("email", "guntas7347@gmail.com");
+    setFields(
+      "phoneNumber",
+      `${Math.floor(9000000000 + Math.random() * 100000000)}`
+    );
+    setFields("imageUrl", `/profile/${getRandomItem(imagePool)}.jpg`);
   };
 
   const showAutoFill = true;
+
+  const handleImageUpload = async (formData) => {
+    try {
+      if (!formData) return setFields("imageUrl", null);
+
+      const res = await uploadImage(formData);
+      const data = await res.json();
+
+      if (data.s === "ULD201IMG") {
+        setFields("imageUrl", data.p);
+        setFeedback(1, data.m);
+      } else setFeedback(2, data.m);
+    } catch (error) {
+      setFeedback(2, error.m);
+    }
+  };
 
   return (
     <div className="px-1 md:px-20 md:py-2">
@@ -143,11 +208,15 @@ const JoinPage = () => {
               onChange={handleChange}
             />
             <Input
-              label="Roll Number"
+              label="Permenant Roll Number (optional)"
               name="rollNumber"
               value={formFields.rollNumber}
-              required={true}
-              onChange={handleChange}
+              onChange={(e) => {
+                setFields(
+                  "rollNumber",
+                  e.target.value.replace(/[^0-9]/g, "").slice(0, 6)
+                );
+              }}
             />
             <Select
               label="Gender"
@@ -217,13 +286,19 @@ const JoinPage = () => {
               label="Phone Number"
               name="phoneNumber"
               value={formFields.phoneNumber}
-              type="number"
+              type="text"
               required={true}
-              onChange={handleChange}
+              onChange={(e) => {
+                setFields(
+                  "phoneNumber",
+                  e.target.value.replace(/[^0-9]/g, "").slice(0, 10)
+                );
+              }}
             />
-            <div>
-              <ImageUploader onUpload={(e) => setFields("imageUrl", e.path)} />
-            </div>
+            <ImageCropper
+              onUpload={(e) => handleImageUpload(e)}
+              label="Upload face image"
+            />
           </div>
 
           <div className="flex items-start mb-6">
@@ -231,13 +306,13 @@ const JoinPage = () => {
               <input
                 id="remember"
                 type="checkbox"
-                className="w-4 h-4 border border-gray-300 rounded-sm bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
+                className="w-4 h-4 border  cursor-pointer border-gray-300 rounded-sm bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
                 required
               />
             </div>
             <label
               htmlFor="remember"
-              className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+              className="ms-2 text-sm font-medium  cursor-pointer text-gray-900 dark:text-gray-300"
             >
               I agree with the{" "}
               <a
@@ -251,12 +326,7 @@ const JoinPage = () => {
             </label>
           </div>
 
-          <Button
-            label="Submit"
-            type="submit"
-            spinner={applying}
-            passive={false}
-          />
+          <Button label="Submit" type="submit" spinner={applying} />
         </form>
       </div>
     </div>

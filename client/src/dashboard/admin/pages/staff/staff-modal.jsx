@@ -5,35 +5,31 @@ import Input from "../../../../components/forms/input";
 import TextArea from "../../../../components/forms/text-area";
 import ModalCloseButton from "../../../../components/buttons/svg-buttons/close-button";
 import Spinner from "../../../../components/feedback/spinner/spinner.component";
+import { imagePathUrl } from "../../../../utils/functions";
 
 const StaffModal = ({ id, onClose }) => {
   const setFeedback = useFeedback();
 
-  const [staffData, setStaffData] = useState();
+  const [data, setData] = useState();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const asyncFunc = async () => {
-      await server.staff
-        .fetch(id)
-        .then((res) => {
-          const authData = res.authId;
-          delete res.authId;
-          let s = {
-            ...res,
-            ...authData,
-            rights: authData.rights
-              .map((item) => item.toUpperCase())
-              .join(", "),
-          };
-          setStaffData(s);
-          setLoading(false);
-        })
-        .catch((error) => {
-          setFeedback([1, 2, error]);
-        });
-    };
-    asyncFunc();
+    (async () => {
+      try {
+        const res = await server.staff.fetch(id);
+        const authData = res.p.authId;
+        delete res.p.authId;
+        let s = {
+          ...res.p,
+          ...authData,
+          rights: authData.rights.map((item) => item.toUpperCase()).join(", "),
+        };
+        setData(s);
+        setLoading(false);
+      } catch (error) {
+        setFeedback(2, error.m);
+      }
+    })();
   }, []);
 
   return (
@@ -61,86 +57,79 @@ const StaffModal = ({ id, onClose }) => {
                   <Input
                     disabled={true}
                     label="ID Number"
-                    value={staffData.idNumber}
+                    value={data.idNumber}
                   />
                   <Input
                     disabled={true}
                     label="Full Name"
-                    value={staffData.fullName}
+                    value={data.fullName}
                   />
-                  <Input
-                    disabled={true}
-                    label="Email"
-                    value={staffData.email}
-                  />
+                  <Input disabled={true} label="Email" value={data.email} />
                   <Input
                     disabled={true}
                     label="Phone Number"
-                    value={staffData.phoneNumber}
+                    value={data.phoneNumber}
                   />
                   <Input
                     disabled={true}
                     label="Date of Birth"
                     value={
-                      staffData.dateOfBirth
-                        ? new Date(staffData.dateOfBirth).toLocaleDateString()
+                      data.dateOfBirth
+                        ? new Date(data.dateOfBirth).toLocaleDateString()
                         : ""
                     }
                   />
-                  <Input
-                    disabled={true}
-                    label="Gender"
-                    value={staffData.gender}
-                  />
+                  <Input disabled={true} label="Gender" value={data.gender} />
                   <TextArea
                     disabled={true}
                     className="UPPERCASE"
                     label="Rights"
-                    value={staffData.rights}
+                    value={data.rights}
                   />
                   <TextArea
                     disabled={true}
                     label="Address"
-                    value={staffData.address}
+                    value={data.address}
                   />
                   <Input
                     disabled={true}
                     label="Emergency Contact"
-                    value={staffData.emergencyContact}
+                    value={data.emergencyContact}
                   />
                   <Input
                     disabled={true}
                     label="Employee ID"
-                    value={staffData.employeeId}
+                    value={data.employeeId}
                   />
                   <Input
                     disabled={true}
                     label="Department"
-                    value={staffData.department}
+                    value={data.department}
                   />
                   <Input
                     disabled={true}
                     label="Designation"
-                    value={staffData.designation}
+                    value={data.designation}
                   />
                   <Input
                     disabled={true}
                     label="Joining Date"
                     value={
-                      staffData.joiningDate
-                        ? new Date(staffData.joiningDate).toLocaleDateString()
+                      data.joiningDate
+                        ? new Date(data.joiningDate).toLocaleDateString()
                         : ""
                     }
                   />
                   <Input
                     disabled={true}
                     label="Employment Status"
-                    value={staffData.employmentStatus}
+                    value={data.employmentStatus}
                   />
-                  <Input
-                    disabled={true}
-                    label="Profile Picture URL"
-                    value={staffData.profilePictureURL}
+                  <img
+                    className="border border-black"
+                    crossOrigin="anonymous"
+                    src={imagePathUrl(data.imageUrl)}
+                    alt="image"
                   />
                 </div>
               )}

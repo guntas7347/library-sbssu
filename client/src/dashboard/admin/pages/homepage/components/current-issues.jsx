@@ -16,8 +16,8 @@ const CurrentIssues = () => {
             $gte: new Date(new Date().getTime() - 1000 * 60 * 60 * 24 * 7),
           },
         });
-        setTotalIssues(result1);
-        setPast7dayIssues(result2);
+        setTotalIssues(result1.p);
+        setPast7dayIssues(result2.p);
         setLoading(false);
       } catch (error) {
         console.log(error);

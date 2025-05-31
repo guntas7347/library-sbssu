@@ -21,27 +21,23 @@ const TransactionsPage = () => {
 
   const handleFetch = async (e) => {
     setCurrentFilter({ ...currentFilter, ...e });
-    await fetchTransactions({ ...currentFilter, ...e })
-      .then((res) => {
-        setTotalPages(res.totalPages);
-        setRowData(
-          processData(res.data, [
-            "_id",
-            "createdAt",
-            "fullName",
-            "category",
-            "amount",
-            "transactionType",
-            "closingBalance",
-          ])
-        );
-        if (res.length === 0) {
-          setFeedback([1, 2, "No data found"]);
-        }
-      })
-      .catch((error) => {
-        setFeedback([1, 2, error]);
-      });
+    try {
+      const res = await fetchTransactions({ ...currentFilter, ...e });
+      setTotalPages(res.p.totalPages);
+      setRowData(
+        processData(res.p.data, [
+          "_id",
+          "createdAt",
+          "fullName",
+          "category",
+          "amount",
+          "transactionType",
+          "closingBalance",
+        ])
+      );
+    } catch (error) {
+      setFeedback(2, error.m);
+    }
   };
 
   return (

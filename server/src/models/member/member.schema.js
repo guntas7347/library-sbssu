@@ -44,11 +44,10 @@ const MemberSchema = new Schema({
       "NON TEACHING STAFF",
     ],
   },
-  active: { type: Boolean, default: true },
   status: {
     type: String,
     default: "APPLIED",
-    enum: ["APPLIED", "REJECTED", "CANCELLED", "ACTIVE", "INACTIVE"],
+    enum: ["APPLIED", "REJECTED", "CANCELLED", "ACTIVE", "INACTIVE", "CLEARED"],
   },
   balance: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },

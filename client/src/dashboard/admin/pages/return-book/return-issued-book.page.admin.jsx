@@ -11,77 +11,66 @@ import Spinner from "../../../../components/feedback/spinner/spinner.component";
 import { useFeedback } from "../../../../components/context/snackbar.context";
 import Input from "../../../../components/forms/input";
 import ReturnBookSearchBar from "./search-bar";
-import ReturnConfirmationModal from "./return-confirmation.modal";
 import ConfirmationModal from "../../../../components/modals/confirmation-model";
 import { UPLOADS_PATH } from "../../../../keys";
+import Button from "../../../../components/buttons/interactive-button";
 
 const ReturnIssuedBookPage = () => {
   const setFeedback = useFeedback();
 
-  const [ShowAlertDialog, setShowAlertDialog] = useState(false);
+  const [alert, setAlert] = useState(false);
 
-  const [isStudentFetching, setIsStudentFetching] = useState(false);
   const [fine, setFine] = useState(false);
-  const { formFields, handleChange, resetFormFields } = useForm({
-    accessionNumber: "",
-  });
-  const [issuedBookDoc, setIssuedBookDoc] = useState([]);
-  const {
-    title,
-    author,
-    accessionNumber,
-    libraryCard,
-    issueDate,
-    fullName,
-    issuedBy,
-    rollNumber,
-    _id,
-    imageUrl,
-  } = issuedBookDoc;
+  const [btn, setBtn] = useState(false);
+
+  const { formFields, handleChange } = useForm();
+  const [issuedBookDoc, setIssuedBookDoc] = useState({});
 
   const handleFetch = async () => {
-    setIsStudentFetching(true);
-    await fetchIssuedBookByAccessionNumber(+formFields.accessionNumber)
-      .then((res) => {
-        setIssuedBookDoc(res);
-      })
-      .catch((error) => {
-        setFeedback([1, 2, error]);
-        setIsStudentFetching(false);
-      });
+    try {
+      const res = await fetchIssuedBookByAccessionNumber(
+        formFields.accessionNumber
+      );
+
+      setIssuedBookDoc(res.p);
+    } catch (error) {
+      setFeedback(2, error.m);
+    }
   };
 
   const returnDate = formatDate();
 
   const handleReturnBook = async () => {
-    await returnIssuedBook({ _id })
-      .then((res) => {
-        setFeedback(1, res);
-        resetFormFields();
-        setIssuedBookDoc([]);
-        setIsStudentFetching(false);
-      })
-      .catch((error) => {
-        setFeedback([1, 2, error]);
-      });
+    try {
+      const res = await returnIssuedBook(issuedBookDoc._id);
+      setFeedback(1, res.m);
+      setIssuedBookDoc({});
+      setBtn(false);
+    } catch (error) {
+      setFeedback(2, error.m);
+      setBtn(false);
+    }
   };
 
   const handleCheckFine = async () => {
-    await issueBookFine({ _id })
-      .then(async (fine) => {
-        if (fine != null) setFine(fine);
-        setShowAlertDialog(true);
-      })
-      .catch((error) => setFeedback([1, 2, error]));
+    try {
+      setBtn(true);
+      const res = await issueBookFine(issuedBookDoc._id);
+      if (res != null) setFine(res.p);
+      setAlert(true);
+    } catch (error) {
+      setFeedback(2, error.m);
+      setBtn(false);
+    }
   };
 
   const isStudentFetched = () => {
-    if (issuedBookDoc.length === 0) return false;
+    if (Object.keys(issuedBookDoc).length === 0) return false;
     else return true;
   };
 
-  const imagePath = imageUrl
-    ? UPLOADS_PATH + imageUrl
+  const imagePath = issuedBookDoc.imageUrl
+    ? UPLOADS_PATH + issuedBookDoc.imageUrl
     : UPLOADS_PATH + "/sample-user.jpg";
   return (
     <div>
@@ -99,63 +88,67 @@ const ReturnIssuedBookPage = () => {
           />
         </div>
 
-        {isStudentFetching &&
-          (isStudentFetched() ? (
-            <>
-              <div className="my-5">
-                <SpanningTable
-                  rows={[
-                    ["Accession Number", accessionNumber],
-                    ["Library Card Number", libraryCard],
-                    ["Issue Date", formatTime(issueDate)],
-                    ["Issued By", issuedBy],
-                    ["Book title", title],
-                    ["Book Author", author],
-                    ["Member Name", fullName],
-                    ["Roll Number", rollNumber],
-                  ]}
-                  imageUrl={imagePath}
-                />
-              </div>
-              <div className="flex justify-center items-end gap-10">
-                <Input
-                  label="Return Date"
-                  name="returnDate"
-                  value={returnDate}
-                  disabled
-                  style={{ textAlign: "center" }}
-                  InputLabelProps={{ shrink: true }}
-                />
-
-                <button className="c-btn-blue" onClick={handleCheckFine}>
-                  Return
-                </button>
-              </div>
-            </>
-          ) : (
-            <div
-              className="d-flex justify-content-center align-items-center"
-              style={{
-                height: "50vh",
-              }}
-            >
-              <Spinner />
+        {isStudentFetched() && (
+          <>
+            <div className="my-5 p-5 flex flex-col justify-center items-center border rounded ">
+              <h1 className="pb-5 font-bold text-4xl">Issued Book Details</h1>
+              <SpanningTable
+                rows={[
+                  ["Accession Number", issuedBookDoc.accessionNumber],
+                  ["Library Card Number", issuedBookDoc.libraryCard],
+                  [
+                    "Issue Date",
+                    new Date(issuedBookDoc.issueDate).toDateString(),
+                  ],
+                  ["Due Date", new Date(issuedBookDoc.dueDate).toDateString()],
+                  ["Issued Duration", `${issuedBookDoc.issueDuration} days`],
+                  ["Issued By", issuedBookDoc.issuedBy],
+                  ["Book title", issuedBookDoc.title],
+                  ["Book Author", issuedBookDoc.author],
+                  ["Member Name", issuedBookDoc.fullName],
+                  ["Roll Number", issuedBookDoc.rollNumber],
+                ]}
+                imageUrl={imagePath}
+              />
             </div>
-          ))}
+            <div className="flex justify-center items-end gap-10">
+              <Input
+                label="Return Date"
+                name="returnDate"
+                value={returnDate}
+                disabled
+                style={{ textAlign: "center" }}
+                InputLabelProps={{ shrink: true }}
+              />
+
+              <Button
+                label="Return Book"
+                spinner={btn}
+                onClick={handleCheckFine}
+              />
+            </div>
+          </>
+        )}
       </div>
-      {ShowAlertDialog && (
-        <ConfirmationModal
-          onYes={() => handleReturnBook()}
-          onClose={() => setShowAlertDialog(false)}
-        >
-          <div className="grid grid-cols-2 text-start mb-5">
-            <span> Accession Number:</span>
-            <span> {accessionNumber} </span>
-            <span> Fine: </span>
-            <span>{fine}</span>
-          </div>
-        </ConfirmationModal>
-      )}
+      <ConfirmationModal
+        onYes={handleReturnBook}
+        show={alert}
+        onClose={(e) => {
+          setAlert(false);
+          !e && setBtn(false);
+        }}
+        title="Are you sure of it to Return the below book?"
+        table={[
+          ["Accession Number", issuedBookDoc.accessionNumber],
+          ["Library Card Number", issuedBookDoc.libraryCard],
+          ["Issue Date", new Date(issuedBookDoc.issueDate).toDateString()],
+          ["Due Date", new Date(issuedBookDoc.dueDate).toDateString()],
+          ["Issued Duration", `${issuedBookDoc.issueDuration} days`],
+          ["Book title", issuedBookDoc.title],
+          ["Member Name", issuedBookDoc.fullName],
+          ["Fine", `₹${fine}`],
+        ]}
+      ></ConfirmationModal>
     </div>
   );
 };

@@ -12,6 +12,7 @@ const IssuedBookSchema = new Schema({
     required: true,
   },
   issueDate: { type: Date, required: true },
+  dueDate: { type: Date, required: true },
   issuedBy: {
     type: Schema.Types.ObjectId,
     ref: "Staff",

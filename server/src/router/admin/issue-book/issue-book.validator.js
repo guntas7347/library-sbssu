@@ -4,10 +4,7 @@ const crs = require("../../../utils/custom-response-codes");
 const validateIssueBookDetails = async (req, res, next) => {
   try {
     const { error } = Joi.object({
-      accessionNumber: Joi.number()
-        .integer()
-        .min(1) // Ensure it's a positive number
-        .required(),
+      accessionNumber: Joi.number().integer().min(1).required(),
       cardNumber: Joi.number()
         .integer()
         .min(10000000) // Ensure it's at least an 8-digit number
@@ -16,6 +13,7 @@ const validateIssueBookDetails = async (req, res, next) => {
       issueDate: Joi.date()
         .iso() // Ensure it's a valid date string, e.g., 'YYYY-MM-DD'
         .required(),
+      issueDuration: Joi.number().integer().min(1).required(),
     }).validate(req.body);
 
     if (error)
@@ -23,7 +21,7 @@ const validateIssueBookDetails = async (req, res, next) => {
 
     return next();
   } catch (error) {
-    console.error(error);
+    createLog(error);
     return res.status(500).json(crs.SERR500REST(error));
   }
 };

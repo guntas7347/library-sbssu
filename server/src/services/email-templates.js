@@ -5,7 +5,7 @@ const mailGenerator = new Mailgen({
   product: {
     name: "Library SBSSU",
     link: "https://sbssu.ac.in/",
-    logo: "/sbssu-logo.png",
+    logo: "https://sbssu.ac.in/8d9475c8-d451-4424-93f9-ac6f0df32284.jpeg",
   },
 });
 
@@ -128,6 +128,15 @@ const generateEmailTemplate = {
       },
     });
   },
+  rejectionEmail: (memberName) => {
+    return mailGenerator.generate({
+      body: {
+        name: memberName,
+        intro: `We regret to inform you that your application for SBSSU Library membership has been rejected.`,
+        outro: `If you have any questions or believe this decision was made in error, please feel free to contact us. Thank you for your interest in the SBSSU Library.`,
+      },
+    });
+  },
   transactionConfirmation: ({
     fullName,
     transactionType,
@@ -159,6 +168,32 @@ const generateEmailTemplate = {
         },
         outro:
           "If you did not authorize this transaction or have any queries, please contact the Library immediately.",
+      },
+    });
+  },
+  noDueConfirmationEmail: (
+    memberName,
+    membershipID,
+    clearedDate = new Date()
+  ) => {
+    return mailGenerator.generate({
+      body: {
+        name: memberName,
+        intro: `We are writing to confirm that your no-due clearance process has been successfully completed. Your library account is now marked as cleared.`,
+        table: {
+          data: [
+            {
+              "Membership ID": membershipID,
+              "Cleared On": new Date(clearedDate).toLocaleDateString(),
+            },
+          ],
+        },
+
+        outro: [
+          "Please collect your no-due form from the library during working hours.",
+          ,
+          "Thank you for being a valued member of the SBSSU Library. We appreciate your participation and responsible use of library resources. If you need any assistance in the future or wish to rejoin, please feel free to reach out. Wishing you all the best!",
+        ],
       },
     });
   },

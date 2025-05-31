@@ -43,12 +43,12 @@ issueBookRouter.post(
   verifyLibraryCardAvailability,
   checkIssueCompatibility,
   processIssuingBook,
-  sendIssuedConfirmationEmail,
+  // sendIssuedConfirmationEmail,
   async (req, res) => {
     try {
       return res.status(200).json(crs.ISB200INB());
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -71,7 +71,7 @@ issueBookRouter.post(
     try {
       return res.status(200).json(crs.ISB200CIBF(req.cust.fine));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -83,9 +83,12 @@ issueBookRouter.post(
   fetchIssuedBooks,
   async (req, res) => {
     try {
+      if (req.cust.issuedBooks.issuedBooksArray.length === 0)
+        return res.status(200).json(crs.SRH404GLB());
+
       res.status(200).json(crs.ISB200FAIB(req.cust.issuedBooks));
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
@@ -127,7 +130,7 @@ issueBookRouter.post(
 
       res.status(200).send(excelBuffer);
     } catch (error) {
-      console.log(error);
+      createLog(error);
       return res.status(500).json(crs.SERR500REST(error));
     }
   }
