@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id             String        @id @default(uuid())
+  membershipId   Int?          @unique
+  applicationId  Int           @unique
+  authId         String?
+  rollNumber     Int?
+  fullName       String
+  fatherName     String
+  imageUrl       String
+  category       String        @default("GENERAL")
+  gender         String        @default("MALE")
+  dob            DateTime
+  program        String
+  specialization String
+  batch          Int
+  email          String
+  phoneNumber    String
+  libraryCards   LibraryCard[]
+  role           String        @default("STUDENT UG")
+  status         String        @default("APPLIED")
+  balance        Int           @default(0)
+  createdAt      DateTime      @default(now())
+  transactions   Transaction[]
+  Auth           Auth?
+}
+
+model LibraryCard {
+  id            String         @id @default(uuid())
+  member        Member         @relation(fields: [memberId], references: [id])
+  memberId      String
+  cardNumber    Int            @unique
+  status        String         @default("AVAILABLE")
+  category      String         @default("GENERAL")
+  createdBy     String
+  autoAlloted   Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  staff         Staff?         @relation("StaffLibraryCards", fields: [createdBy], references: [id])
+  issuedBooks   IssuedBook[]
+  returnedBooks ReturnedBook[]
+}
+
+model Staff {
+  id                  String         @id @default(uuid())
+  idNumber            Int            @unique
+  fullName            String
+  authId              String?
+  phoneNumber         String?
+  dateOfBirth         DateTime?
+  gender              String?
+  address             String?
+  emergencyContact    String?
+  employeeId          String?
+  department          String?
+  designation         String?
+  joiningDate         DateTime?
+  employmentStatus    String?
+  imageUrl            String?
+  createdAt           DateTime       @default(now())
+  libraryCards        LibraryCard[]  @relation("StaffLibraryCards")
+  auth                Auth?
+  issuedBooksIssued   IssuedBook[]   @relation("IssuedByStaff")
+  issuedBooksReturned ReturnedBook[] @relation("IssuedByStaffReturned")
+  returnedBooks       ReturnedBook[] @relation("ReturnedByStaff")
+}
+
+model Auth {
+  id            String    @id @default(uuid())
+  userName      String    @unique
+  password      String
+  email         String
+  role          String    @default("STAFF")
+  rights        String[]  @default([])
+  createdAt     DateTime  @default(now())
+  resetCode     String?
+  resetCodeTime DateTime?
+  twoFaSecret   String
+  active        Boolean   @default(true)
+  userType      String
+  staffId       String?   @unique
+  memberId      String?   @unique
+  staff         Staff?    @relation(fields: [staffId], references: [id])
+  member        Member?   @relation(fields: [memberId], references: [id])
+}
+
+model Book {
+  id                 String      @id @default(uuid())
+  isbn               Int?
+  title              String?
+  author             String?
+  placeAndPublishers String?
+  publicationYear    Int?
+  pages              Int?
+  volume             Int?
+  source             String?
+  cost               Float?
+  callNumber         Int?
+  createdAt          DateTime    @default(now())
+  accessions         Accession[]
+}
+
+model Accession {
+  id              String         @id @default(uuid())
+  book            Book           @relation(fields: [bookId], references: [id])
+  bookId          String
+  accessionNumber Int            @unique
+  status          String         @default("AVAILABLE")
+  category        String         @default("GENERAL")
+  issuedBooks     IssuedBook[]
+  returnedBooks   ReturnedBook[]
+}
+
+model IssuedBook {
+  id              String      @id @default(uuid())
+  bookAccession   Accession   @relation(fields: [bookAccessionId], references: [id])
+  bookAccessionId String
+  libraryCard     LibraryCard @relation(fields: [libraryCardId], references: [id])
+  libraryCardId   String
+  issueDate       DateTime
+  dueDate         DateTime
+  issuedBy        Staff       @relation("IssuedByStaff", fields: [issuedById], references: [id])
+  issuedById      String
+  issueRemark     String      @default("None")
+}
+
+model ReturnedBook {
+  id              String        @id @default(uuid())
+  bookAccession   Accession     @relation(fields: [bookAccessionId], references: [id])
+  bookAccessionId String
+  libraryCard     LibraryCard   @relation(fields: [libraryCardId], references: [id])
+  libraryCardId   String
+  issueDate       DateTime
+  dueDate         DateTime
+  returnDate      DateTime
+  fine            Transaction?  @relation("FineTransaction", fields: [fineId], references: [id])
+  fineId          String?       @unique
+  issuedBy        Staff         @relation("IssuedByStaffReturned", fields: [issuedById], references: [id])
+  issuedById      String
+  returnedBy      Staff         @relation("ReturnedByStaff", fields: [returnedById], references: [id])
+  returnedById    String
+  issueRemark     String        @default("None")
+  returnRemark    String        @default("None")
+  transactions    Transaction[] @relation("ReturnedBookTransactions")
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+}
+
+model Transaction {
+  id              String          @id @default(uuid())
+  member          Member          @relation(fields: [memberId], references: [id])
+  memberId        String
+  returnedBook    ReturnedBook?   @relation("ReturnedBookTransactions", fields: [returnedBookId], references: [id])
+  returnedBookId  String?
+  fineFor         ReturnedBook?   @relation("FineTransaction")
+  transactionType TransactionType
+  category        String
+  remark          String          @default("NONE")
+  amount          Float
+  receiptNumber   String?         @unique
+  paymentMethod   String
+  closingBalance  Float
+  createdAt       DateTime        @default(now())
+}
+
+model Setting {
+  id           String   @id @default(uuid())
+  key          String   @unique
+  value        Json
+  lastModified DateTime @default(now())
+}
