@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { createLog } from "./functions.js";
+import { createLog } from "./log.js";
 
 export const encryptText = (text) => {
   try {

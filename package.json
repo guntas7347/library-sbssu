@@ -9,5 +9,9 @@
     "client": "cd client && npm run dev",
     "prismaStudio": "cd server && npx prisma studio",
     "build": "cd client && npm run build && cp -r dist ../server"
+  },
+  "dependencies": {
+    "face-api.js": "^0.20.0",
+    "react-image-crop": "^11.0.10"
   }
 }

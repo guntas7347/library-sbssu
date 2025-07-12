@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { createLog } from "./functions.js";
+import { createLog } from "./log.js";
 
 export const hashPassword = async (password) => {
   return new Promise((resolve, reject) => {

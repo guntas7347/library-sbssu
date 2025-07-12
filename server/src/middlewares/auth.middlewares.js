@@ -1,9 +1,9 @@
-import crs from "../utils/crs.js";
+import crs from "../utils/crs/crs.js";
 import { comparePassword } from "../utils/bycrypt.js";
-import { createLog } from "../utils/functions.js";
 import prisma from "../services/prisma.js";
 import { createJWT, verifyJwt } from "../utils/jwt.js";
 import { decrptText, encryptText } from "../utils/encrypt.crypto.js";
+import { createLog } from "../utils/log.js";
 
 const TOKEN_EXPIRY_MINUTES = 60;
 
@@ -15,7 +15,7 @@ export const verifyPassword = async (req, res, next) => {
     next();
   } catch (error) {
     createLog(error);
-    return res.status(500).json(crs.SERR500REST(error));
+    return res.status(500).json(crs.SERR_500_INTERNAL(error));
   }
 };
 
@@ -38,7 +38,7 @@ export const setJwtCookie = async (req, res, next) => {
     next();
   } catch (error) {
     createLog(error);
-    return res.status(500).json(crs.SERR500REST(error));
+    return res.status(500).json(crs.SERR_500_INTERNAL(error));
   }
 };
 
@@ -55,17 +55,17 @@ export const authorisationLevel = (rights = ["open"]) => {
       else return res.status(403).json(crs.ADM403JWT());
     } catch (error) {
       createLog(error);
-      return res.status(500).json(crs.ERR500JWT(error));
+      return res.status(500).json(crs.SERR_500_INTERNAL(error));
     }
   };
 };
 
 export const createFingerprint = async (req, res, next) => {
   try {
-    const fingerprintHash = req.body.fingerprint;
+    const fingerprintHash = req.vBody.fingerprint;
     if (!fingerprintHash) throw Error("fingerprintHash is required");
 
-    const authId = req.cust._id;
+    const authId = req.context.id;
 
     await prisma.sessionFingerprint.updateMany({
       where: { authId, fingerprintHash: { not: fingerprintHash } },
@@ -87,7 +87,7 @@ export const createFingerprint = async (req, res, next) => {
     return next();
   } catch (error) {
     createLog(error);
-    return res.status(500).json(crs.SERR500REST(error));
+    return res.status(500).json(crs.SERR_500_INTERNAL(error));
   }
 };
 
@@ -95,17 +95,19 @@ export const verifyFingerprint = async (req, res, next) => {
   try {
     const fingerprintHash = req.headers["x-fingerprint"];
 
-    if (!fingerprintHash) return res.status(401).json(crs.AUTH401FP());
+    if (!fingerprintHash)
+      return res.status(401).json(crs.AUTH_401_INVALID_FINGERPRINT());
 
     const record = await prisma.sessionFingerprint.findFirst({
       where: { authId: req.user.uid, fingerprintHash, isActive: true },
     });
-    if (!record) return res.status(401).json(crs.AUTH401FP());
+    if (!record)
+      return res.status(401).json(crs.AUTH_401_INVALID_FINGERPRINT());
 
     return next();
   } catch (error) {
     createLog(error);
-    return res.status(500).json(crs.SERR500REST(error));
+    return res.status(500).json(crs.SERR_500_INTERNAL(error));
   }
 };
 
@@ -122,13 +124,13 @@ export const verifyJwtMiddleware = (req, res, next) => {
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
       });
-      return res.status(401).json(crs.AUTH401JWT());
+      return res.status(401).json(crs.AUTH_401_INVALID_JWT());
     }
     req.user = jwt;
     next();
   } catch (error) {
     createLog(error);
-    return res.status(500).json(crs.ERR500JWT(error));
+    return res.status(500).json(crs.AUTH_500_JWT_SERVER_ERROR(error));
   }
 };
 
@@ -142,15 +144,16 @@ export const verifyStaff = async (req, res, next) => {
       },
     });
 
-    if (!auth?.role) return res.status(401).json(crs.ADM401JWT());
+    if (!auth?.role)
+      return res.status(401).json(crs.AUTH_401_INSUFFICIENT_ROLE());
 
     req.user.role = auth.role;
     req.user.rights = auth.rights ?? [];
 
     if (auth.role === "STAFF") return next();
-    else return res.status(401).json(crs.ADM401JWT());
+    else return res.status(401).json(crs.AUTH_401_INSUFFICIENT_ROLE());
   } catch (error) {
     createLog(error);
-    return res.status(500).json(crs.ERR500JWT(error));
+    return res.status(500).json(crs.AUTH_500_JWT_SERVER_ERROR(error));
   }
 };

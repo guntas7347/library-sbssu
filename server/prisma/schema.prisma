@@ -10,42 +10,52 @@ datasource db {
 // prisma:warn In production, we recommend using `prisma generate --no-engine` (See: `prisma generate --help`)
 
 enum Gender {
-  MALE
-  FEMALE
-  OTHER
+  male
+  female
+  other
 }
 
 model Member {
-  id             String        @id @default(uuid())
-  membershipId   Int?          @unique
-  applicationId  Int           @unique
+  id             String   @id @default(uuid())
+  membershipId   String?  @unique
+  applicationId  String   @unique
   authId         String?
   rollNumber     Int?
   fullName       String
   fatherName     String
   imageUrl       String
-  category       String        @default("GENERAL")
-  gender         Gender        @default(MALE)
-  dob            DateTime
-  program        String
-  specialization String
   batch          Int
   email          String
   phoneNumber    String
-  libraryCards   LibraryCard[]
-  role           String        @default("STUDENT UG")
-  status         String        @default("APPLIED")
-  balance        Int           @default(0)
-  createdAt      DateTime      @default(now())
-  transactions   Transaction[]
-  Auth           Auth?
+  category       String   @default("general")
+  gender         Gender   @default(male)
+  dob            DateTime
+  program        String
+  specialization String
+
+  streetAddress String
+  city          String
+  state         String
+  pinCode       String
+
+  subscribeToUpdates Boolean
+
+  libraryCards LibraryCard[]
+  memberType   String        @default("student_ug")
+  status       String        @default("applied")
+  balance      Int           @default(0)
+
+  transactions Transaction[]
+  Auth         Auth?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 }
 
 model LibraryCard {
   id            String         @id @default(uuid())
   member        Member         @relation(fields: [memberId], references: [id])
   memberId      String
-  cardNumber    Int            @unique
+  cardNumber    String         @unique
   status        String         @default("AVAILABLE")
   category      String         @default("GENERAL")
   createdBy     String
@@ -82,12 +92,13 @@ model Staff {
 
 model Auth {
   id                  String               @id @default(uuid())
-  userName            String               @unique
+  username            String               @unique
   password            String
   email               String
   role                String               @default("STAFF")
   rights              String[]             @default([])
   createdAt           DateTime             @default(now())
+  updatedAt           DateTime?            @updatedAt
   resetCode           String?
   resetCodeTime       DateTime?
   twoFaSecret         String
