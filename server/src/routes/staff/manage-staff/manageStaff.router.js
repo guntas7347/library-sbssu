@@ -4,6 +4,7 @@ import { hashPassword } from "../../../utils/bycrypt.js";
 import { createLog } from "../../../utils/log.js";
 import { authorisationLevel } from "../../../middlewares/auth.middlewares.js";
 import crs from "../../../utils/crs/crs.js";
+import { getStaff } from "../../../controllers/staff.controller.js";
 
 export async function createStaffInternal() {
   const sampleStaffData = {
@@ -21,7 +22,7 @@ export async function createStaffInternal() {
     designation: "Developer",
     joiningDate: "2023-01-01",
     employmentStatus: "Active",
-    imageUrl: "",
+    photo: "",
     role: "STAFF",
     rights: ["admin"],
   };
@@ -50,7 +51,7 @@ export async function createStaffInternal() {
             ? new Date(sampleStaffData.joiningDate)
             : undefined,
           employmentStatus: sampleStaffData.employmentStatus,
-          imageUrl: sampleStaffData.imageUrl,
+          photo: sampleStaffData.photo,
         },
       });
 
@@ -87,20 +88,9 @@ manageStaffRouter.get(
   authorisationLevel(["search-staff"]),
   async (req, res) => {
     try {
-      const staffCol = await prisma.staff.findMany({
-        include: {
-          auth: {
-            select: { rights: true, id: true, email: true },
-          },
-        },
-      });
-
-      const staffArray = staffCol.map((staff) => ({
-        ...staff,
-        rights: staff.auth ? staff.auth.rights?.length ?? "N/A" : "N/A",
-      }));
-
-      return res.status(200).json(crs.STAFF_200_ALL_FETCHED(staffArray));
+      const staff = await getStaff(req.query);
+      console.log(staff);
+      return res.status(200).json(crs.STAFF_200_ALL_FETCHED(staff));
     } catch (error) {
       createLog(error);
       return res.status(500).json(crs.SERR_500_INTERNAL(error));

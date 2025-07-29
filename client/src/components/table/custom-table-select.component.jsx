@@ -7,7 +7,7 @@ const CustomTableSelect = ({
   columns,
   onSelect,
   indexToSelect,
-  imageUrl = null,
+  photo = null,
 }) => {
   const [isChecked, setIsChecked] = useState(false);
 
@@ -99,14 +99,14 @@ const CustomTableSelect = ({
                 </tr>
               );
             })}
-            {imageUrl && (
+            {photo && (
               <tr>
                 <td className="text-left w-96 px-6 py-3">Image</td>
                 <td>
                   <img
                     className="w-52 h-52"
                     crossOrigin="anonymous"
-                    src={imageUrl}
+                    src={photo}
                     alt="image"
                   />
                 </td>

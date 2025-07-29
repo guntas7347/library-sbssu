@@ -1,26 +1,26 @@
-import React, { useState } from "react";
-import PageHeader from "../../../../components/pages/dashboard/staff/pageHeader/PageHeader";
-import SearchBarMenu from "../../../../components/forms/searchBar/SearchBarMenu";
-import StaffTable from "../../../../components/pages/dashboard/staff/staff/StaffTable";
+import { useState } from "react";
+import StaffTable from "../../../../components/features/dashboard/staff/staff/StaffTable";
 import server from "../../../../services/server.api";
 import useFeedback from "../../../../hooks/useFeedback";
 import useSearchFilter from "../../../../hooks/useSearchFilter";
+import PageHeader from "../../../../components/header/PageHeader";
+import { Shield } from "lucide-react";
+import SearchBar2 from "../../../../components/forms/searchBar/SearchBar-2";
+import useTable from "../../../../hooks/useTable";
 
 const StaffPage = () => {
   const setFeedback = useFeedback();
-  const [data, setData] = useState([]);
+  const { tableData, loader, setTable, clearTable } = useTable();
   const { getQuery } = useSearchFilter();
 
   const handleFetch = async (e) => {
     const query = getQuery(e);
     try {
       const res = await server.staff.fetchAll(query);
-      console.log(res);
-      setData(res.data);
+      setTable(res.data);
     } catch (error) {
-      console.log(error);
       setFeedback(2, error);
-      setData([]);
+      clearTable();
     }
   };
 
@@ -28,19 +28,20 @@ const StaffPage = () => {
     <div className="flex flex-col gap-5">
       <PageHeader
         title="Staff"
-        subTitle="Manage staff accounts and permissions"
+        svg={Shield}
+        sub="Manage staff accounts and permissions"
+        colorClass="bg-amber-700"
       />
-      <SearchBarMenu
-        onSearch={(e) => {
-          handleFetch(e);
-        }}
+      <SearchBar2
+        page={tableData.page}
+        onSearch={handleFetch}
+        loader={loader}
         menuOptions={[
           { label: "Name", value: "fullName" },
           { label: "ID Number", value: "idNumber" },
         ]}
-        showDefault={true}
       />
-      <StaffTable data={data} />
+      <StaffTable data={tableData} />
     </div>
   );
 };

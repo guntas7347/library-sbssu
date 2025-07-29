@@ -16,39 +16,35 @@ enum Gender {
 }
 
 model Member {
-  id             String   @id @default(uuid())
-  membershipId   String?  @unique
-  applicationId  String   @unique
-  authId         String?
-  rollNumber     Int?
-  fullName       String
-  fatherName     String
-  imageUrl       String
-  batch          Int
-  email          String
-  phoneNumber    String
-  category       String   @default("general")
-  gender         Gender   @default(male)
-  dob            DateTime
-  program        String
-  specialization String
-
-  streetAddress String
-  city          String
-  state         String
-  pinCode       String
-
+  id                 String        @id @default(uuid())
+  membershipId       String?       @unique
+  applicationId      String        @unique
+  authId             String?
+  rollNumber         Int?
+  fullName           String
+  fatherName         String
+  photo              String
+  batch              Int
+  email              String
+  phoneNumber        String
+  cast               String        @default("general")
+  gender             Gender        @default(male)
+  dob                DateTime
+  program            String
+  specialization     String
+  streetAddress      String
+  city               String
+  state              String
+  pinCode            String
   subscribeToUpdates Boolean
-
-  libraryCards LibraryCard[]
-  memberType   String        @default("student_ug")
-  status       String        @default("applied")
-  balance      Int           @default(0)
-
-  transactions Transaction[]
-  Auth         Auth?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  libraryCards       LibraryCard[]
+  memberType         String
+  status             String        @default("applied")
+  balance            Int           @default(0)
+  transactions       Transaction[]
+  Auth               Auth?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
 }
 
 model LibraryCard {
@@ -56,38 +52,42 @@ model LibraryCard {
   member        Member         @relation(fields: [memberId], references: [id])
   memberId      String
   cardNumber    String         @unique
-  status        String         @default("AVAILABLE")
-  category      String         @default("GENERAL")
+  status        String         @default("available")
+  type          String
+  expiry        DateTime
+  remark        String?
   createdBy     String
   autoAlloted   Boolean        @default(false)
   createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   staff         Staff?         @relation("StaffLibraryCards", fields: [createdBy], references: [id])
   issuedBooks   IssuedBook[]
   returnedBooks ReturnedBook[]
 }
 
 model Staff {
-  id                  String         @id @default(uuid())
-  idNumber            Int            @unique
-  fullName            String
-  authId              String?
-  phoneNumber         String?
-  dateOfBirth         DateTime?
-  gender              String?
-  address             String?
-  emergencyContact    String?
-  employeeId          String?
-  department          String?
-  designation         String?
-  joiningDate         DateTime?
-  employmentStatus    String?
-  imageUrl            String?
-  createdAt           DateTime       @default(now())
-  libraryCards        LibraryCard[]  @relation("StaffLibraryCards")
-  auth                Auth?
-  issuedBooksIssued   IssuedBook[]   @relation("IssuedByStaff")
-  issuedBooksReturned ReturnedBook[] @relation("IssuedByStaffReturned")
-  returnedBooks       ReturnedBook[] @relation("ReturnedByStaff")
+  id                   String         @id @default(uuid())
+  idNumber             Int            @unique
+  fullName             String
+  authId               String?
+  phoneNumber          String?
+  dateOfBirth          DateTime?
+  gender               String?
+  address              String?
+  emergencyContact     String?
+  employeeId           String?
+  department           String?
+  designation          String?
+  joiningDate          DateTime?
+  employmentStatus     String?
+  photo                String?
+  createdAt            DateTime       @default(now())
+  libraryCards         LibraryCard[]  @relation("StaffLibraryCards")
+  auth                 Auth?
+  issuedBooks          IssuedBook[]   @relation("IssuedByStaff")
+  returnedBooks        ReturnedBook[] @relation("ReturnedByStaff")
+  returnsOfIssuedBooks ReturnedBook[] @relation("IssuedByStaffReturned")
+  transactions         Transaction[]
 }
 
 model Auth {
@@ -95,10 +95,10 @@ model Auth {
   username            String               @unique
   password            String
   email               String
-  role                String               @default("STAFF")
+  role                String               @default("staff")
   rights              String[]             @default([])
   createdAt           DateTime             @default(now())
-  updatedAt           DateTime?            @updatedAt
+  updatedAt           DateTime             @updatedAt
   resetCode           String?
   resetCodeTime       DateTime?
   twoFaSecret         String
@@ -125,17 +125,22 @@ model SessionFingerprint {
 
 model Book {
   id                 String      @id @default(uuid())
-  isbn               Int?
+  isbn               String?
   title              String?
   author             String?
   placeAndPublishers String?
-  publicationYear    Int?
-  pages              Int?
-  volume             Int?
+  publicationYear    String?
+  edition            String?
+  pages              String?
+  volume             String?
+  description        String?
   source             String?
-  cost               Float?
-  callNumber         Int?
+  location           String?
+  tags               String[]
+  cost               String?
+  callNumber         String?
   createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
   accessions         Accession[]
 }
 
@@ -143,15 +148,18 @@ model Accession {
   id              String         @id @default(uuid())
   book            Book           @relation(fields: [bookId], references: [id])
   bookId          String
+  condition       String?        @default("unknown")
   accessionNumber Int            @unique
-  status          String         @default("AVAILABLE")
-  category        String         @default("GENERAL")
+  status          String         @default("available")
+  category        String?
+  timesIssued     Int            @default(0)
   issuedBooks     IssuedBook[]
   returnedBooks   ReturnedBook[]
 }
 
 model IssuedBook {
   id              String      @id @default(uuid())
+  issueRefNumber  String      @unique
   bookAccession   Accession   @relation(fields: [bookAccessionId], references: [id])
   bookAccessionId String
   libraryCard     LibraryCard @relation(fields: [libraryCardId], references: [id])
@@ -160,27 +168,28 @@ model IssuedBook {
   dueDate         DateTime
   issuedBy        Staff       @relation("IssuedByStaff", fields: [issuedById], references: [id])
   issuedById      String
-  issueRemark     String      @default("None")
+  issueRemark     String?
+  issueCondition  String
 }
 
 model ReturnedBook {
-  id              String        @id @default(uuid())
-  bookAccession   Accession     @relation(fields: [bookAccessionId], references: [id])
+  id              String       @id @default(uuid())
+  issueRefNumber  String       @unique
+  bookAccession   Accession    @relation(fields: [bookAccessionId], references: [id])
   bookAccessionId String
-  libraryCard     LibraryCard   @relation(fields: [libraryCardId], references: [id])
+  libraryCard     LibraryCard  @relation(fields: [libraryCardId], references: [id])
   libraryCardId   String
   issueDate       DateTime
   dueDate         DateTime
   returnDate      DateTime
-  fine            Transaction?  @relation("FineTransaction", fields: [fineId], references: [id])
-  fineId          String?       @unique
-  issuedBy        Staff         @relation("IssuedByStaffReturned", fields: [issuedById], references: [id])
+  fine            Transaction? @relation("ReturnFine")
+  fineId          String?      @unique
+  issuedBy        Staff        @relation("IssuedByStaffReturned", fields: [issuedById], references: [id])
   issuedById      String
-  returnedBy      Staff         @relation("ReturnedByStaff", fields: [returnedById], references: [id])
+  returnedBy      Staff        @relation("ReturnedByStaff", fields: [returnedById], references: [id])
   returnedById    String
-  issueRemark     String        @default("None")
-  returnRemark    String        @default("None")
-  transactions    Transaction[] @relation("ReturnedBookTransactions")
+  issueRemark     String?
+  returnRemark    String?
 }
 
 enum TransactionType {
@@ -192,14 +201,15 @@ model Transaction {
   id              String          @id @default(uuid())
   member          Member          @relation(fields: [memberId], references: [id])
   memberId        String
-  returnedBook    ReturnedBook?   @relation("ReturnedBookTransactions", fields: [returnedBookId], references: [id])
-  returnedBookId  String?
-  fineFor         ReturnedBook?   @relation("FineTransaction")
+  returnedBook    ReturnedBook?   @relation("ReturnFine", fields: [returnedBookId], references: [id])
+  returnedBookId  String?         @unique
+  issuedBy        Staff?          @relation(fields: [issuedById], references: [id])
+  issuedById      String?
   transactionType TransactionType
   category        String
-  remark          String          @default("NONE")
+  remark          String?
   amount          Float
-  receiptNumber   String?         @unique
+  receiptNumber   String?
   paymentMethod   String
   closingBalance  Float
   createdAt       DateTime        @default(now())
@@ -210,4 +220,10 @@ model Setting {
   key          String   @unique
   value        Json
   lastModified DateTime @default(now())
+}
+
+model Sequence {
+  id        String @id @default(uuid())
+  name      String @unique
+  lastValue Int
 }

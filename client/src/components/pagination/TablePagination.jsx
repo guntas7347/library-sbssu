@@ -4,8 +4,7 @@ import useInput from "../../hooks/useInput";
 const TablePagination = ({
   totalPages = 1,
   currentPage = 1,
-  setPage,
-  rows = 10, // rows per page
+  setPage = () => {},
 }) => {
   const { formField, handleChange: hc } = useInput({ currentPage });
 
@@ -24,6 +23,10 @@ const TablePagination = ({
   useEffect(() => {
     hc({ target: { name: "currentPage", value: currentPage } });
   }, [currentPage]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [totalPages]);
 
   const handleChange = (e) => {
     const { value } = e.target;

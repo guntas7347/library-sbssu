@@ -5,13 +5,13 @@ import { useForm } from "../../hooks/useForm";
 import { useCountdown } from "../../hooks/useCountdown";
 import useQuery from "../../hooks/useQuery";
 import useFeedback from "../../hooks/useFeedback";
-import Page404 from "../../components/404/404";
+import NotFoundPage from "../../components/404/404";
 import TwoFactorSetup from "./qrcode.component";
-import Input from "../../components/forms/input/input-2";
+import Input from "../../components/forms/input/Input-2";
 import ProgressBar from "../../components/feedback/progress-bar/progress-bar.component";
 import server from "../../services/server.api";
 import Header from "../../components/header/Header";
-import LoginCard from "../../components/pages/login/LoginCard";
+import LoginCard from "../../components/features/login/LoginCard";
 import TotpInput from "../../components/forms/input/Totp";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -178,7 +178,7 @@ const ResetPasswordPage = () => {
           </LoginCard>
         </>
       ) : (
-        <Page404 />
+        <NotFoundPage />
       )}
     </>
   );

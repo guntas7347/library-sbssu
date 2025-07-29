@@ -29,13 +29,39 @@ const CRS_CODES = {
   APPLICATION_200_REJECTED: "Application rejected successfully",
 
   MEMBER_200_FETCHED: "Member fetched successfully",
+  MEMBER_200_CARDS_FETCHED: "Cards fetched successfully",
   MEMBER_201_CREATED: "Member created successfully",
   MEMBER_200_UPDATED: "Member updated successfully",
   MEMBER_200_ALL_FETCHED: "All members fetched successfully",
   MEMBER_200_PROFILE_FETCHED: "Member profile fetched successfully",
 
+  BOOK_200_FETCHED: "Book fetched successfully",
+  BOOK_200_ALL_FETCHED: "Books fetched successfully",
+  BOOK_201_CREATED: "Book created successfully",
+  BOOK_200_UPDATED: "Book updated successfully",
+  BOOK_204_NOT_FOUND: "No books found",
+  BOOK_200_DELETED: "Book deleted successfully",
+  BOOK_400_INVALID: "Invalid book data",
+  BOOK_404_NOT_FOUND: "Book not found",
+  BOOK_409_CONFLICT: "Book conflict detected",
+  BOOK_409_ACCESSION_CONFLICT: "Book accession number already exists",
+
+  ISSUE_200_MEMBER_FETCHED: "Member fetched successfully",
+  ISSUE_200_BOOK_FETCHED: "Book fetched successfully",
+  ISSUE_403_BOOK_UNAVAILABLE: "Book is currently unavailable for issue",
+  ISSUE_403_CARD_UNAVAILABLE: "Member card is not available or inactive",
+  ISSUE_201_BOOK_ISSUED: "Book issued successfully",
+  ISSUE_200_ALL_FETCHED: "Books fetched successfully",
+
+  RETURN_200_FETCHED: "Book fetched successfully",
+  RETURN_201_BOOK_ISSUED: "Book returned successfully",
+
+  TRANSACTION_200_ALL_FETCHED: "Transactions returned successfully",
+  TRANSACTION_201_CREATED: "Transaction created successfully",
+
   SETTINGS_200_FETCHED: "Settings fetched successfully",
   SETTINGS_200_UPDATED: "Settings updated successfully",
+  STATS_200_FETCHED: "Stats fetched successfully",
 
   STAFF_200_FETCHED: "Staff fetched successfully",
   STAFF_201_CREATED: "Staff created successfully",
@@ -45,7 +71,7 @@ const CRS_CODES = {
 
   UPLOADER_200_IMAGE_UPLOADED: "Image uploaded successfully",
 
-  PUBLIC_200_PROGRAMS_FETCHED: "Programs fetched successfully",
+  PUBLIC_200_SETTINGS_FETCHED: "Settings fetched successfully",
   PUBLIC_201_APPLICATION_CREATED: "Application created successfully",
   PUBLIC_200_APPLICATION_FETCHED: "Application fetched successfully",
   PUBLIC_200_APPLICATION_DELETED: "Application deleted successfully",

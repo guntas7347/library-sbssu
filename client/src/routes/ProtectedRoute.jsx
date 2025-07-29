@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth.hook";
 import server from "../services/server.api";
-// import { signOut, verifyAuthRole } from "../../dashboard/http-requests";
-// import { useAuth } from "../context/auth.content";
 
 const ProtectedRoute = ({ redirectPath = "/", children, userType = "" }) => {
   const [session, setSession] = useState(false);
@@ -20,7 +18,6 @@ const ProtectedRoute = ({ redirectPath = "/", children, userType = "" }) => {
           setSession(true);
           setIsLoading(false);
         } else {
-          // server();
           setSession(false);
           setIsLoading(false);
         }

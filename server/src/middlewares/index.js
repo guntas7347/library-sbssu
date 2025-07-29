@@ -8,8 +8,7 @@ const globalMiddlewares = (app) => {
       origin: function (origin, callback) {
         const allowedOrigins = [
           "http://localhost:8080",
-          "http://localhost",
-          "http://192.168.1.2",
+          "http://localhost:5173",
         ];
         if (!origin || allowedOrigins.includes(origin)) {
           callback(null, true);

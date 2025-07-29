@@ -1,42 +1,55 @@
-import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import useSearchFilter from "../../../../hooks/useSearchFilter";
 import useFeedback from "../../../../hooks/useFeedback";
 import server from "../../../../services/server.api";
-import PageHeader from "../../../../components/pages/dashboard/staff/pageHeader/PageHeader";
-import SearchBarMenu from "../../../../components/forms/searchBar/SearchBarMenu";
-import MemberTable from "../../../../components/pages/dashboard/staff/member/MemberTable";
+import MemberTable from "../../../../components/features/dashboard/staff/member/MemberTable";
+import PageHeader from "../../../../components/header/PageHeader";
+import { TicketPlus, Users } from "lucide-react";
+import SearchBar2 from "../../../../components/forms/searchBar/SearchBar-2";
+import useTable from "../../../../hooks/useTable";
 
 const MemberPage = () => {
   const setFeedback = useFeedback();
-  const [data, setData] = useState([]);
+  const { tableData, loader, setTable, clearTable } = useTable();
   const { getQuery } = useSearchFilter();
 
   const handleFetch = async (e) => {
     const query = getQuery(e);
     try {
       const res = await server.member.fetchAll(query);
-      console.log(res.data.data);
-      setData(res.data.data);
+      setTable(res.data);
     } catch (error) {
-      console.log(error);
       setFeedback(2, error);
-      setData([]);
+      clearTable();
     }
   };
+
   return (
-    <div className="flex flex-col gap-5">
-      <PageHeader title="Member" subTitle="Search and manage library members" />
-      <SearchBarMenu
-        onSearch={(e) => {
-          handleFetch(e);
-        }}
+    <div className="space-y-5">
+      <PageHeader
+        title="Member"
+        svg={Users}
+        sub="Search and manage library members"
+        colorClass="bg-purple-700"
+      >
+        <Link
+          className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/50 hover:bg-purple-200 dark:hover:bg-purple-900/70 transition-all duration-200"
+          to="allot-card"
+        >
+          <TicketPlus className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+        </Link>
+      </PageHeader>
+      <SearchBar2
+        page={tableData.page}
+        onSearch={handleFetch}
+        loader={loader}
         menuOptions={[
           { label: "Name", value: "fullName" },
-          { label: "ID Number", value: "idNumber" },
+          { label: "Membership ID", value: "membershipId" },
         ]}
-        showDefault={true}
       />
-      <MemberTable data={data} />
+
+      <MemberTable data={tableData} />
     </div>
   );
 };

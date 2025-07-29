@@ -55,3 +55,16 @@ export function generateLibraryCardId(lastCardId = null, memberId = null) {
   const nextCopy = String(lastCopy + 1).padStart(2, "0");
   return `${parts[0]}-${parts[1]}-${parts[2]}-${nextCopy}`;
 }
+
+const getDateString = () => {
+  const now = new Date();
+  return now.toISOString().slice(0, 10).replace(/-/g, ""); // YYYYMMDD
+};
+
+// ✅ Issue Ref Number: IRN-25-0001
+export const generateIssueRefNumber = (sequenceNumber) => {
+  // 1. Get the last two digits of the current year (e.g., "25")
+  const year = new Date().getFullYear().toString().slice(-2);
+  // 2. Format the number into the final ID string (e.g., "IRN-25-0101")
+  return `IRN-${year}-${padNumber(sequenceNumber, 4)}`;
+};

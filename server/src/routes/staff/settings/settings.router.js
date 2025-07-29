@@ -6,10 +6,10 @@ import crs from "../../../utils/crs/crs.js";
 
 const settingsRouter = Router();
 
-settingsRouter.post("/fetch", authorisationLevel(), async (req, res) => {
+settingsRouter.get("/fetch", authorisationLevel(), async (req, res) => {
   try {
     const doc = await prisma.setting.findUnique({
-      where: { key: req.body.key },
+      where: { key: req.query.key },
     });
     return res.status(200).json(crs.SETTINGS_200_FETCHED(doc));
   } catch (error) {
@@ -17,13 +17,6 @@ settingsRouter.post("/fetch", authorisationLevel(), async (req, res) => {
     return res.status(500).json(crs.SERR_500_INTERNAL(error));
   }
 });
-
-const a = async () => {
-  await prisma.setting.create({
-    data: { key: "PRO-SPZ-LIST", value: {} },
-  });
-};
-// a();
 
 settingsRouter.post(
   "/update",

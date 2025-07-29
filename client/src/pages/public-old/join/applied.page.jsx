@@ -85,8 +85,8 @@ const AppliedPage = () => {
     );
   };
 
-  const imagePath = data.imageUrl
-    ? UPLOADS_PATH + data.imageUrl
+  const imagePath = data.photo
+    ? UPLOADS_PATH + data.photo
     : UPLOADS_PATH + "/sample-user.jpg";
 
   return (

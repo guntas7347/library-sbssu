@@ -5,6 +5,7 @@ const usePrograms = ({ formFields, handleChange }) => {
   const [programsArr, setProgramsArr] = useState([
     { name: "", specialization: [{ name: "" }] },
   ]);
+  const [memberTypes, setMemberType] = useState([]);
 
   const batchYears = useMemo(() => {
     const array = [];
@@ -30,7 +31,7 @@ const usePrograms = ({ formFields, handleChange }) => {
     const sp = [];
     programsArr
       .find((p) => {
-        return p.name === formFields.program?.toUpperCase();
+        return p.name === formFields.program;
       })
       ?.specialization.forEach((s) => sp.push(s.name));
 
@@ -40,8 +41,9 @@ const usePrograms = ({ formFields, handleChange }) => {
   useEffect(() => {
     (async () => {
       try {
-        const p = await server.public.getPrograms();
-        setProgramsArr(p.data);
+        const settings = await server.public.settings();
+        setProgramsArr(settings.data.programs);
+        setMemberType(settings.data.members);
       } catch (error) {
         console.log(error);
       }
@@ -62,7 +64,7 @@ const usePrograms = ({ formFields, handleChange }) => {
     }
   }, [formFields.program]);
 
-  return { programs, specializations, batchYears };
+  return { programs, specializations, batchYears, memberTypes };
 };
 
 export default usePrograms;

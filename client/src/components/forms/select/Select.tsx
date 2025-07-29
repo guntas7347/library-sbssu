@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { fromSnakeCase, toSnakeCase } from "../../../utils/functions";
 
 type OptionType = string | { label: string; value: string };
 
@@ -9,6 +10,7 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   onChange?: React.ChangeEventHandler<HTMLSelectElement>;
   options?: OptionType[];
   autoFire?: boolean;
+  snakeCase?: boolean;
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -20,6 +22,7 @@ const Select: React.FC<SelectProps> = ({
   autoFire = true,
   value,
   disabled,
+  snakeCase = false,
   ...props
 }) => {
   const hasAutoSelected = useRef(false);
@@ -70,13 +73,11 @@ const Select: React.FC<SelectProps> = ({
         {options.map((option, index) => {
           const label = typeof option === "string" ? option : option.label;
           const val =
-            typeof option === "string"
-              ? option.toLowerCase().replace(/\s+/g, "_")
-              : option.value;
+            typeof option === "string" ? toSnakeCase(option) : option.value;
 
           return (
             <option key={index} value={val}>
-              {label}
+              {snakeCase ? fromSnakeCase(label) : label?.toUpperCase()}
             </option>
           );
         })}

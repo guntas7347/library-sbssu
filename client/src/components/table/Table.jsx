@@ -1,7 +1,9 @@
-import { Edit, Eye, Plus, Search, Trash2 } from "lucide-react";
 import TablePagination from "../pagination/tablePagination";
 
-const Table = ({ data = [], architecture = [] }) => {
+const Table = ({
+  data = { data: [], totalPages: 1, page: 1, setPage: () => {} },
+  architecture = [],
+}) => {
   return (
     <>
       <div className="space-y-6">
@@ -21,7 +23,7 @@ const Table = ({ data = [], architecture = [] }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {data.map((item, index) => (
+                {data.data.map((item, index) => (
                   <tr
                     key={index}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200"
@@ -45,13 +47,11 @@ const Table = ({ data = [], architecture = [] }) => {
               </tbody>
             </table>
           </div>
-          <div className="">
-            <TablePagination
-              totalPages={1}
-              currentPage={1}
-              setPage={() => {}}
-            />
-          </div>
+          <TablePagination
+            totalPages={data.totalPages}
+            currentPage={data.page}
+            setPage={data.setPage}
+          />
         </div>
       </div>
     </>

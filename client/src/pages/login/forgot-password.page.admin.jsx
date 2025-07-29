@@ -3,7 +3,7 @@ import useFeedback from "../../hooks/useFeedback";
 import server from "../../services/server.api";
 import Input from "../../components/forms/input/Input-2";
 import { useForm } from "../../hooks/useForm";
-import LoginCard from "../../components/pages/login/LoginCard";
+import LoginCard from "../../components/features/login/LoginCard";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();

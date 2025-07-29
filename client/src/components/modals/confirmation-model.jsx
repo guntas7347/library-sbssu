@@ -77,7 +77,7 @@ const ConfirmationModal = ({
                   d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                 />
               </svg>
-              <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              <h3 className="mb-1 text-lg font-normal text-gray-500 dark:text-gray-400">
                 {title}
               </h3>
               {table.length !== 0 && (

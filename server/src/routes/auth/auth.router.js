@@ -19,7 +19,6 @@ import {
   verifyResetLink,
   verifyUsernameForLogin,
 } from "./auth.middlewares.js";
-// import { createStaffInternal } from "../staff/staff/staff.router.js";
 import prisma from "../../services/prisma.js";
 import { hashPassword } from "../../utils/bycrypt.js";
 import {
@@ -27,6 +26,7 @@ import {
   verifyFingerprint,
   verifyJwtMiddleware,
 } from "../../middlewares/auth.middlewares.js";
+// import { createStaffInternal } from "../staff/manage-staff/manageStaff.router.js";
 
 const authRouter = new Router();
 
@@ -146,8 +146,8 @@ authRouter.post(
           role: true,
           active: true,
           userType: true,
-          staff: { select: { fullName: true, imageUrl: true } },
-          member: { select: { fullName: true, imageUrl: true } },
+          staff: { select: { fullName: true, photo: true } },
+          member: { select: { fullName: true, photo: true } },
         },
       });
 
@@ -163,7 +163,7 @@ authRouter.post(
         role: authDoc.role,
         fullName: fullName,
         username: authDoc.username,
-        imageUrl: authDoc?.staff?.imageUrl || authDoc?.member?.imageUrl || null,
+        photo: authDoc?.staff?.photo || authDoc?.member?.photo || null,
       };
 
       return res.status(200).json(crs.AUTH_200_PING_SUCCESS(userAuth));

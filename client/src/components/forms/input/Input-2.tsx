@@ -1,3 +1,4 @@
+import { Scan } from "lucide-react";
 import React from "react";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -7,6 +8,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   type?: string;
   placeholder?: string;
   onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  svg?: React.FC;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -16,6 +18,7 @@ const Input: React.FC<InputProps> = ({
   type = "text",
   placeholder,
   onChange,
+  svg: SVG,
   ...props
 }) => {
   const inputId = props.id || name;
@@ -29,16 +32,27 @@ const Input: React.FC<InputProps> = ({
           {label}
           {required && " *"}
         </label>
-        <input
-          className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
-          id={inputId}
-          name={name}
-          type={type}
-          required={required}
-          placeholder={placeholder}
-          onChange={onChange}
-          {...props}
-        />{" "}
+        <div className="relative">
+          <input
+            className={`w-full ${
+              SVG ? "pl-8" : ""
+            } px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200`}
+            id={inputId}
+            name={name}
+            type={type}
+            required={required}
+            placeholder={placeholder}
+            onChange={onChange}
+            {...props}
+          />
+          <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400">
+            {SVG && <SVG className="size-4" />}
+          </div>
+
+          {/* {error && (
+            <p className="text-red-500 text-sm mt-1">{error}</p>
+          )} */}
+        </div>
       </div>
     </>
   );

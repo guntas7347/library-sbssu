@@ -1,6 +1,6 @@
-const SpanningTable = ({ rows, imageUrl = null }) => {
+const SpanningTable = ({ rows }) => {
   return (
-    <table className="bg-gray-100 ">
+    <table className="bg-gray-50 ">
       <tbody>
         {rows.map((row, idx) => {
           return (
@@ -21,14 +21,6 @@ const SpanningTable = ({ rows, imageUrl = null }) => {
             </tr>
           );
         })}
-        {/* {imageUrl && (
-          <img
-            className="w-52 h-52"
-            crossOrigin="anonymous"
-            src={imageUrl}
-            alt="image"
-          />
-        )} */}
       </tbody>
     </table>
   );

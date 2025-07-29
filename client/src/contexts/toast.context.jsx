@@ -1,73 +1,30 @@
-import { createContext, useEffect, useState } from "react";
-import Toast from "../components/feedback/toast/toast.component";
+import { createContext } from "react";
+import useToastManager from "../hooks/useToastManager";
+import Toast from "../components/feedback/toast/Toast";
 
-export const ToastContext = createContext({
-  feedback: [0, 0, ""],
-  setFeedback: () => {},
-});
+export const ToastContext = createContext();
 
 export const ToastProvider = ({ children }) => {
-  const [feedback, setFeedback] = useState([0, 0, ""]);
-
-  const [feedbackArray, setFeedbackArray] = useState([]);
-
-  const value = { feedback, setFeedback };
-
-  const doesFeedbackExists =
-    feedback[0] !== 0 || feedback[1] !== 0 || feedback[2] !== "";
-
-  useEffect(() => {
-    if (doesFeedbackExists)
-      setFeedbackArray(() => [...feedbackArray, feedback]);
-  }, [feedback]);
-
-  useEffect(() => {
-    if (feedbackArray.length > 0) {
-      const timer = setTimeout(
-        () => setFeedbackArray(() => feedbackArray.slice(1)),
-        5000
-      );
-      return () => clearTimeout(timer);
-    }
-  }, [feedbackArray]);
-
-  const checkArraysEquality = (array1, array2) => {
-    if (array1.length !== array2.length) return false;
-    for (let index = 0; index < array1.length; index++)
-      if (array1[index] !== array2[index]) return false;
-    return true;
-  };
-
-  const handleClose = (index) => {
-    let newArr = [
-      ...feedbackArray.slice(0, index),
-      ...feedbackArray.slice(index + 1),
-    ];
-    setFeedbackArray(newArr);
-  };
+  const { toasts, showToast, hideToast } = useToastManager();
 
   return (
-    <>
-      <ToastContext.Provider value={value}>
-        {children}
-        <Toast feedback={feedback} />
-
-        {feedbackArray.map((feedback, index) => {
-          if (checkArraysEquality(feedback, [0, 0, ""])) return;
-
-          const bm = index === 0 ? 80 : (index + 1) * 80;
-
-          return (
-            <div
-              key={index}
-              className="fixed z-[9999]"
-              style={{ bottom: `${bm}px` }}
-            >
-              <Toast feedback={feedback} keyNo={index} onClose={handleClose} />
-            </div>
-          );
-        })}
-      </ToastContext.Provider>
-    </>
+    <ToastContext.Provider value={{ showToast }}>
+      {children}
+      {toasts.map((toast, index) => (
+        <div
+          key={toast.id}
+          className="fixed flex-center left-5 z-50"
+          style={{ bottom: `${30 + index * 70}px` }}
+        >
+          <Toast
+            message={toast.message}
+            severity={toast.severity}
+            show={toast.show}
+            onClose={() => hideToast(toast.id)}
+            duration={toast.duration}
+          />
+        </div>
+      ))}
+    </ToastContext.Provider>
   );
 };

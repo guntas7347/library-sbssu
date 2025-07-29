@@ -13,6 +13,7 @@ node_modules
 build
 uploads
 dist
+misc
 dist-ssr
 *.local
 

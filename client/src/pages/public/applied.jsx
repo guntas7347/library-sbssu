@@ -1,20 +1,17 @@
 import { useNavigate } from "react-router-dom";
-import Header from "../../components/pages/public/applied/Header";
-import StatusBanner from "../../components/pages/public/applied/StatusBanner";
-import Instructions from "../../components/pages/public/applied/Instructions";
-import PrintButton from "../../components/pages/public/applied/PrintButton";
-import HelpSection from "../../components/pages/public/footer/HelpSection";
+import Header from "../../components/features/public/applied/Header";
+import StatusBanner from "../../components/features/public/applied/StatusBanner";
+import Instructions from "../../components/features/public/applied/Instructions";
+import PrintButton from "../../components/features/public/applied/PrintButton";
+import HelpSection from "../../components/features/public/footer/HelpSection";
 import { CircleUserRound, GraduationCap, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import useQuery from "../../hooks/useQuery";
 import server from "../../services/server.api";
-import useFeedback from "../../hooks/useFeedback";
-import { getCookieValue } from "../../utils/functions";
+import { fromSnakeCase, getCookieValue } from "../../utils/functions";
 import InfoField from "../../components/forms/infoField/InfoField ";
-import { memberTypeLabels } from "../../utils/selectLabels";
 
 const AppliedPage = () => {
-  const setFeedback = useFeedback();
   const navigate = useNavigate();
   const gh = getCookieValue("gh");
 
@@ -46,8 +43,7 @@ const AppliedPage = () => {
         }
       } catch (error) {
         console.log(error);
-        navigate("/");
-        setFeedback(2, "No application found");
+        navigate("/join/applied/404");
       }
     })();
   }, []);
@@ -74,7 +70,7 @@ const AppliedPage = () => {
                     Application Details
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400">
-                    ID: {data?.applicationId || ""}
+                    ID: {data?.applicationId ?? "N/A"}
                   </p>
                 </div>
                 <div className="text-right">
@@ -94,36 +90,36 @@ const AppliedPage = () => {
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <InfoField label="Full Name" value={data?.fullName || ""} />
+                <InfoField label="Full Name" value={data?.fullName ?? ""} />
                 <InfoField
                   label="Father's Name"
-                  value={data?.fatherName || ""}
+                  value={data?.fatherName ?? ""}
                 />
-                <InfoField label="Email Address" value={data?.email || ""} />
+                <InfoField label="Email Address" value={data?.email ?? ""} />
                 <InfoField
                   label="Phone Number"
-                  value={data?.phoneNumber || ""}
+                  value={data?.phoneNumber ?? ""}
                 />
                 <InfoField
                   label="Date of Birth"
-                  value={new Date(data?.dob).toDateString() || ""}
+                  value={data?.dob ? new Date(data.dob).toDateString() : "N/A"}
                 />
                 <InfoField
                   label="Gender"
-                  value={data?.gender.toUpperCase() || ""}
+                  value={fromSnakeCase(data?.gender) ?? ""}
                 />
                 <InfoField
-                  label="Category"
-                  value={data?.category.toUpperCase() || ""}
+                  label="Caste"
+                  value={fromSnakeCase(data?.cast) ?? ""}
                 />
               </div>
 
               <div className="mt-6">
                 <InfoField
                   label="Address"
-                  value={`${data?.streetAddress || ""}, ${data?.city || ""}, ${
-                    data?.state || ""
-                  } ${data?.pinCode || ""}`}
+                  value={`${data?.streetAddress ?? ""}, ${data?.city ?? ""}, ${
+                    data?.state ?? ""
+                  } ${data?.pinCode ?? ""}`}
                 />
               </div>
             </div>
@@ -135,17 +131,20 @@ const AppliedPage = () => {
                 Academic Information
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <InfoField label="Roll Number" value={data?.rollNumber || ""} />
+                <InfoField label="Roll Number" value={data?.rollNumber ?? ""} />
                 <InfoField
                   label="Academic Level"
-                  value={memberTypeLabels[data?.memberType] || ""}
+                  value={fromSnakeCase(data?.memberType) ?? ""}
                 />
-                <InfoField label="Degree/Diploma" value={data?.program || ""} />
+                <InfoField
+                  label="Degree/Diploma"
+                  value={fromSnakeCase(data?.program) ?? ""}
+                />
                 <InfoField
                   label="Specialization"
-                  value={data?.specialization.toUpperCase() || ""}
-                />{" "}
-                <InfoField label="Batch" value={data?.batch || ""} />
+                  value={fromSnakeCase(data?.specialization) ?? ""}
+                />
+                <InfoField label="Batch" value={data?.batch ?? ""} />
               </div>
             </div>
           </div>

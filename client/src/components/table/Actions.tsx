@@ -15,7 +15,7 @@ const Actions: React.FC<ActionsProps> = ({
   children,
 }) => {
   return (
-    <div className="flex items-center justify-end space-x-2">
+    <div className="flex-center space-x-2">
       {onView && (
         <button
           className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-all duration-200"
@@ -25,6 +25,7 @@ const Actions: React.FC<ActionsProps> = ({
           <Eye className="w-4 h-4" />
         </button>
       )}
+      {children}
       {onEdit && (
         <button
           className="p-2 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/50 rounded-lg transition-all duration-200"
@@ -43,7 +44,6 @@ const Actions: React.FC<ActionsProps> = ({
           <Trash2 className="w-4 h-4" />
         </button>
       )}
-      {children}
     </div>
   );
 };

@@ -6,21 +6,18 @@ const SaveCancelButton = ({ onSave = () => {}, onCancel = () => {} }) => {
 
   return (
     <>
-      {" "}
-      <div className="mt-auto text-right">
+      <div className="flex justify-end gap-4 mt-8">
         <button
-          type="button"
           onClick={onCancel}
-          className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+          className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
         >
           Cancel
         </button>
         <button
-          type="button"
-          className="c-btn-blue"
           onClick={() => setAlert(true)}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
         >
-          Save
+          Save Changes
         </button>
       </div>
       <ConfirmationModal

@@ -2,7 +2,7 @@ import React from "react";
 import { lazy } from "react";
 import { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
-import Page404 from "../components/404/404";
+import NotFoundPage from "../components/404/404";
 import ProtectedRoute from "./ProtectedRoute";
 import Spinner from "../components/feedback/spinner/Spinner";
 
@@ -24,7 +24,7 @@ const StaffDashboard = () => {
           }
         />
 
-        <Route path="*" element={<Page404 />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   );

@@ -1,5 +1,4 @@
 import speakeasy from "speakeasy";
-import { fetchSettings } from "../../controllers/settings.controller.js";
 import prisma from "../../services/prisma.js";
 import { comparePassword } from "../../utils/bycrypt.js";
 import crs from "../../utils/crs/crs.js";

@@ -37,9 +37,9 @@ const JoinPage = () => {
     e.preventDefault();
 
     if (
-      formFields.imageUrl === null ||
-      !formFields.imageUrl ||
-      formFields.imageUrl === ""
+      formFields.photo === null ||
+      !formFields.photo ||
+      formFields.photo === ""
     ) {
       alert("Please upload your image.");
       return;
@@ -155,20 +155,20 @@ const JoinPage = () => {
       "phoneNumber",
       `${Math.floor(9000000000 + Math.random() * 100000000)}`
     );
-    setFields("imageUrl", `/profile/${getRandomItem(imagePool)}.jpg`);
+    setFields("photo", `/profile/${getRandomItem(imagePool)}.jpg`);
   };
 
   const showAutoFill = true;
 
   const handleImageUpload = async (formData) => {
     try {
-      if (!formData) return setFields("imageUrl", null);
+      if (!formData) return setFields("photo", null);
 
       const res = await uploadImage(formData);
       const data = await res.json();
 
       if (data.s === "ULD201IMG") {
-        setFields("imageUrl", data.p);
+        setFields("photo", data.p);
         setFeedback(1, data.m);
       } else setFeedback(2, data.m);
     } catch (error) {

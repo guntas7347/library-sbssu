@@ -1,34 +1,75 @@
-import React from "react";
+import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
-import ApplicationsPage from "../../pages/dashboard/staff/applicantions/ApplicationPage";
-import SettingsPage from "../../pages/dashboard/staff/settings/page";
-import Dashboard from "../../components/pages/dashboard/staff/dashBoard/Dashboard";
-import SideBar from "../../components/pages/dashboard/staff/sideBar/SideBar";
-import Navbar from "../../components/pages/dashboard/staff/navbar/Navbar-2";
-import SampleDashboard from "../../pages/dashboard/staff/sample";
+import ApplicationsPage from "../../pages/dashboard/staff/applications/ApplicationPage";
+import SideBar from "../../components/features/dashboard/staff/sideBar/SideBar";
+import Navbar from "../../components/features/dashboard/staff/navbar/Navbar-2";
 import StaffPage from "../../pages/dashboard/staff/staff/StaffPage";
 import MemberPage from "../../pages/dashboard/staff/member/MemberPage";
-import TransactionDetails from "../../components/pages/dashboard/staff/transaction/TransactionDetails";
-import BookDetails from "../../components/pages/dashboard/staff/book/BookDetails";
-import IssueBookPage from "../../components/pages/dashboard/staff/issueBook/issueBookPage";
-import ReturnBookPage from "../../components/pages/dashboard/staff/returnBook/returnBookPage";
+import BookPage from "../../pages/dashboard/staff/books/BooksPage";
+import IssuePage from "../../pages/dashboard/staff/issue/IssuePage";
+import ReturnPage from "../../pages/dashboard/staff/return/ReturnPage";
+import AddBookPage from "../../pages/dashboard/staff/books/AddBookPage";
+import AllotCard from "../../pages/dashboard/staff/member/AllotCard";
+import SearchIssuesPage from "../../pages/dashboard/staff/searchIssues/SearchIssuesPage";
+import SearchReturnPage from "../../pages/dashboard/staff/searchReturn/SearchReturnPage";
+import SettingsPage from "../../pages/dashboard/staff/settings/SettingsPage";
+import HomePage from "../../pages/dashboard/staff/dashboard/HomePage";
+import MemberDetails from "../../pages/dashboard/staff/member/MemberDetails";
+import BookDetails from "../../pages/dashboard/staff/books/BookDetails";
+import IssueDetails from "../../pages/dashboard/staff/searchIssues/IssueDetails";
+import ReturnDetails from "../../pages/dashboard/staff/searchReturn/ReturnDetails";
+import TransactionSearchPage from "../../pages/dashboard/staff/transactions/SearchPage";
+import TransactionDetailsPage from "../../pages/dashboard/staff/transactions/DetailsPage";
+import AddTransaction from "../../pages/dashboard/staff/transactions/AddTransaction";
 
 const StaffRoutes = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+
   return (
     <>
-      <Navbar />
+      <Navbar
+        isSidebarCollapsed={isSidebarCollapsed}
+        setIsSidebarCollapsed={setIsSidebarCollapsed}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+      />
       <div className="flex">
-        <SideBar />
-        <div className="flex-1 p-6 lg:p-8">
+        <SideBar
+          isSidebarCollapsed={isSidebarCollapsed}
+          setIsSidebarCollapsed={setIsSidebarCollapsed}
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
+        />
+        <div className="flex-1 p-2 lg:p-4">
           <Routes>
-            <Route index element={<Dashboard />} />
-            <Route path="sample" element={<SampleDashboard />} />
+            <Route index element={<HomePage />} />
             <Route path="applications" element={<ApplicationsPage />} />
+
             <Route path="members" element={<MemberPage />} />
-            <Route path="books" element={<BookDetails />} />
-            <Route path="issue-books" element={<IssueBookPage />} />
-            <Route path="return-books" element={<ReturnBookPage />} />
-            <Route path="transactions" element={<TransactionDetails />} />
+            <Route path="members/:id" element={<MemberDetails />} />
+            <Route path="members/allot-card" element={<AllotCard />} />
+
+            <Route path="books" element={<BookPage />} />
+            <Route path="books/:id" element={<BookDetails />} />
+            <Route path="books/add" element={<AddBookPage />} />
+
+            <Route path="issue-books" element={<IssuePage />} />
+            <Route path="return-books" element={<ReturnPage />} />
+
+            <Route path="search-issues" element={<SearchIssuesPage />} />
+            <Route path="search-issues/:id" element={<IssueDetails />} />
+
+            <Route path="search-returns" element={<SearchReturnPage />} />
+            <Route path="search-returns/:id" element={<ReturnDetails />} />
+
+            <Route path="transactions" element={<TransactionSearchPage />} />
+            <Route
+              path="transactions/:id"
+              element={<TransactionDetailsPage />}
+            />
+            <Route path="transactions/add" element={<AddTransaction />} />
+
             <Route path="staff" element={<StaffPage />} />
             <Route path="settings/*" element={<SettingsPage />} />
           </Routes>

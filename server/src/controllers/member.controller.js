@@ -23,37 +23,75 @@ export const getMembers = async (queryParam) => {
   const pageSize = 10;
   const skip = (page - 1) * pageSize;
 
-  let whereClause = {
-    status: "active",
-  };
+  const where = {};
 
   switch (name) {
     case "all":
+      where.AND = [{ status: "active" }];
       break;
 
     case "fullName":
-      whereClause.fullName = {
-        contains: value,
-        mode: "insensitive",
-      };
+      where.AND = [
+        {
+          fullName: {
+            contains: value,
+            mode: "insensitive",
+          },
+        },
+      ];
+      break;
+
+    case "membershipId":
+      where.AND = [
+        {
+          membershipId: {
+            contains: value,
+            mode: "insensitive",
+          },
+        },
+      ];
       break;
 
     default:
-      whereClause[name] = value;
       break;
   }
 
-  const totalCount = await prisma.member.count({
-    where: whereClause,
-  });
+  const totalCount = await prisma.member.count({ where });
 
   const members = await prisma.member.findMany({
-    where: whereClause,
+    where,
     skip,
     take: pageSize,
+    select: {
+      id: true,
+      photo: true,
+      fullName: true,
+      gender: true,
+      email: true,
+      membershipId: true,
+      rollNumber: true,
+      program: true,
+      batch: true,
+      specialization: true,
+      memberType: true,
+      balance: true,
+      status: true,
+      _count: {
+        select: {
+          libraryCards: true,
+        },
+      },
+    },
   });
+
+  // Format result to match frontend expectation
+  const formattedMembers = members.map((member) => ({
+    ...member,
+    booksIssued: member._count.libraryCards, // renamed for frontend column
+    fineAmount: member.balance, // alias for balance
+  }));
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
-  return { data: members, totalPages };
+  return { data: formattedMembers, totalPages };
 };

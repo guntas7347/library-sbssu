@@ -5,13 +5,22 @@ import { createLog } from "../../../utils/log.js";
 
 const publicSettings = Router();
 
-publicSettings.get("/programs", async (req, res) => {
+publicSettings.get("/application", async (req, res) => {
   try {
-    const { value } = await prisma.setting.findUnique({
-      where: { key: "PRO-SPZ-LIST" },
+    const programs = await prisma.setting.findUnique({
+      where: { key: "PROGRAMS" },
     });
 
-    return res.status(200).json(crs.PUBLIC_200_PROGRAMS_FETCHED(value));
+    const members = await prisma.setting.findUnique({
+      where: { key: "MEMBER-TYPES" },
+    });
+
+    const data = {
+      programs: programs.value,
+      members: members.value,
+    };
+
+    return res.status(200).json(crs.PUBLIC_200_SETTINGS_FETCHED(data));
   } catch (error) {
     createLog(error);
     return res.status(500).json(crs.SERR_500_INTERNAL(error));

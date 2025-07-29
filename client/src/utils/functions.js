@@ -1,5 +1,4 @@
 import queryString from "query-string";
-
 import { UPLOADS_PATH } from "./keys";
 
 export const sortObjectUsingKeys = (object, keysArray) => {
@@ -49,26 +48,17 @@ export const formatDate = (date = new Date()) => {
   return `${yyyy}-${mm}-${dd}`;
 };
 
-const options = {
-  timeZone: "Asia/Kolkata", // IST time zone
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-};
-
-export const formatTime = (dateString) =>
-  new Date(dateString).toLocaleString("en-US", options);
-
-export const rowsArray = (data = [], config = []) => {
-  return data.map((obj) => {
-    return config.map(({ key, transform }) => {
-      const value = obj[key];
-      return transform ? transform(value, obj) : value;
-    });
-  });
+export const formatTime = (dateString) => {
+  const options = {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  };
+  return new Date(dateString).toLocaleString("en-US", options);
 };
 
 export const createURLQuery = (customParam, currentQueryString) => {
@@ -123,28 +113,6 @@ export const getCroppedImg = (image, crop) => {
   });
 };
 
-export const processData = (array, sortArray = []) => {
-  return array.map((obj) => {
-    return Object.values(sortObjectUsingKeys({ ...obj }, sortArray));
-  });
-};
-
-export const processDataForBooks = (array, sortArray = []) => {
-  const mergeArrayElementsToString = (arr = []) => {
-    if (!arr.length) return "";
-    const accessionNumbers = arr.map((el) => el.accessionNumber);
-    return `(${accessionNumbers.length}) ${accessionNumbers.join(", ")}`;
-  };
-
-  return array.map((obj) => {
-    const newObj = {
-      ...obj,
-      accessionNumber: mergeArrayElementsToString(obj.accessions),
-    };
-    return Object.values(sortObjectUsingKeys(newObj, sortArray));
-  });
-};
-
 export const toLowerCamelCase = (str) => {
   return str
     .toLowerCase()
@@ -153,9 +121,9 @@ export const toLowerCamelCase = (str) => {
 
 export const fromLowerCamelCase = (str) => {
   return str
-    .replace(/([A-Z])/g, " $1") // Add space before uppercase letters
-    .toLowerCase() // Convert everything to lowercase
-    .replace(/\b\w/g, (match) => match.toUpperCase()); // Capitalize each word
+    .replace(/([A-Z])/g, " $1")
+    .toLowerCase()
+    .replace(/\b\w/g, (match) => match.toUpperCase());
 };
 
 export function getCookieValue(name) {
@@ -167,8 +135,12 @@ export function getCookieValue(name) {
   );
 }
 
-export const imagePathUrl = (imageUrl) => {
-  return imageUrl ? UPLOADS_PATH + imageUrl : UPLOADS_PATH + "/sample-user.jpg";
+export const imagePathUrl = (photo) => {
+  if (photo === "book")
+    return "https://images.pexels.com/photos/159711/books-bookstore-book-reading-159711.jpeg";
+  return photo
+    ? UPLOADS_PATH + photo
+    : "https://placehold.co/64x64/cccccc/333333?text=N/A";
 };
 
 export const memberTypeOptions = [
@@ -181,13 +153,7 @@ export const memberTypeOptions = [
 ];
 
 export const autofillTestData = (setFields, programs, specializations) => {
-  const roles = [
-    "student_ug",
-    "student_pg",
-    "teacher_regular",
-    "teacher_adhoc",
-    "non_teaching_staff",
-  ];
+  const roles = ["undergraduate", "postgraduate", "teacher"];
 
   const categories = ["general", "sc_st", "other"];
 
@@ -276,7 +242,7 @@ export const autofillTestData = (setFields, programs, specializations) => {
     rollNumber: `${Math.floor(100000 + Math.random() * 900000)}`,
     gender: gender,
     dob: getRandomDOB(),
-    category: getRandomItem(categories),
+    cast: getRandomItem(categories),
     memberType: getRandomItem(roles),
     program: program,
     specialization: specialization,
@@ -287,6 +253,53 @@ export const autofillTestData = (setFields, programs, specializations) => {
     pinCode: "141001",
     email: "guntas7347@gmail.com",
     phoneNumber: `${Math.floor(9000000000 + Math.random() * 100000000)}`,
-    imageUrl: `/profile/${getRandomItem(imagePool)}.jpg`,
+    photo: `/profile/${getRandomItem(imagePool)}.jpg`,
   });
 };
+
+export function toSnakeCase(str) {
+  return str
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .replace(/[^\w_]/g, "");
+}
+
+export function fromSnakeCase(str, mode = 2) {
+  if (typeof str !== "string") return "";
+
+  const trimmed = str.trim();
+  if (trimmed === "") return "";
+
+  const words = trimmed.split("_").filter(Boolean); // Remove empty parts
+
+  if (words.length === 0) return "";
+
+  switch (mode) {
+    case 1:
+      return words
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        )
+        .join(" ");
+    case 2:
+      return words.join(" ").toUpperCase();
+    default:
+      return words.join(" ");
+  }
+}
+
+export function calculateAge(dateString) {
+  const today = new Date();
+  const birthDate = new Date(dateString);
+  let age = today.getFullYear() - birthDate.getFullYear();
+
+  const m = today.getMonth() - birthDate.getMonth();
+
+  // Adjust age if birth month/day hasn't occurred yet this year
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age;
+}

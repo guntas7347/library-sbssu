@@ -4,10 +4,10 @@ import { useForm } from "../../hooks/useForm";
 import { getFingerprint } from "../../utils/fingerprint";
 import server from "../../services/server.api";
 import useFeedback from "../../hooks/useFeedback";
-import Input from "../../components/forms/input/input-2";
+import Input from "../../components/forms/input/Input-2";
 import { Eye, EyeOff } from "lucide-react";
 import TotpInput from "../../components/forms/input/Totp";
-import LoginCard from "../../components/pages/login/LoginCard";
+import LoginCard from "../../components/features/login/LoginCard";
 
 const LoginPage = () => {
   const navigate = useNavigate();
