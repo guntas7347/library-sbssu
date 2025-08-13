@@ -1,4 +1,3 @@
-import React from "react";
 import ConfirmationModal from "../../../../../modals/confirmation-model";
 
 const Confirmation = ({

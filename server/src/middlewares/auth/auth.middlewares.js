@@ -1,0 +1,147 @@
+import crs from "../../utils/crs/crs.js";
+import prisma from "../../services/prisma.js";
+import { createJWT, verifyJwt } from "../../utils/jwt.js";
+import { decrptText, encryptText } from "../../utils/encrypt.crypto.js";
+import { createLog } from "../../utils/log.js";
+
+export const setJwtCookie = async (req, res, next) => {
+  const TOKEN_EXPIRY_MINUTES = 60;
+  try {
+    const { id } = req.context;
+    const jwtCredentials = { uid: id };
+    const jwt = createJWT(jwtCredentials);
+    const cookieOptions = {
+      secure: process.env.NODE_ENV !== "dev",
+      httpOnly: process.env.NODE_ENV !== "dev",
+      expires: new Date(Date.now() + 1000 * 60 * TOKEN_EXPIRY_MINUTES),
+      path: "/",
+    };
+
+    const jwtCookie = encryptText(jwt);
+
+    res.cookie("session", jwtCookie, cookieOptions);
+    req.context = { ...req.context, jwtCookie };
+    next();
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR_500_INTERNAL(error));
+  }
+};
+
+export const authorisationLevel = (rights = ["open"]) => {
+  return function (req, res, next) {
+    try {
+      if (!Array.isArray(rights)) rights = [rights];
+      if (
+        req.user.rights.some((right) => rights.includes(right)) ||
+        req.user.rights.includes("admin") ||
+        rights[0] === "open"
+      )
+        next();
+      else return res.status(403).json(crs.AUTH_403_FORBIDDEN());
+    } catch (error) {
+      createLog(error);
+      return res.status(500).json(crs.SERR_500_INTERNAL(error));
+    }
+  };
+};
+
+export const createFingerprint = async (req, res, next) => {
+  try {
+    const fingerprintHash = req.body.fingerprint;
+    if (!fingerprintHash) throw Error("fingerprintHash is required");
+
+    const authId = req.context.id;
+
+    await prisma.sessionFingerprint.updateMany({
+      where: { authId, fingerprintHash: { not: fingerprintHash } },
+      data: { isActive: false },
+    });
+    const existing = await prisma.sessionFingerprint.findFirst({
+      where: { authId, fingerprintHash },
+    });
+
+    if (!existing)
+      await prisma.sessionFingerprint.create({
+        data: { authId, fingerprintHash, isActive: true },
+      });
+    else
+      await prisma.sessionFingerprint.update({
+        where: { id: existing.id },
+        data: { lastUsedAt: new Date(), isActive: true },
+      });
+    return res
+      .status(200)
+      .json(crs.AUTH_200_LOGIN_SUCCESS(req.context.userType));
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR_500_INTERNAL(error));
+  }
+};
+
+export const verifyFingerprint = async (req, res, next) => {
+  try {
+    const fingerprintHash = req.headers["x-fingerprint"];
+
+    if (!fingerprintHash)
+      return res.status(401).json(crs.AUTH_401_INVALID_FINGERPRINT());
+
+    const record = await prisma.sessionFingerprint.findFirst({
+      where: { authId: req.user.uid, fingerprintHash, isActive: true },
+    });
+    if (!record)
+      return res.status(401).json(crs.AUTH_401_INVALID_FINGERPRINT());
+
+    return next();
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.SERR_500_INTERNAL(error));
+  }
+};
+
+export const verifyJwtMiddleware = (req, res, next) => {
+  try {
+    const jwt = req.cookies.session
+      ? verifyJwt(decrptText(req.cookies.session))
+      : null;
+
+    if (!jwt) {
+      res.cookie("session", null, {
+        expires: new Date(0),
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      });
+      return res.status(401).json(crs.AUTH_401_INVALID_JWT());
+    }
+    req.user = jwt;
+    next();
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.AUTH_500_JWT_SERVER_ERROR(error));
+  }
+};
+
+export const verifyStaff = async (req, res, next) => {
+  try {
+    const auth = await prisma.auth.findUnique({
+      where: { id: req.user.uid },
+      select: {
+        role: true,
+        rights: true,
+      },
+    });
+
+    if (!auth?.role)
+      return res.status(401).json(crs.AUTH_401_INSUFFICIENT_ROLE());
+
+    req.user.role = auth.role;
+    req.user.rights = auth.rights ?? [];
+
+    if (auth.role === "staff") return next();
+    else return res.status(401).json(crs.AUTH_401_INSUFFICIENT_ROLE());
+  } catch (error) {
+    createLog(error);
+    return res.status(500).json(crs.AUTH_500_JWT_SERVER_ERROR(error));
+  }
+};

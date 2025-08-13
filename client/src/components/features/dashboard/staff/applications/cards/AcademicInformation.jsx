@@ -1,5 +1,5 @@
 import { GraduationCap } from "lucide-react";
-import React from "react";
+
 import InfoField from "../../../../../forms/infoField/InfoField ";
 import { fromSnakeCase } from "../../../../../../utils/functions";
 

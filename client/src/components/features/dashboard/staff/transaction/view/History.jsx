@@ -1,9 +1,10 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
 import { FileText, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
 
 const History = ({ data }) => {
   // Use a safe default for the history array
   const history = data || [];
+  const navigate = useNavigate();
 
   const typeMap = {
     DEBIT: {
@@ -50,7 +51,12 @@ const History = ({ data }) => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
-                      <h5 className="font-medium text-gray-900 dark:text-white capitalize">
+                      <h5
+                        onClick={() =>
+                          navigate(`/staff/dashboard/transactions/${entry?.id}`)
+                        }
+                        className=" hover:underline inline hover:cursor-pointer font-medium text-gray-900 dark:text-white capitalize"
+                      >
                         {entry?.category ?? "General Transaction"}
                       </h5>
                       <span className="text-sm text-gray-500 dark:text-gray-400">

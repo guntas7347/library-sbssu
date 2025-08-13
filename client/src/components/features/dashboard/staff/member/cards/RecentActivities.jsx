@@ -1,5 +1,5 @@
 import { Activity, BookOpen, CreditCard, RefreshCw } from "lucide-react";
-import React from "react";
+
 import { useNavigate } from "react-router-dom";
 
 const RecentActivities = ({ data }) => {

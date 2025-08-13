@@ -1,10 +1,9 @@
-import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import server from "../../../../services/server.api";
 import useFeedback from "../../../../hooks/useFeedback";
+import { URL_PATH } from "../../../../utils/keys";
 
 const Header = ({ id, gh = null }) => {
-  console.log(gh);
   const setFeedback = useFeedback();
   const navigate = useNavigate();
 
@@ -28,7 +27,7 @@ const Header = ({ id, gh = null }) => {
   };
 
   const handleShareWhatsApp = () => {
-    const path = `${window.location.protocol}//${window.location.hostname}${window.location.pathname}?gh=${id}`;
+    const path = `${URL_PATH}/join/applied?gh=${id}`;
     window.open(
       `https://api.whatsapp.com/send?text=${encodeURIComponent(
         "I’ve submitted my library application. Please use this link to print the form if needed:\n"

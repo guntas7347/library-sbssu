@@ -1,7 +1,8 @@
 import SimpleHeader from "../../../../components/header/SimpleHeader";
 import IssueDurationCard from "../../../../components/features/dashboard/staff/settings/issue/IssueDurationCard";
-import IssuePermissionCard from "../../../../components/features/dashboard/staff/settings/issue/IssuePermissionCard";
-import IssueCompatibilityCard from "../../../../components/features/dashboard/staff/settings/issue/IssueCompatibilityCard";
+// import IssuePermissionCard from "../../../../components/features/dashboard/staff/settings/issue/IssuePermissionCard";
+// import IssueCompatibilityCard from "../../../../components/features/dashboard/staff/settings/issue/IssueCompatibilityCard";
+import AutoAllotCard from "../../../../components/features/dashboard/staff/settings/libraryCard/AutoAllotCard";
 
 const IssueSettings = () => {
   return (
@@ -12,8 +13,9 @@ const IssueSettings = () => {
           sub="Configure issue durations, permissions, and compatibility"
         />
         <IssueDurationCard />
-        <IssuePermissionCard />
-        <IssueCompatibilityCard />
+        {/* <IssuePermissionCard />
+        <IssueCompatibilityCard /> */}
+        <AutoAllotCard />
       </div>
     </>
   );

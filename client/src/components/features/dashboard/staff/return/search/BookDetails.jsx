@@ -1,5 +1,3 @@
-import React from "react";
-
 const BookDetails = ({ book }) => {
   // ✅ SAFE: A top-level guard clause prevents any rendering if `book` is missing.
   if (!book) return null;

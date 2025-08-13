@@ -152,10 +152,10 @@ export const memberTypeOptions = [
   { label: "Special Member", value: "special_member" },
 ];
 
-export const autofillTestData = (setFields, programs, specializations) => {
+export const autofillTestData = (programs, specializations) => {
   const roles = ["undergraduate", "postgraduate", "teacher"];
 
-  const categories = ["general", "sc_st", "other"];
+  const categories = ["general", "scst", "other"];
 
   const genders = ["male", "female", "other"];
 
@@ -236,7 +236,7 @@ export const autofillTestData = (setFields, programs, specializations) => {
     return `${firstName} ${lastName}`;
   }
 
-  setFields({
+  return {
     fullName: generateRandomName(),
     fatherName: generateRandomName(),
     rollNumber: `${Math.floor(100000 + Math.random() * 900000)}`,
@@ -254,7 +254,8 @@ export const autofillTestData = (setFields, programs, specializations) => {
     email: "guntas7347@gmail.com",
     phoneNumber: `${Math.floor(9000000000 + Math.random() * 100000000)}`,
     photo: `/profile/${getRandomItem(imagePool)}.jpg`,
-  });
+    subscribeToUpdates: true,
+  };
 };
 
 export function toSnakeCase(str) {
@@ -303,3 +304,8 @@ export function calculateAge(dateString) {
 
   return age;
 }
+
+export const formatDateForInput = (dateString) => {
+  if (!dateString) return "";
+  return new Date(dateString).toISOString().split("T")[0];
+};

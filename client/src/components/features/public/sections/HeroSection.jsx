@@ -1,5 +1,5 @@
 import { Rocket, Search } from "lucide-react";
-import React from "react";
+
 import { Link } from "react-router-dom";
 
 const HeroSection = ({ scroll }) => {
@@ -37,7 +37,7 @@ const HeroSection = ({ scroll }) => {
             </p>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link
-                to="catalog"
+                to="catalogue"
                 className="group px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white rounded-2xl font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300 flex items-center"
               >
                 <Search className="size-5 mr-2" />

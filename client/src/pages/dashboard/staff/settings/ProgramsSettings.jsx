@@ -28,7 +28,6 @@ const ProgramsSettings = () => {
   };
 
   const addSpecialization = (index, name) => {
-    if (toSnakeCase(name) == "other") return;
     const updated = [...data];
     updated[index].specialization.unshift({ name: toSnakeCase(name) });
     setData(updated);
@@ -36,8 +35,6 @@ const ProgramsSettings = () => {
 
   const deleteSpecialization = (pIndex, sIndex) => {
     const updated = [...data];
-    const specName = updated[pIndex].specialization[sIndex].name;
-    if (specName === "OTHER") return;
     updated[pIndex].specialization = updated[pIndex].specialization.filter(
       (_, i) => i !== sIndex
     );

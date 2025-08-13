@@ -26,8 +26,9 @@ const LoginPage = () => {
         fingerprint,
       });
 
-      if (res.data === "STAFF") return navigate("/staff/dashboard");
-      if (res.data === "MEMBER") return navigate("/member/dashboard");
+      if (res.data === "staff") return navigate("/staff/dashboard");
+      if (res.data === "member") return navigate("/member/dashboard");
+
       const err = new Error();
       err.message = "Login failed, Contact library.";
       throw err;

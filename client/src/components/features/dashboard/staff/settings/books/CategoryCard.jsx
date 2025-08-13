@@ -46,7 +46,7 @@ const CategoryCard = () => {
     setArray([...array, toSnakeCase(field)]);
   };
 
-  if (loading) return <Spinner center={true} height="min-h-96" />;
+  if (loading) return <Spinner />;
 
   return (
     <div className="card p-6">
@@ -60,7 +60,7 @@ const CategoryCard = () => {
         {array.map((item, idx) => (
           <ListOption
             key={idx}
-            label={fromSnakeCase(item, true)}
+            label={fromSnakeCase(item, 1)}
             onDelete={() => {
               const temp = [...array];
               temp.splice(idx, 1);

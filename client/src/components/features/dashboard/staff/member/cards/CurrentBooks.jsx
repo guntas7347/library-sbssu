@@ -1,5 +1,4 @@
 import { AlertCircle, BookOpen } from "lucide-react";
-import React from "react";
 
 const CurrentBooks = ({ data }) => {
   // Use optional chaining on `data` and nullish coalescing for a safe default.

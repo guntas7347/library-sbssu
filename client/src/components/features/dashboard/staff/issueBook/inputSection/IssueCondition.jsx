@@ -1,5 +1,5 @@
 import { CheckCircle } from "lucide-react";
-import React from "react";
+
 import RadioCard from "../../../../../forms/radio/RadioCard";
 import Card from "../../../../../cards/Card";
 

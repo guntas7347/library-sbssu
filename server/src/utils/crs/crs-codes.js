@@ -34,17 +34,17 @@ const CRS_CODES = {
   MEMBER_200_UPDATED: "Member updated successfully",
   MEMBER_200_ALL_FETCHED: "All members fetched successfully",
   MEMBER_200_PROFILE_FETCHED: "Member profile fetched successfully",
+  MEMBER_200_CARD_ALLOTED: "Card alloted successfully",
+  MEMBER_200_CARD_UPDATED: "Card status updated",
+  MEMBER_409_CARD_UPDATE: "Card status can not be changed",
+  MEMBER_200_NO_DUE_SLIP: "No-Due issued successfully",
+  MEMBER_409_NO_DUE_SLIP: "No-Due can not be issued ",
 
   BOOK_200_FETCHED: "Book fetched successfully",
   BOOK_200_ALL_FETCHED: "Books fetched successfully",
-  BOOK_201_CREATED: "Book created successfully",
+  BOOK_200_CREATED: "Book created successfully",
   BOOK_200_UPDATED: "Book updated successfully",
-  BOOK_204_NOT_FOUND: "No books found",
   BOOK_200_DELETED: "Book deleted successfully",
-  BOOK_400_INVALID: "Invalid book data",
-  BOOK_404_NOT_FOUND: "Book not found",
-  BOOK_409_CONFLICT: "Book conflict detected",
-  BOOK_409_ACCESSION_CONFLICT: "Book accession number already exists",
 
   ISSUE_200_MEMBER_FETCHED: "Member fetched successfully",
   ISSUE_200_BOOK_FETCHED: "Book fetched successfully",
@@ -75,8 +75,10 @@ const CRS_CODES = {
   PUBLIC_201_APPLICATION_CREATED: "Application created successfully",
   PUBLIC_200_APPLICATION_FETCHED: "Application fetched successfully",
   PUBLIC_200_APPLICATION_DELETED: "Application deleted successfully",
+  PUBLIC_200_CATALOGUE_FETCHED: "Catalogue data fetched successfully.",
 
   ZOD_400_INVALID_INPUT: "Invalid input",
+  MSG: "Error",
 };
 
 export default CRS_CODES;

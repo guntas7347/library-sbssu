@@ -51,14 +51,25 @@ const server = {
       restCall(`staff/member/all?${e}`, null, "MEMBER_200_ALL_FETCHED"),
     fetch: (e) =>
       restCall(`staff/member/one?id=${e}`, null, "MEMBER_200_FETCHED"),
+    fetchForAllot: (e) =>
+      restCall(`staff/member/allot-data?id=${e}`, null, "MEMBER_200_FETCHED"),
+    fetchForEdit: (e) =>
+      restCall(`staff/member/for-edit?id=${e}`, null, "MEMBER_200_FETCHED"),
     fetchCards: (e) =>
       restCall(`staff/member/cards?id=${e}`, null, "MEMBER_200_CARDS_FETCHED"),
     search: (e) =>
       restCall(
-        `staff/member/search?number=${e}`,
+        `staff/member/search?searchTerm=${e}`,
         null,
         "MEMBER_200_ALL_FETCHED"
       ),
+    allotCard: (e) =>
+      restCall("staff/member/allot-card", e, "MEMBER_200_CARD_ALLOTED"),
+    update: (e) => restCall("staff/member/update", e, "MEMBER_200_UPDATED"),
+    updateCardStatus: (e) =>
+      restCall("staff/member/card-status", e, "MEMBER_200_CARD_UPDATED"),
+    issueNoDue: (id) =>
+      restCall("staff/member/issue-no-due", { id }, "MEMBER_200_NO_DUE_SLIP"),
   },
 
   issue: {
@@ -75,6 +86,8 @@ const server = {
       restCall(`staff/issue/all?${e}`, null, "ISSUE_200_ALL_FETCHED"),
     fetch: (e) =>
       restCall(`staff/issue/one?id=${e}`, null, "ISSUE_200_BOOK_FETCHED"),
+    bulkReminder: (e) =>
+      restCall("staff/issue/bulk-remind", null, "ISSUE_201_BOOK_ISSUED"),
   },
 
   return: {
@@ -108,9 +121,8 @@ const server = {
     fetchAll: (e) =>
       restCall(`staff/book/all?${e}`, null, "BOOK_200_ALL_FETCHED"),
     fetch: (e) => restCall(`staff/book/one?id=${e}`, null, "BOOK_200_FETCHED"),
-    create: (e) => restCall("staff/book/create", e, "BOOK_201_CREATED"),
-    search: (e) =>
-      restCall(`staff/book/search?number=${e}`, null, "MEMBER_200_ALL_FETCHED"),
+    create: (e) => restCall("staff/book/create", e, "BOOK_200_CREATED"),
+    update: (e) => restCall("staff/book/update", e, "BOOK_200_UPDATED"),
   },
 
   settings: {
@@ -125,7 +137,14 @@ const server = {
       restCall(`staff/staff/all?${e}`, null, "STAFF_200_ALL_FETCHED"),
     fetch: (id) =>
       restCall(`staff/staff/one?id=${id}`, null, "STAFF_200_FETCHED"),
+    fetchForEdit: (id) =>
+      restCall(`staff/staff/edit?id=${id}`, null, "STAFF_200_FETCHED"),
+    fetchProfile: () =>
+      restCall("staff/staff/profile", null, "STAFF_200_FETCHED"),
+    create: (e) => restCall("staff/staff/create", e, "STAFF_201_CREATED"),
+    update: (e) => restCall("staff/staff/update", e, "STAFF_200_UPDATED"),
   },
+
   stats: () => restCall(`staff/stats`, null, "STATS_200_FETCHED"),
   public: {
     settings: () =>
@@ -133,6 +152,12 @@ const server = {
         "public/settings/application",
         null,
         "PUBLIC_200_SETTINGS_FETCHED"
+      ),
+    catalogue: (e) =>
+      restCall(
+        `public/catalogue/search?search=${e}`,
+        null,
+        "PUBLIC_200_CATALOGUE_FETCHED"
       ),
   },
 };

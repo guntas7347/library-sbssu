@@ -1,3 +1,4 @@
+import React from "react";
 import {
   ArrowDown,
   ArrowRight,
@@ -15,6 +16,8 @@ import SaveCancelButton from "../../../../../buttons/SaveCancelButton";
 const IssueCompatibilityCard = () => {
   const { data: cards, loading: l1 } = useSetting("LIBRARY-CARD-TYPES", []);
   const { data: books, loading: l2 } = useSetting("BOOKS-CATEGORIES", []);
+
+  // This is now the single source of truth for the compatibility matrix
   const { data, setData, loading, handleSave } = useSetting(
     "ISSUE-COMPATIBILITY",
     {}
@@ -22,71 +25,75 @@ const IssueCompatibilityCard = () => {
 
   if (l1 || l2 || loading) return <Spinner />;
 
-  const handleToggle = (row, col, toggle) => {
-    setData((prev) => ({
-      ...prev,
-      [row]: {
-        ...(prev?.[row] || {}),
-        [col]: toggle,
+  // A single, clean handler to update the compatibility state
+  const handleToggle = (cardType, bookCategory, isEnabled) => {
+    setData((prevData) => ({
+      ...prevData,
+      [cardType]: {
+        ...(prevData?.[cardType] || {}),
+        [bookCategory]: isEnabled,
       },
     }));
   };
 
   return (
-    <>
-      <div className="card p-6">
-        <CardHeader
-          title="Issue Compatibility"
-          svg={BookOpen}
-          svgClass="bg-purple-100 text-purple-600"
-        />
-        {/* Toggle Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-medium flex text-gray-900">
-                  <ArrowDown /> Card Type / Book Categories <ArrowRight />
+    <div className="card p-6">
+      <CardHeader
+        title="Issue Compatibility"
+        svg={BookOpen}
+        svgClass="bg-purple-100 text-purple-600"
+      />
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[600px]">
+          <thead>
+            <tr className="border-b border-gray-200 dark:border-gray-700">
+              <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-gray-100">
+                <div className="flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-purple-500" />
+                  <span>Card Type</span>
+                  <ArrowRight className="w-4 h-4 text-gray-400" />
+                  <Book className="w-4 h-4 text-green-500" />
+                  <span>Book Category</span>
+                </div>
+              </th>
+              {books.map((col) => (
+                <th
+                  key={col}
+                  className="text-center py-3 px-4 font-medium text-gray-900 dark:text-gray-100"
+                >
+                  {fromSnakeCase(col, true)}
                 </th>
-                {/* // books passed as col and cards as row */}
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {cards.map((row) => (
+              <tr
+                key={row}
+                className="border-b border-gray-100 dark:border-gray-800"
+              >
+                <td className="py-3 px-4 font-medium text-gray-800 dark:text-gray-200">
+                  {fromSnakeCase(row, 1)}
+                </td>
                 {books.map((col) => (
-                  <th
-                    key={col}
-                    className="text-center  py-3 px-4 font-medium text-gray-900"
-                  >
-                    <div className="flex-center gap-2">
-                      <Book className="text-green-400" />
-                      {fromSnakeCase(col, true)}
-                    </div>
-                  </th>
+                  <td key={col} className="py-3 px-4 text-center">
+                    <Toggle
+                      // The onToggle now calls our clean handler
+                      onToggle={(isEnabled) =>
+                        handleToggle(row, col, isEnabled)
+                      }
+                      // The 'checked' prop directly reads from our single state
+                      checked={data?.[row]?.[col] || false}
+                    />
+                  </td>
                 ))}
               </tr>
-            </thead>
-            <tbody>
-              {cards.map((row) => (
-                <tr key={row} className="border-b border-gray-100">
-                  <td className="py-3 px-4 font-medium">
-                    <div className="flex gap-2">
-                      <CreditCard className="text-purple-400" />
-                      {fromSnakeCase(row, true)}
-                    </div>
-                  </td>
-                  {books.map((col) => (
-                    <td key={col} className="py-3 px-4 font-medium text-center">
-                      <Toggle
-                        onToggle={(t) => handleToggle(row, col, t)}
-                        defaultToggle={data?.[row]?.[col]}
-                      />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <SaveCancelButton onSave={handleSave} />
+            ))}
+          </tbody>
+        </table>
       </div>
-    </>
+      <SaveCancelButton onSave={handleSave} />
+    </div>
   );
 };
 

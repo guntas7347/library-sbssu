@@ -1,5 +1,3 @@
-import React from "react";
-
 interface InfoFieldProps {
   label: string;
   value?: React.ReactNode;

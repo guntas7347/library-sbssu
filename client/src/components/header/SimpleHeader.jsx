@@ -1,5 +1,3 @@
-import React from "react";
-
 const SimpleHeader = ({ title = "", sub = "" }) => {
   return (
     <>

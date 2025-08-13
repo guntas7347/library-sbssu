@@ -1,27 +1,63 @@
+import { Book, Save } from "lucide-react";
+import PageHeader from "../../../../components/header/PageHeader";
 import BasicInfoForm from "../../../../components/features/dashboard/staff/book/cards/BasicInfoForm";
 import LocationPhysicalDetails from "../../../../components/features/dashboard/staff/book/cards/LocationPhysicalDetails";
 import TagsForm from "../../../../components/forms/tags/TagsForm";
 import AccessionsField from "../../../../components/features/dashboard/staff/book/cards/AccessionsField";
-import { useForm } from "../../../../hooks/useForm";
-import { Book, Save } from "lucide-react";
 import Confirmation from "../../../../components/features/dashboard/staff/book/modals/Confirmation";
+import { useForm } from "../../../../hooks/useForm";
 import useAlert from "../../../../hooks/useAlert";
 import server from "../../../../services/server.api";
 import useFeedback from "../../../../hooks/useFeedback";
-import PageHeader from "../../../../components/header/PageHeader";
 
 const AddBookPage = () => {
   const setFeedback = useFeedback();
-  const { formFields, handleChange, setFields } = useForm();
   const { showAlert, closeAlert, openAlert } = useAlert();
+
+  // The entire form state, including accessions, is managed here.
+  const { formFields, handleChange, setFields, setFormFields } = useForm({
+    tags: [],
+    accessions: [{ accessionNumber: "", category: "", condition: "" }],
+  });
+
+  // --- LOGIC FOR MANAGING ACCESSIONS ---
+
+  const handleAccessionsChange = (index, field, value) => {
+    const updatedAccessions = [...formFields.accessions];
+    updatedAccessions[index][field] = value;
+    setFields({ accessions: updatedAccessions });
+  };
+
+  const addAccession = () => {
+    setFields({
+      accessions: [
+        ...formFields.accessions,
+        { accessionNumber: "", category: "", condition: "" },
+      ],
+    });
+  };
+
+  const removeAccession = (index) => {
+    if (formFields.accessions.length > 1) {
+      const updatedAccessions = formFields.accessions.filter(
+        (_, i) => i !== index
+      );
+      setFields({ accessions: updatedAccessions });
+    }
+  };
 
   const handleSubmit = async () => {
     try {
       const res = await server.book.create(formFields);
       setFeedback(1, res);
+      setFormFields({
+        tags: [],
+        accessions: [{ accessionNumber: "", category: "", condition: "" }],
+      });
     } catch (error) {
-      console.log(error);
       setFeedback(2, error);
+    } finally {
+      closeAlert();
     }
   };
 
@@ -41,8 +77,12 @@ const AddBookPage = () => {
         }}
       >
         <div className="space-y-4">
-          <BasicInfoForm onChange={handleChange} />
-          <TagsForm onChange={(e) => setFields({ tags: e })} />
+          {/* Pass the form state and handler down */}
+          <BasicInfoForm formFields={formFields} onChange={handleChange} />
+          <TagsForm
+            value={formFields.tags}
+            onChange={(newTags) => setFields({ tags: newTags })}
+          />
         </div>
         <div className="space-y-4">
           <button
@@ -52,8 +92,19 @@ const AddBookPage = () => {
             <Save className="w-5 h-5" />
             <span>Add Book</span>
           </button>
-          <AccessionsField onChange={(e) => setFields({ accessions: e })} />{" "}
-          <LocationPhysicalDetails onChange={handleChange} />
+
+          {/* Pass the accessions state and the new handlers down */}
+          <AccessionsField
+            accessions={formFields.accessions}
+            onAccessionChange={handleAccessionsChange}
+            onAddAccession={addAccession}
+            onRemoveAccession={removeAccession}
+          />
+
+          <LocationPhysicalDetails
+            formFields={formFields}
+            onChange={handleChange}
+          />
         </div>
       </form>
       <Confirmation

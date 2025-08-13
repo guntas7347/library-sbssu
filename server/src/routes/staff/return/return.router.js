@@ -1,51 +1,42 @@
 import { Router } from "express";
-import crs from "../../../utils/crs/crs.js";
-import { createLog } from "../../../utils/log.js";
-import prisma from "../../../services/prisma.js";
-import { processReturn } from "./return.middlewares.js";
-import { findReturnedBooks } from "../../../controllers/return/findReturnedBooks.js";
-import { fetchReturnDetails } from "../../../controllers/return/fetchReturnDetails.js";
-import { findIssuedBookForReturn } from "../../../controllers/return/findIssuedBookForReturn.js";
+import { authorisationLevel } from "../../../middlewares/auth/auth.middlewares.js";
+import { fetchReturnDetailsHandler } from "../../../middlewares/return/fetchReturnDetails.js";
+import { fetchBookForIssueSchema } from "../../../schema/issue/fetchBookForIssueSchema.js";
+import validate from "../../../middlewares/validateRequest.js";
+import { findReturnedBooksHandler } from "../../../middlewares/return/findReturnedBooks.js";
+import { findReturnsSchema } from "../../../schema/return/findReturnsSchema.js";
+import { returnBookHandler } from "../../../middlewares/return/returnBook.js";
+import { fetchReturnBookDetailsHandler } from "../../../middlewares/return/fetchReturnBookDetails.js";
+import idSchema from "../../../schema/common/idSchema.js";
+import { returnBookSchema } from "../../../schema/return/returnBookSchema.js";
 
 const returnRouter = Router();
 
-returnRouter.get("/fetch", async (req, res) => {
-  try {
-    const issuedBook = await findIssuedBookForReturn(req.query.number);
-    if (!issuedBook) return res.status(200).json(crs.DATA_204_NOT_FOUND());
-    return res.status(200).json(crs.RETURN_200_FETCHED(issuedBook));
-  } catch (error) {
-    createLog(error);
-    return res.status(500).json(crs.SERR_500_INTERNAL(error));
-  }
-});
+returnRouter.get(
+  "/fetch",
+  authorisationLevel(["return_books"]),
+  validate(fetchBookForIssueSchema),
+  fetchReturnDetailsHandler
+);
 
-returnRouter.post("/return", processReturn, async (req, res) => {
-  try {
-    return res.status(201).json(crs.RETURN_201_BOOK_ISSUED());
-  } catch (error) {
-    createLog(error);
-    return res.status(500).json(crs.SERR_500_INTERNAL(error));
-  }
-});
+returnRouter.post(
+  "/return",
+  authorisationLevel(["return_books"]),
+  validate(returnBookSchema),
+  returnBookHandler
+);
 
-returnRouter.get("/all", async (req, res) => {
-  try {
-    const returns = await findReturnedBooks(req.query);
-    return res.status(200).json(crs.RETURN_200_FETCHED(returns));
-  } catch (error) {
-    createLog(error);
-    return res.status(500).json(crs.SERR_500_INTERNAL(error));
-  }
-});
+returnRouter.get(
+  "/all",
+  authorisationLevel(["return_books"]),
+  validate(findReturnsSchema),
+  findReturnedBooksHandler
+);
 
-returnRouter.get("/one", async (req, res) => {
-  try {
-    const returned = await fetchReturnDetails(req.query.id);
-    return res.status(200).json(crs.RETURN_200_FETCHED(returned));
-  } catch (error) {
-    createLog(error);
-    return res.status(500).json(crs.SERR_500_INTERNAL(error));
-  }
-});
+returnRouter.get(
+  "/one",
+  authorisationLevel(["return_books"]),
+  validate(idSchema),
+  fetchReturnBookDetailsHandler
+);
 export default returnRouter;

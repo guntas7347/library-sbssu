@@ -1,4 +1,3 @@
-import React from "react";
 import { lazy } from "react";
 import { Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
@@ -15,12 +14,11 @@ const StaffDashboard = () => {
         <Route
           path="/dashboard/*"
           element={
-            <ProtectedRoute userType="STAFF">
+            <ProtectedRoute userType="staff">
               <Suspense fallback={<CenteredSpinner />}>
                 <StaffRoutes />
               </Suspense>
             </ProtectedRoute>
-            // <div>Heyy</div>
           }
         />
 

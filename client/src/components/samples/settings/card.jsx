@@ -1,4 +1,3 @@
-import React from "react";
 import { CreditCard, Plus, Minus, X } from "lucide-react";
 
 const LibraryCardPage = () => {

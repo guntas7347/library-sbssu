@@ -162,9 +162,9 @@ export async function uploadBooks(filePath) {
 // 3. Run the script from your terminal using: `node your_script_name.js`
 
 // Define the path to the JSON file.
-const filePath = path.resolve(
-  "./src/misc/library-data-json/acm/20201-21937-acm-errors.json"
-);
+// const filePath = path.resolve(
+//   "./src/misc/library-data-json/acm/20201-21937-acm-errors.json"
+// );
 
 // GUNTAS READ ME => below function.import it to app (only import). add file path in above file path. It needs acm type (all accessionNumbers key with numbers in book object itself.)
 

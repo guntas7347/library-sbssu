@@ -51,8 +51,6 @@ const IssueDetails = () => {
     );
   }
 
-  console.log(data);
-
   return (
     <div className="min-h-screen space-y-5">
       <PageHeader

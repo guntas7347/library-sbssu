@@ -4,6 +4,7 @@ import server from "../../services/server.api";
 import Input from "../../components/forms/input/Input-2";
 import { useForm } from "../../hooks/useForm";
 import LoginCard from "../../components/features/login/LoginCard";
+import { URL_PATH } from "../../utils/keys";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ const ForgotPassword = () => {
   const setFeedback = useFeedback();
 
   const { formFields, handleChange } = useForm({
-    url: `${window.location.protocol}//${window.location.hostname}/reset-password?token=`,
+    url: `${URL_PATH}/reset-password?token=`,
   });
 
   const handleSubmit = async (e) => {

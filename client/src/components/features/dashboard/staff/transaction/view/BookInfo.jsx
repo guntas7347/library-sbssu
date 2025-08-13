@@ -1,5 +1,5 @@
 import { Book } from "lucide-react";
-import React from "react";
+
 import { imagePathUrl } from "../../../../../../utils/functions";
 import { useNavigate } from "react-router-dom";
 

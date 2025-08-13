@@ -21,6 +21,12 @@ import ReturnDetails from "../../pages/dashboard/staff/searchReturn/ReturnDetail
 import TransactionSearchPage from "../../pages/dashboard/staff/transactions/SearchPage";
 import TransactionDetailsPage from "../../pages/dashboard/staff/transactions/DetailsPage";
 import AddTransaction from "../../pages/dashboard/staff/transactions/AddTransaction";
+import StaffProfilePage from "../../pages/dashboard/staff/staff/StaffProfilePage";
+import ViewStaffPage from "../../pages/dashboard/staff/staff/ViewStaffPage";
+import AddStaffPage from "../../pages/dashboard/staff/staff/AddStaffPage";
+import EditStaffPage from "../../pages/dashboard/staff/staff/EditStaffPage";
+import EditBook from "../../pages/dashboard/staff/books/EditBook";
+import EditMemberPage from "../../pages/dashboard/staff/member/EditMember";
 
 const StaffRoutes = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -44,15 +50,19 @@ const StaffRoutes = () => {
         <div className="flex-1 p-2 lg:p-4">
           <Routes>
             <Route index element={<HomePage />} />
+            <Route path="profile" element={<StaffProfilePage />} />
+
             <Route path="applications" element={<ApplicationsPage />} />
 
             <Route path="members" element={<MemberPage />} />
             <Route path="members/:id" element={<MemberDetails />} />
-            <Route path="members/allot-card" element={<AllotCard />} />
+            <Route path="members/:id/allot-card" element={<AllotCard />} />
+            <Route path="members/:id/edit" element={<EditMemberPage />} />
 
             <Route path="books" element={<BookPage />} />
             <Route path="books/:id" element={<BookDetails />} />
             <Route path="books/add" element={<AddBookPage />} />
+            <Route path="books/:id/edit" element={<EditBook />} />
 
             <Route path="issue-books" element={<IssuePage />} />
             <Route path="return-books" element={<ReturnPage />} />
@@ -71,6 +81,9 @@ const StaffRoutes = () => {
             <Route path="transactions/add" element={<AddTransaction />} />
 
             <Route path="staff" element={<StaffPage />} />
+            <Route path="staff/add" element={<AddStaffPage />} />
+            <Route path="staff/edit/:id" element={<EditStaffPage />} />
+            <Route path="staff/:id" element={<ViewStaffPage />} />
             <Route path="settings/*" element={<SettingsPage />} />
           </Routes>
         </div>

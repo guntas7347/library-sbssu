@@ -1,5 +1,3 @@
-import React from "react";
-
 const AboutPage = () => {
   return (
     <div className="px-2 md:px-10 py-5 flex flex-col gap-5 overflow-hidden c-about">

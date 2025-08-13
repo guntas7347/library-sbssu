@@ -10,7 +10,7 @@ const SearchBar2 = ({
   page = 1,
 }) => {
   const { formFields, handleChange, setFields, resetFormFields } = useForm({
-    name: "all",
+    filter: "all",
     search: "",
   });
 
@@ -20,7 +20,7 @@ const SearchBar2 = ({
 
   const handleSearch = (e) => {
     if ("key" in e && e.key !== "Enter" && e.type !== "click") return;
-    onSearch({ name: formFields.name, value: formFields.search, page });
+    onSearch({ filter: formFields.filter, value: formFields.search, page });
   };
 
   useEffect(() => {
@@ -55,9 +55,11 @@ const SearchBar2 = ({
           </div>
           <div className=" gap-4">
             <select
-              name="name"
-              onChange={(e) => setFields({ search: "", name: e.target.value })}
-              value={formFields.name}
+              name="filter"
+              onChange={(e) =>
+                setFields({ search: "", filter: e.target.value })
+              }
+              value={formFields.filter}
               className="px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all duration-200"
             >
               {options.map((option) => (

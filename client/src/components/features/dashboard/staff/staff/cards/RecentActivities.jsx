@@ -1,5 +1,4 @@
 import { Activity } from "lucide-react";
-import React from "react";
 
 const RecentActivities = ({ data }) => {
   return (

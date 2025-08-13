@@ -1,4 +1,3 @@
-import React from "react";
 import PageHeader from "../../../../components/header/PageHeader";
 import { CreditCard, Plus } from "lucide-react";
 import SearchBar2 from "../../../../components/forms/searchBar/SearchBar-2";

@@ -1,5 +1,3 @@
-import React from "react";
-
 const InfoField = ({ label = "", value = "" }) => {
   return (
     <div className="flex items-center justify-between">

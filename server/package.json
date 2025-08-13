@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "version": "4.2.0",
+  "version": "5.0.0",
   "description": "library server",
   "license": "ISC",
   "author": "Guntas Singh",
@@ -22,8 +22,10 @@
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.0",
     "jsonwebtoken": "^9.0.2",
+    "mailgen": "^2.0.29",
     "multer": "^2.0.1",
-    "nodemailer": "^7.0.3",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^7.0.5",
     "speakeasy": "^2.0.0",
     "zod": "^3.25.74"
   },

@@ -1,4 +1,3 @@
-import React from "react";
 import Spinner from "../../../../../components/feedback/spinner/Spinner";
 
 const StatCard = ({ stat = { change: 0 }, loading = true }) => {

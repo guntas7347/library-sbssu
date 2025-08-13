@@ -30,7 +30,7 @@ const MemberTypes = () => {
         {data.map((item, idx) => (
           <ListOption
             key={idx}
-            label={fromSnakeCase(item, true)}
+            label={fromSnakeCase(item, 1)}
             onDelete={() => {
               const temp = [...data];
               temp.splice(idx, 1);

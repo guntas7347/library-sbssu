@@ -10,13 +10,14 @@ import CurrentIssues from "../../../../components/features/dashboard/staff/book/
 import useFeedback from "../../../../hooks/useFeedback";
 import server from "../../../../services/server.api";
 import AccessionNumbersCard from "../../../../components/features/dashboard/staff/book/cards/AccesionNumbersCard";
+import QuickActions from "../../../../components/features/common/QuickActions";
 
 const BookDetails = () => {
   const setFeedback = useFeedback();
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const [data, setData] = useState(null); // Initialize with null
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,8 +39,7 @@ const BookDetails = () => {
     };
 
     fetchBook();
-    // Dependency array ensures this runs only when `id` changes
-  }, []);
+  }, [id]);
 
   // A more informative loading state
   if (loading) return <div>Loading...</div>;
@@ -66,6 +66,11 @@ const BookDetails = () => {
         <div className="lg:col-span-1 grid gap-y-4">
           <ProfileCard data={data} />
           <AccessionNumbersCard data={data} />
+          <QuickActions
+            actions={[
+              { label: "Edit", svg: Book, onClick: () => navigate("edit") },
+            ]}
+          />
         </div>
         <div className="lg:col-span-2 grid gap-y-4">
           <BookInformation data={data} />

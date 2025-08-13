@@ -1,16 +1,11 @@
-import React from "react";
-
 const FinancialSummary = ({ data }) => {
   // Use optional chaining and nullish coalescing to safely access nested data.
   // This prevents crashes if `financialSummary` or its properties are missing.
-  const totalFines = data?.financialSummary?.totalFines ?? 0;
-  const paid = data?.financialSummary?.paid ?? 0;
+  const totalDebits = data?.financialSummary?.totalDebits ?? 0;
+  const totalCredits = data?.financialSummary?.totalCredits ?? 0;
   const outstanding = data?.financialSummary?.outstanding ?? 0;
 
-  // Render nothing if the parent component hasn't passed the data prop yet.
-  if (!data) {
-    return null;
-  }
+  if (!data) return null;
 
   return (
     <div className="mt-6 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 p-6">
@@ -19,15 +14,17 @@ const FinancialSummary = ({ data }) => {
       </h4>
       <div className="space-y-3">
         <div className="flex justify-between">
-          <span className="text-gray-600 dark:text-gray-400">Total Fines</span>
+          <span className="text-gray-600 dark:text-gray-400">Total Debits</span>
           <span className="font-semibold text-gray-900 dark:text-white">
-            ₹{totalFines}
+            ₹{totalDebits}
           </span>
         </div>
         <div className="flex justify-between">
-          <span className="text-gray-600 dark:text-gray-400">Paid</span>
+          <span className="text-gray-600 dark:text-gray-400">
+            Total Credits
+          </span>
           <span className="font-semibold text-green-600 dark:text-green-400">
-            ₹{paid}
+            ₹{totalCredits}
           </span>
         </div>
         <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-3">

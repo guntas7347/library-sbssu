@@ -1,4 +1,3 @@
-import React from "react";
 import Input from "../../../../../forms/input/Input-2";
 import { MapPin } from "lucide-react";
 

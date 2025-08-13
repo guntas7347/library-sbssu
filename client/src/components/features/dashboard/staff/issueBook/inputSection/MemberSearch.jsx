@@ -24,7 +24,7 @@ const MemberSearch = ({ onSelect = () => {} }) => {
 
   const fetchMember = async () => {
     const input = formFields.search?.trim();
-    if (!input || input.length !== 6) {
+    if (!input || input.length < 6) {
       setData(null);
       return;
     }
@@ -63,7 +63,7 @@ const MemberSearch = ({ onSelect = () => {} }) => {
 
       <Input
         label="Member ID"
-        placeholder="eg., 25-001"
+        placeholder="eg., 25001"
         name="search"
         onChange={handleChange}
         SVG={<Scan />}

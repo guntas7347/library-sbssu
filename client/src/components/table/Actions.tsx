@@ -1,4 +1,3 @@
-import React from "react";
 import { Edit, Eye, Trash2 } from "lucide-react";
 
 type ActionsProps = {
@@ -15,7 +14,7 @@ const Actions: React.FC<ActionsProps> = ({
   children,
 }) => {
   return (
-    <div className="flex-center space-x-2">
+    <div className="flex justify-start items-center space-x-2">
       {onView && (
         <button
           className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-all duration-200"

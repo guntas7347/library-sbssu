@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PageHeader from "../../../../components/header/PageHeader";
 import { Currency } from "lucide-react";
 import FormCard from "../../../../components/features/dashboard/staff/transaction/add/FormCard";
@@ -16,7 +16,7 @@ const AddTransaction = () => {
         colorClass="bg-purple-700"
       />
       <div className="grid grid-cols-3 gap-2">
-        <SearchMembers onSelect={(e) => setMember(e)} />
+        <SearchMembers onSelect={(member) => setMember(member)} />
         <div className="col-span-2">
           <FormCard member={member} />
         </div>

@@ -1,5 +1,3 @@
-import React from "react";
-
 const Toggle = ({ label = "", onChange, defaultChecked, disabled = false }) => {
   return (
     <div>

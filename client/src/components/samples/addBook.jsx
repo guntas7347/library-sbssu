@@ -154,7 +154,6 @@ export default function AddBookPage() {
         addedDate: new Date().toISOString().split("T")[0],
       };
 
-      console.log("Book data to submit:", bookPayload);
       alert(
         `Book "${bookData.title}" added successfully with ${bookIds.length} copies!`
       );

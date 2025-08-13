@@ -1,4 +1,3 @@
-import React from "react";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import { Loader2, Upload, X, Crop, Info, CheckCircle } from "lucide-react";

@@ -163,7 +163,6 @@ export default function AllotLibraryCardPage() {
         issuedDate: new Date().toISOString(),
       };
 
-      console.log("Library card data to submit:", cardPayload);
       alert(
         `Library card ${cardData.cardNumber} has been successfully allotted to ${selectedMember.name}!`
       );

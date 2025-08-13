@@ -73,12 +73,7 @@ const ApplicationTable = ({ data }) => {
     },
     {
       header: "Actions",
-      render: (item) => (
-        <Actions
-          onView={() => setModal("view", item.id)}
-          onDelete={() => setModal("delete", item.id)}
-        />
-      ),
+      render: (item) => <Actions onView={() => setModal("view", item.id)} />,
     },
   ];
 
@@ -86,9 +81,7 @@ const ApplicationTable = ({ data }) => {
     <>
       <Table data={data} architecture={architecture} />
       {modal.name === "view" && (
-        <>
-          <ApplicantModal id={modal.id} onClose={closeModal} />
-        </>
+        <ApplicantModal id={modal.id} onClose={closeModal} />
       )}
     </>
   );

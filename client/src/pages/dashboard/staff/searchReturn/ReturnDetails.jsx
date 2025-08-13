@@ -7,6 +7,9 @@ import {
   Calendar,
   DollarSign,
   Info,
+  ReceiptIndianRupee,
+  IndianRupee,
+  ExternalLink,
 } from "lucide-react";
 
 import server from "../../../../services/server.api";
@@ -171,13 +174,24 @@ const DetailsCard = ({ data, navigate }) => {
 
 // Child Component for Fine and Remarks
 const FinancialCard = ({ data }) => {
+  const navigate = useNavigate();
+
   if (!data) return null;
+
   return (
     <div className="p-6 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 space-y-4">
       <div>
         <h4 className="font-bold text-gray-900 dark:text-white mb-2 flex items-center">
-          <DollarSign className="w-5 h-5 mr-2 text-green-500" />
+          <IndianRupee className="w-5 h-5 mr-2 text-green-500" />
           Fine Details
+          {data.fine.id && (
+            <ExternalLink
+              onClick={() =>
+                navigate(`/staff/dashboard/transactions/${data.fine.id}`)
+              }
+              className="ml-2 text-green-500 hover:bg-gray-100 p-1 size-8 rounded-xl"
+            />
+          )}
         </h4>
         <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-xl space-y-2 text-sm">
           <DetailRow
@@ -257,7 +271,7 @@ const ReturnDetails = () => {
         setLoading(false);
       }
     })();
-  }, [id, setFeedback, navigate]);
+  }, []);
 
   if (loading) return null;
 

@@ -6,7 +6,7 @@ import {
   verifyFingerprint,
   verifyJwtMiddleware,
   verifyStaff,
-} from "../middlewares/auth.middlewares.js";
+} from "../middlewares/auth/auth.middlewares.js";
 
 const router = new Router();
 

@@ -1,4 +1,3 @@
-import React from "react";
 import SimpleHeader from "../../../../components/header/SimpleHeader";
 
 const SecuritySettings = () => {

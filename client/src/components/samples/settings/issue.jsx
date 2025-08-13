@@ -1,4 +1,3 @@
-import React from "react";
 import { Clock, Shield, BookOpen, Plus, Minus, X } from "lucide-react";
 
 const IssueSettingsPage = () => {

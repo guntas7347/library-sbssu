@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/feedback/spinner/Spinner";
 import { useForm } from "../../hooks/useForm";
@@ -34,8 +34,7 @@ const ResetPasswordPage = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await server.auth.verifyLink({ token });
-        setFeedback(1, res);
+        const res = await server.auth.verifyLink({ code: token });
         setData(res.data);
         const resetCodeTime = new Date(res.data.resetCodeTime).getTime();
         const expiry = new Date(resetCodeTime + 1000 * 60 * 15);
@@ -68,7 +67,10 @@ const ResetPasswordPage = () => {
     }
 
     try {
-      const res = await server.auth.resetPassword(formFields, token);
+      const res = await server.auth.resetPassword({
+        ...formFields,
+        code: token,
+      });
       setFeedback(1, res);
       navigate("/login");
     } catch (error) {

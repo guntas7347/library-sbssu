@@ -1,5 +1,5 @@
 import { BookOpen, CheckCircle } from "lucide-react";
-import React from "react";
+
 import useFeedback from "../../../../../../hooks/useFeedback";
 import server from "../../../../../../services/server.api";
 import { useState } from "react";
@@ -14,9 +14,7 @@ const IssueSummary = ({
   const [btn, setBtn] = useState(true);
   const { showAlert, closeAlert, openAlert } = useAlert();
 
-  const [issueDate, setIssueDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [issueDate, setIssueDate] = useState(new Date());
   const handleIssueBook = async () => {
     try {
       setBtn(false);
@@ -104,8 +102,8 @@ const IssueSummary = ({
           <Input
             type="date"
             label="Issue Date"
-            value={issueDate}
             onChange={(e) => setIssueDate(e.target.value)}
+            defaultValue={new Date().toISOString().split("T")[0]}
           />
         </div>
 
@@ -120,7 +118,7 @@ const IssueSummary = ({
       </div>
       <IssueConfirmation
         show={showAlert}
-        data={data}
+        data={{ ...data, issueDate }}
         onYes={handleIssueBook}
         onClose={closeAlert}
       />

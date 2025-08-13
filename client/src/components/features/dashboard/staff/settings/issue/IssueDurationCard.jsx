@@ -11,7 +11,7 @@ const IssueDurationCard = () => {
     "ISSUE-DURATION",
     []
   );
-  if (loading) return <Spinner center />;
+  if (loading) return <Spinner solo />;
 
   return (
     <>

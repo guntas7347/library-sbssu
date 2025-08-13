@@ -1,12 +1,12 @@
 import z from "zod";
 
 export const applicationSchema = z.object({
-  rollNumber: z.coerce.number(),
+  rollNumber: z.coerce.number().optional(),
   fullName: z.string().trim().min(1, "Full name is required"),
   fatherName: z.string().trim().min(1, "Father's name is required"),
   photo: z.string().min(1, "Photo is required"),
-  cast: z.enum(["general", "sc_st", "other"]).default("general"),
-  gender: z.enum(["male", "female", "other"]).default("male"),
+  cast: z.enum(["general", "scst", "other"]),
+  gender: z.enum(["male", "female", "other"]),
   dob: z.coerce.date({ required_error: "Date of birth is required" }),
   program: z.string().min(1, "Program is required"),
   specialization: z.string().min(1, "Specialization is required"),

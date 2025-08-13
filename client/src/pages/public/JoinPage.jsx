@@ -23,6 +23,7 @@ import ProfilePhotoUploader from "../../components/features/public/join/ProfileP
 import Header from "../../components/features/public/join/Header";
 import TermsOfService from "../../components/features/public/join/TermsOfService";
 import PageHeader from "../../components/header/PageHeader";
+import { URL_PATH } from "../../utils/keys";
 
 // Step 1: Personal Information Component
 const PersonalInfoStep = ({ formFields, handleChange, setFields }) => (
@@ -261,6 +262,7 @@ const JoinPage = () => {
     setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
+  const printApplicationLink = `${URL_PATH}/join/applied`;
   const handleSubmit = async () => {
     if (!formFields.photo) {
       setFeedback(2, "Please upload your profile photo.");
@@ -270,11 +272,31 @@ const JoinPage = () => {
 
     setIsSubmitting(true);
     try {
-      const res = await server.application.create(formFields);
+      const res = await server.application.create({
+        printApplicationLink,
+        ...formFields,
+      });
       setFeedback(1, res);
       navigate("/join/applied");
     } catch (error) {
-      setFeedback(2, error.message || "An unexpected error occurred.");
+      setFeedback(2, error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const testSubmit = async () => {
+    try {
+      const formFields = autofillTestData(programs, specializations);
+
+      const res = await server.application.create({
+        printApplicationLink,
+        ...formFields,
+      });
+      setFeedback(1, res);
+      navigate("/join/applied");
+    } catch (error) {
+      setFeedback(2, error);
     } finally {
       setIsSubmitting(false);
     }
@@ -291,6 +313,12 @@ const JoinPage = () => {
           colorClass="bg-blue-700"
         />
 
+        <button
+          className="p-2 bg-blue-400 m-5 flex hover:bg-blue-700 rounded-lg text-white"
+          onClick={testSubmit}
+        >
+          <Rocket /> Test Submit
+        </button>
         <div className="mt-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-6 sm:p-8 lg:p-10">
             {/* Progress Bar */}

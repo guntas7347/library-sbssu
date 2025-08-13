@@ -1,5 +1,4 @@
 import { Calculator } from "lucide-react";
-import React from "react";
 
 const FineCalculation = () => {
   return (

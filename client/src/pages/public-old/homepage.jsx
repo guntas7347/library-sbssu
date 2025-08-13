@@ -1,5 +1,3 @@
-import React from "react";
-
 const Homepage = () => {
   return (
     <div className="flex justify-center items-center h-96">

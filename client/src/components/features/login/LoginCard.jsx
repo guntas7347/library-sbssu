@@ -1,4 +1,3 @@
-import React from "react";
 import HelpSection from "../public/footer/HelpSection";
 
 const LoginCard = ({ title, subTitle, children }) => {

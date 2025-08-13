@@ -1,4 +1,3 @@
-import React from "react";
 import Table from "../../../../table/Table";
 import { fromSnakeCase, imagePathUrl } from "../../../../../utils/functions";
 import {

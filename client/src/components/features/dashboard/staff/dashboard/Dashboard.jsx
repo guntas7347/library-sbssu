@@ -6,7 +6,7 @@ import {
   User,
   Users,
 } from "lucide-react";
-import React from "react";
+
 import PageHeader from "../pageHeader/PageHeader";
 
 const Dashboard = () => {

@@ -1,4 +1,3 @@
-import React from "react";
 import SimpleHeader from "../../../../components/header/SimpleHeader";
 import FineCard from "../../../../components/features/dashboard/staff/settings/return/FineCard";
 

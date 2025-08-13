@@ -62,6 +62,7 @@ export const fetchReturnDetails = async (returnId) => {
             amount: true,
             paymentMethod: true,
             createdAt: true,
+            id: true,
           },
         },
       },
@@ -101,6 +102,7 @@ export const fetchReturnDetails = async (returnId) => {
         cardNumber: returnedBook.libraryCard?.cardNumber,
       },
       fine: {
+        id: returnedBook.fine?.id ?? null,
         amount: returnedBook.fine?.amount ?? 0,
         paidOn: returnedBook.fine?.createdAt?.toISOString() ?? null,
         paymentMethod: returnedBook.fine?.paymentMethod ?? "N/A",

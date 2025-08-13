@@ -1,4 +1,3 @@
-import React from "react";
 import TablePagination from "../pagination/tablePagination";
 
 const ButtonTable = ({

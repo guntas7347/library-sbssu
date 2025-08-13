@@ -6,65 +6,48 @@ const padNumber = (num, width) => {
   return String(num).padStart(width, "0");
 };
 
-// ✅ Application ID: LIB-25-001
-export const generateApplicationId = (lastId = null) => {
+/**
+ * Generates a formatted Application ID from a sequence number.
+ * @param {number} sequenceNumber The unique number from the sequence.
+ * @returns {string} Formatted ID (e.g., "LIB-25-0001").
+ */
+export const generateApplicationId = (sequenceNumber) => {
   const year = getYearSuffix();
-  let num = 1;
-
-  if (lastId && lastId.startsWith(`LIB-${year}-`)) {
-    const parts = lastId.split("-");
-    const lastNum = parseInt(parts[2], 10);
-    if (!isNaN(lastNum)) num = lastNum + 1;
-  }
-
-  return `LIB-${year}-${padNumber(num, 3)}`;
+  return `LIB-${year}-${padNumber(sequenceNumber, 4)}`;
 };
 
-// ✅ Member ID: MEM-25-001
-export const generateMemberId = (lastId = null) => {
+/**
+ * Generates a formatted Member ID from a sequence number.
+ * @param {number} sequenceNumber The unique number from the sequence.
+ * @returns {string} Formatted ID (e.g., "MEM-25-0001").
+ */
+export const generateMemberId = (sequenceNumber) => {
   const year = getYearSuffix();
-  let num = 1;
-
-  if (lastId && lastId.startsWith(`MEM-${year}-`)) {
-    const parts = lastId.split("-");
-    const lastNum = parseInt(parts[2], 10);
-    if (!isNaN(lastNum)) num = lastNum + 1;
-  }
-
-  return `MEM-${year}-${padNumber(num, 3)}`;
+  return `MEM-${year}-${padNumber(sequenceNumber, 4)}`;
 };
 
-// ✅ Library Card ID: MEM-25-001-01
-// Pass membershipId like "MEM-25-001", and lastCardId like "MEM-25-001-02"
-export function generateLibraryCardId(lastCardId = null, memberId = null) {
-  if (!lastCardId && memberId) {
-    const parts = memberId.split("-");
-    if (parts.length !== 3) return null;
+/**
+ * Generates a formatted Library Card ID from a member ID and a copy number.
+ * @param {string} memberId The member's full ID (e.g., "MEM-25-0001").
+ * @param {number} copyNumber The copy number for the card (e.g., 1, 2).
+ * @returns {string|null} Formatted ID (e.g., "CRD-25-0001-01") or null if memberId is invalid.
+ */
+export function generateLibraryCardId(memberId, copyNumber) {
+  if (!memberId) return null;
+  const parts = memberId.split("-");
+  if (parts.length !== 3) return null;
 
-    const year = parts[1];
-    const memberNum = parts[2];
-    return `CRD-${year}-${memberNum}-01`;
-  }
-
-  const parts = lastCardId?.split("-");
-  if (!parts || parts.length !== 4) return null;
-
-  const lastCopy = parseInt(parts[3], 10);
-  if (isNaN(lastCopy)) return null;
-
-  const nextCopy = String(lastCopy + 1).padStart(2, "0");
-  return `${parts[0]}-${parts[1]}-${parts[2]}-${nextCopy}`;
+  const year = parts[1];
+  const memberNum = parts[2];
+  return `CRD-${year}-${memberNum}-${padNumber(copyNumber, 2)}`;
 }
 
-const getDateString = () => {
-  const now = new Date();
-  return now.toISOString().slice(0, 10).replace(/-/g, ""); // YYYYMMDD
-};
-
-// ✅ Issue Ref Number: IRN-25-0001
+/**
+ * Generates a formatted Issue Reference Number from a sequence number.
+ * @param {number} sequenceNumber The unique number from the sequence.
+ * @returns {string} Formatted ID (e.g., "IRN-25-0001").
+ */
 export const generateIssueRefNumber = (sequenceNumber) => {
-  // 1. Get the last two digits of the current year (e.g., "25")
-  const year = new Date().getFullYear().toString().slice(-2);
-  // 2. Format the number into the final ID string (e.g., "IRN-25-0101")
+  const year = getYearSuffix();
   return `IRN-${year}-${padNumber(sequenceNumber, 4)}`;
 };

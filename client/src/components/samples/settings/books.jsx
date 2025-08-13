@@ -1,4 +1,3 @@
-import React from "react";
 import { BookOpen, Plus, X } from "lucide-react";
 
 const BooksPage = () => {

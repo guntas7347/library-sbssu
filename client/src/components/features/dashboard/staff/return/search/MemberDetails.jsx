@@ -1,4 +1,3 @@
-import React from "react";
 import { imagePathUrl } from "../../../../../../utils/functions";
 
 const MemberDetails = ({ member }) => {

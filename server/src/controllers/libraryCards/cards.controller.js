@@ -1,3 +1,4 @@
+import { createLog } from "../../utils/log.js";
 import { fetchSettings } from "../settings.controller.js";
 
 export const getLCAAL = async (memberType) => {
@@ -8,6 +9,7 @@ export const getLCAAL = async (memberType) => {
     const cardLimit = limits[memberType];
     return { cardLimit, cardType };
   } catch (error) {
+    createLog(error);
     return 0;
   }
 };

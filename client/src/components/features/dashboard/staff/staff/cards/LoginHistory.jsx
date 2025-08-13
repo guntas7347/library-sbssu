@@ -1,5 +1,4 @@
 import { Clock, Monitor } from "lucide-react";
-import React from "react";
 
 const LoginHistory = ({ data }) => {
   return (

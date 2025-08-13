@@ -1,5 +1,3 @@
-import React from "react";
-
 const CardHeader = ({ svg: Svg, title = "", svgClass = "" }) => {
   return (
     <>

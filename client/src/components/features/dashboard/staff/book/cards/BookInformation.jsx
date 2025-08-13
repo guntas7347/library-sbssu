@@ -1,4 +1,3 @@
-import React from "react";
 import InfoField from "../../../../../forms/infoField/InfoField ";
 import { Book } from "lucide-react";
 

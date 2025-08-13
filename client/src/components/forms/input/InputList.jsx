@@ -23,6 +23,7 @@ const InputList = ({
           name={name}
           value={formFields[name] || ""}
           onChange={handleChange}
+          autoComplete="off"
           onKeyUp={(e) => {
             if (e.key === "Enter" && e.target.value) handleAdd();
           }}

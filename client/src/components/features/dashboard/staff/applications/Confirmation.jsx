@@ -1,4 +1,3 @@
-import React from "react";
 import { User, GraduationCap, Info, CreditCard } from "lucide-react";
 import ConfirmationModal from "../../../../modals/confirmation-model";
 import { fromSnakeCase } from "../../../../../utils/functions";

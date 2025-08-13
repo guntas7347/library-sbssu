@@ -14,12 +14,6 @@ const ProfileCard = ({ data }) => {
               src={imagePathUrl(data?.photo)}
               alt={data?.fullName || "Member"}
               className="w-32 h-32 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-lg"
-              // Add a fallback for broken image links
-              onError={(e) => {
-                e.target.onerror = null;
-                e.target.src =
-                  "https://placehold.co/128x128/cccccc/333333?text=N/A";
-              }}
             />
             <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-green-500 rounded-full border-4 border-white dark:border-gray-800 flex items-center justify-center">
               <CheckCircle className="w-5 h-5 text-white" />
@@ -28,10 +22,12 @@ const ProfileCard = ({ data }) => {
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
             {data?.fullName ?? "Member Name N/A"}
           </h3>
-          <p className="text-green-600 dark:text-green-400 font-semibold mb-4">
+          <p className="text-green-600 dark:text-green-400 font-semibold">
             {fromSnakeCase(data?.memberType, 1) ?? "Unknown"} Member
           </p>
-
+          <p className="text-gray-600 dark:text-gray-400 font-semibold mb-4">
+            ID: {data?.membershipId || "N/A"}
+          </p>
           <div className="space-y-3 text-left">
             <div className="flex items-center space-x-3">
               <Mail className="w-5 h-5 text-gray-400" />
@@ -48,7 +44,7 @@ const ProfileCard = ({ data }) => {
             <div className="flex items-center space-x-3">
               <Calendar className="w-5 h-5 text-gray-400" />
               <span className="text-gray-600 dark:text-gray-300 text-sm">
-                {data?.dob ? new Date(data.dob).toDateString() : "N/A"}
+                {data?.dob || "N/A"}
               </span>
             </div>
             <div className="flex items-center space-x-3">

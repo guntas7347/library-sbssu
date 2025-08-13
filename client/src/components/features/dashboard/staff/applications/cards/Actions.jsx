@@ -1,5 +1,4 @@
 import { AlertCircle, CheckCircle, Edit } from "lucide-react";
-import React from "react";
 
 const Actions = ({ handleApprove, handleReject, disabled = false }) => {
   return (

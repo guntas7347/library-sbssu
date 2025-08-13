@@ -1,5 +1,4 @@
 import { Book, BookPlus } from "lucide-react";
-import React from "react";
 
 export const AddModalTitle = () => {
   return (

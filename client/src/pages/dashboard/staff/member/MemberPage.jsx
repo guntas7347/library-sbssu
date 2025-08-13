@@ -31,14 +31,7 @@ const MemberPage = () => {
         svg={Users}
         sub="Search and manage library members"
         colorClass="bg-purple-700"
-      >
-        <Link
-          className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/50 hover:bg-purple-200 dark:hover:bg-purple-900/70 transition-all duration-200"
-          to="allot-card"
-        >
-          <TicketPlus className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-        </Link>
-      </PageHeader>
+      />
       <SearchBar2
         page={tableData.page}
         onSearch={handleFetch}
@@ -46,6 +39,7 @@ const MemberPage = () => {
         menuOptions={[
           { label: "Name", value: "fullName" },
           { label: "Membership ID", value: "membershipId" },
+          { label: "Cleared", value: "cleared" },
         ]}
       />
 

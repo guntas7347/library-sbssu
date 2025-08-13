@@ -1,5 +1,4 @@
 import { NotebookPen } from "lucide-react";
-import React from "react";
 
 const RemarkCard = ({
   onChange = () => {},

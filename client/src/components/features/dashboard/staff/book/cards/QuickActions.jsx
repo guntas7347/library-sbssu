@@ -1,5 +1,4 @@
 import { BarChart3, BookOpen, Plus } from "lucide-react";
-import React from "react";
 
 const QuickActions = () => {
   return (

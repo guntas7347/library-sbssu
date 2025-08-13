@@ -1,4 +1,3 @@
-import React from "react";
 import useToggle from "../../hooks/useToggle";
 import { Link, useLocation } from "react-router-dom";
 import DarkModeToggler from "../../components/darkModeToggler/darkModeToggler";

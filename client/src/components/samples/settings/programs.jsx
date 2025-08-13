@@ -1,4 +1,3 @@
-import React from "react";
 import { Plus, X, Clock, BookOpen, Settings } from "lucide-react";
 
 const ProgramsPage = () => {

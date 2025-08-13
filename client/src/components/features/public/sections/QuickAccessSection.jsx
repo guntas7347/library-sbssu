@@ -23,7 +23,7 @@ const QuickAccessSection = ({ ref }) => {
       title: "Search Catalog",
       sub: "Find books, articles, and other library materials.",
       buttonLabel: "Search Now",
-      to: "/search",
+      to: "/catalogue",
       svg: Search,
       color: "blue",
     },

@@ -1,5 +1,4 @@
 import { AlertCircle, BookOpen, Eye, User } from "lucide-react";
-import React from "react";
 
 const CurrentIssues = ({ data }) => {
   // Safely access the array, defaulting to an empty array

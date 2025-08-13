@@ -1,6 +1,6 @@
 import Table from "../../../../table/Table";
 import Actions from "../../../../table/Actions";
-import ViewStaffModal from "./modals/ViewStaffModal";
+import ViewStaffModal from "../../../../../pages/dashboard/staff/staff/ViewStaffPage";
 import useModal from "../../../../../hooks/useModal";
 import { fromSnakeCase, imagePathUrl } from "../../../../../utils/functions";
 import {
@@ -13,10 +13,10 @@ import {
   XCircle,
 } from "lucide-react";
 import GenderIcon from "../../../../blocks/genderIcon/GenderIcon";
+import { useNavigate } from "react-router-dom";
 
 const StaffTable = ({ data }) => {
-  const { modal, setModal, closeModal } = useModal();
-
+  const navigate = useNavigate();
   const architecture = [
     {
       header: "Staff Info",
@@ -114,18 +114,9 @@ const StaffTable = ({ data }) => {
       header: "Actions",
       render: (item) => (
         <Actions
-          onView={() => setModal({ type: "view", id: item.id })}
-          onEdit={() => setModal({ type: "edit", id: item.id })}
-          onDelete={() => setModal({ type: "delete", id: item.id })}
-        >
-          <button
-            className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg transition-all duration-200"
-            onClick={() => setModal({ type: "schedule", id: item.id })}
-            type="button"
-          >
-            <Calendar className="w-4 h-4" />
-          </button>
-        </Actions>
+          onView={() => navigate(`/staff/dashboard/staff/${item.id}`)}
+          onEdit={() => navigate(`/staff/dashboard/staff/edit/${item.id}`)}
+        ></Actions>
       ),
     },
   ];
@@ -133,9 +124,6 @@ const StaffTable = ({ data }) => {
   return (
     <>
       <Table data={data} architecture={architecture} />
-      {modal.name === "view" && (
-        <ViewStaffModal id={modal.id} onClose={closeModal} />
-      )}
     </>
   );
 };

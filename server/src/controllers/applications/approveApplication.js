@@ -1,10 +1,10 @@
 import prisma from "../../services/prisma.js";
 import { hashPassword } from "../../utils/bycrypt.js";
 import { generateMemberId } from "../../utils/functions/idGenerator.js";
-import { getLatestMembershipId } from "../../controllers/member.controller.js";
 import { getCardExpiry, getLCAAL } from "../libraryCards/cards.controller.js";
-import { cardNumbersArray } from "../../utils/functions/functions.js";
 import crypto from "crypto";
+import { getNextSequenceValue } from "../getNextSequenceValue.js";
+import { cardNumbersArray } from "../../utils/functions/cardNumbersArray .js";
 
 /**
  * Approves a member application, creating a membership ID, auth record, and library cards.
@@ -16,9 +16,14 @@ import crypto from "crypto";
 export const approveApplication = async (applicationId, staffId) => {
   return await prisma.$transaction(async (tx) => {
     // 1. Update member status and generate a new membership ID.
-    const latestMembershipId = await getLatestMembershipId(tx);
-    const generatedMembershipId = generateMemberId(latestMembershipId);
+    const yearSuffix = new Date().getFullYear().toString().slice(-2);
+    const sequenceName = `membershipId_${yearSuffix}`;
 
+    // Get the next unique number for the current year.
+    const newSequenceValue = await getNextSequenceValue(tx, sequenceName);
+
+    // Format the number into the final ID string (e.g., "MEM-25-001").
+    const generatedMembershipId = generateMemberId(newSequenceValue);
     const updatedMember = await tx.member.update({
       where: { id: applicationId },
       data: {
@@ -32,19 +37,13 @@ export const approveApplication = async (applicationId, staffId) => {
       updatedMember.batch,
       updatedMember.program
     );
-    const { cardLimit, cardType } = await getLCAAL(updatedMember.memberType);
+    var { cardLimit, cardType } = await getLCAAL(updatedMember.memberType);
 
     if (!cardLimit || cardLimit <= 0) {
-      throw new Error(
-        `Invalid card limit for member type: ${updatedMember.memberType}`
-      );
+      cardLimit = 0;
     }
 
-    const cardNumbers = cardNumbersArray(
-      generatedMembershipId,
-      null,
-      cardLimit
-    );
+    const cardNumbers = cardNumbersArray(generatedMembershipId, cardLimit);
 
     // 3. Create a new auth record for the member.
     await tx.auth.create({
@@ -65,8 +64,12 @@ export const approveApplication = async (applicationId, staffId) => {
       await tx.libraryCard.create({
         data: {
           cardNumber,
-          memberId: updatedMember.id,
-          createdBy: staffId,
+          member: {
+            connect: { id: updatedMember.id },
+          },
+          staff: {
+            connect: { id: staffId },
+          },
           autoAlloted: true,
           type: cardType,
           expiry,

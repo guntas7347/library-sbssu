@@ -169,7 +169,6 @@ model IssuedBook {
   issuedBy        Staff       @relation("IssuedByStaff", fields: [issuedById], references: [id])
   issuedById      String
   issueRemark     String?
-  issueCondition  String
 }
 
 model ReturnedBook {

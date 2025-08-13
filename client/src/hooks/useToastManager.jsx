@@ -12,7 +12,6 @@ const useToastManager = () => {
 
   const showToast = ({ message, severity = "info", duration = 5000 }) => {
     const id = generateSimpleId();
-    console.log(id);
 
     const toast = { id, message, severity, show: true, duration };
     setToasts((prev) => [...prev, toast]);

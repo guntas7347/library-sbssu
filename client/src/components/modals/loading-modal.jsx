@@ -1,4 +1,3 @@
-import React from "react";
 import Spinner from "../feedback/spinner/Spinner";
 import Modal from "./modal.component";
 

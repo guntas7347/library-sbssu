@@ -5,7 +5,6 @@ import {
   Eye,
   FileText,
 } from "lucide-react";
-import React from "react";
 
 const Documents = ({
   data = {

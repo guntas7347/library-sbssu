@@ -1,4 +1,3 @@
-import React from "react";
 import ConfirmationModal from "../../../../../modals/confirmation-model"; // Assuming this is the correct path
 import { Book, User, Calendar, Clock, Info } from "lucide-react";
 import { fromSnakeCase } from "../../../../../../utils/functions";
@@ -26,7 +25,8 @@ const IssueConfirmation = ({
   const remark = data?.remark;
 
   // Calculate the due date for display
-  const issueDate = new Date();
+  var issueDate = data?.issueDate || new Date();
+  issueDate = new Date(issueDate);
   const dueDate = new Date();
   dueDate.setDate(issueDate.getDate() + duration);
 

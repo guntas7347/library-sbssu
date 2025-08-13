@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import useQueryParams from "../hooks/useQueryParams.hook";
 import { useForm } from "../forms/use-form-hook/use-form.hook.component";

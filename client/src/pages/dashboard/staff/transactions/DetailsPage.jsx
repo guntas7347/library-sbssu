@@ -34,7 +34,7 @@ const TransactionDetailsPage = () => {
       }
     };
     fetchTransaction();
-  }, []);
+  }, [id]);
 
   if (loading) return null;
 

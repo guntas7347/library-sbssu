@@ -8,6 +8,8 @@ import {
   X,
 } from "lucide-react";
 import DarkModeToggler from "../../../../darkModeToggler/darkModeToggler";
+import { useNavigate } from "react-router-dom";
+import UserProfileDropdown from "./UserProfileDropdown";
 
 const Navbar = ({
   isMobileMenuOpen,
@@ -15,13 +17,21 @@ const Navbar = ({
   isSidebarCollapsed,
   setIsSidebarCollapsed,
 }) => {
+  const navigate = useNavigate();
+
   return (
     <>
       <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-lg border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="px-10">
           <div className="flex justify-between items-center py-4">
             {/* Logo and Title */}
             <div className="flex items-center space-x-4">
+              <button
+                onClick={() => navigate(-1)}
+                className="hidden lg:block p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
+              >
+                <ChevronLeft />
+              </button>{" "}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="lg:hidden p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
@@ -37,9 +47,9 @@ const Navbar = ({
                 className="hidden lg:block p-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-200"
               >
                 {isSidebarCollapsed ? (
-                  <ChevronRight className="w-5 h-5" />
+                  <Menu className="w-5 h-5" />
                 ) : (
-                  <ChevronLeft className="w-5 h-5" />
+                  <Menu className="w-5 h-5" />
                 )}
               </button>
               <div className="flex items-center space-x-3">
@@ -64,9 +74,7 @@ const Navbar = ({
                 <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
               </button>
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-white" />
-              </div>
+              <UserProfileDropdown />
             </div>
           </div>
         </div>

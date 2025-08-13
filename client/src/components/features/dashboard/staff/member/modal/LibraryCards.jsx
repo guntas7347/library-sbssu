@@ -22,7 +22,7 @@ const LibraryCards = ({ id, onClose = () => {} }) => {
         onClose();
       }
     })();
-  }, []);
+  }, [loading]);
 
   if (loading)
     return <LoadingModal onClose={onClose} title={() => LibraryCardsTitle()} />;
@@ -30,7 +30,9 @@ const LibraryCards = ({ id, onClose = () => {} }) => {
   return (
     <Modal title={() => LibraryCardsTitle()} onClose={onClose}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <LibraryCard data={data} />
+        {data.map((card) => (
+          <LibraryCard data={card} onUpdate={() => setLoading(true)} />
+        ))}
       </div>
     </Modal>
   );

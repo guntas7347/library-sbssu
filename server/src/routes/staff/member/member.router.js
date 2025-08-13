@@ -1,92 +1,84 @@
 import { Router } from "express";
-import { authorisationLevel } from "../../../middlewares/auth.middlewares.js";
-import crs from "../../../utils/crs/crs.js";
-import { createLog } from "../../../utils/log.js";
-import { getMembers } from "../../../controllers/member.controller.js";
-import prisma from "../../../services/prisma.js";
-import { fetchMemberProfile } from "../../../controllers/member/fetchMemberProfile.js";
+import { authorisationLevel } from "../../../middlewares/auth/auth.middlewares.js";
+import { findMembersHandler } from "../../../middlewares/member/findMembers.js";
+import { fetchMemberProfileHandler } from "../../../middlewares/member/fetchMemberProfile.js";
+import { searchMembersHandler } from "../../../middlewares/member/searchMembers.js";
+import { fetchMemberForAllotHandler } from "../../../middlewares/member/fetchMemberForAllot.js";
+import validateRequest from "../../../middlewares/validateRequest.js";
+import { AllotCardSchema } from "../../../schema/member/AllotCardSchema.js";
+import { allotNewCardHandler } from "../../../middlewares/member/allotNewCard.js";
+import { findLibraryCardsHandler } from "../../../middlewares/member/findLibraryCards.js";
+import validate from "../../../middlewares/validateRequest.js";
+import idSchema from "../../../schema/common/idSchema.js";
+import { findMembersSchema } from "../../../schema/member/findMembersSchema.js";
+import searchSchema from "../../../schema/member/searchSchema.js";
+import { fetchMemberForEditHandler } from "../../../middlewares/member/fetchMemberForEdit.js";
+import { updateMemberSchema } from "../../../schema/member/updateMemberSchema.js";
+import { updateMemberHandler } from "../../../middlewares/member/updateMemberHandler.js";
+import { updateCardStatusSchema } from "../../../schema/member/updateCardStatusSchema.js";
+import { updateCardStatusHandler } from "../../../middlewares/member/updateCardStatus.js";
+import { issueNoDueHandler } from "../../../middlewares/member/issueNoDue.js";
 
 const memberRouter = Router();
 
 memberRouter.get(
   "/all",
-  authorisationLevel(["search-members"]),
-  async (req, res) => {
-    try {
-      const members = await getMembers(req.query);
-      //   if (members.studentsArray.length === 0)
-      //     return res.status(200).json(crs.SRH404GLB());
-
-      return res.status(200).json(crs.MEMBER_200_ALL_FETCHED(members));
-    } catch (error) {
-      createLog(error);
-      return res.status(500).json(crs.SERR_500_INTERNAL(error));
-    }
-  }
+  authorisationLevel(["view_members"]),
+  validate(findMembersSchema),
+  findMembersHandler
 ); //fetch-all-members
 
 memberRouter.get(
   "/one",
-  authorisationLevel(["view-member"]),
-  async (req, res) => {
-    try {
-      const member = await fetchMemberProfile(req.query.id);
-      if (!member) return res.status(200).json(crs.DATA_204_NOT_FOUND());
-      return res.status(200).json(crs.MEMBER_200_FETCHED(member));
-    } catch (error) {
-      createLog(error);
-      return res.status(500).json(crs.SERR_500_INTERNAL(error));
-    }
-  }
+  authorisationLevel(["view_members"]),
+  validate(idSchema),
+  fetchMemberProfileHandler
 ); // fetch one
 
-memberRouter.get("/cards", async (req, res) => {
-  try {
-    const m = await prisma.member.findUnique({
-      where: {
-        id: req.query.id,
-      },
-      select: {
-        fullName: true,
-        program: true,
-        specialization: true,
-        rollNumber: true,
-        membershipId: true,
-        photo: true,
-        libraryCards: {
-          include: {
-            staff: true,
-          },
-        },
-      },
-    });
+memberRouter.get(
+  "/cards",
+  authorisationLevel(["view_members"]),
+  validate(idSchema),
+  findLibraryCardsHandler
+);
 
-    return res.status(200).json(crs.MEMBER_200_CARDS_FETCHED(m));
-  } catch (error) {
-    createLog(error);
-    return res.status(500).json(crs.SERR_500_INTERNAL(error));
-  }
-});
+memberRouter.get(
+  "/for-edit",
+  authorisationLevel(["view_members"]),
+  validate(idSchema),
+  fetchMemberForEditHandler
+);
 
-memberRouter.get("/search", async (req, res) => {
-  try {
-    const lastDigits = req.query.number;
-    const pattern = `-${lastDigits}`;
+memberRouter.post(
+  "/update",
+  authorisationLevel(["edit_members"]),
+  validate(updateMemberSchema),
+  updateMemberHandler
+);
 
-    const members = await prisma.member.findMany({
-      where: {
-        membershipId: {
-          endsWith: pattern,
-        },
-      },
-      include: { libraryCards: true },
-    });
+memberRouter.get("/search", validate(searchSchema), searchMembersHandler);
 
-    return res.status(200).json(crs.MEMBER_200_ALL_FETCHED(members));
-  } catch (error) {
-    createLog(error);
-    return res.status(500).json(crs.SERR_500_INTERNAL(error));
-  }
-});
+memberRouter.get("/allot-data", validate(idSchema), fetchMemberForAllotHandler);
+
+memberRouter.post(
+  "/allot-card",
+  authorisationLevel(["allot_cards"]),
+  validateRequest(AllotCardSchema),
+  allotNewCardHandler
+);
+
+memberRouter.post(
+  "/card-status",
+  authorisationLevel(["manage_card_status"]),
+  validateRequest(updateCardStatusSchema),
+  updateCardStatusHandler
+);
+
+memberRouter.post(
+  "/issue-no-due",
+  authorisationLevel(["issue_no_due"]),
+  validate(idSchema),
+  issueNoDueHandler
+);
 
 export default memberRouter;

@@ -8,12 +8,8 @@ const PrintButton = ({ data }) => {
 
   const handlePrint = useReactToPrint({
     contentRef,
-    documentTitle: "235030",
-    pageStyle: `
-        @page {
-          size: 210mm 297mm;
-          margin:0 } 
-      `,
+    documentTitle: data?.applicationId || "library-form",
+    pageStyle: `@page { size: 210mm 297mm; margin: 0; }`,
   });
   return (
     <>

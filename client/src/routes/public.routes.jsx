@@ -1,4 +1,3 @@
-import React from "react";
 import { Route, Routes } from "react-router-dom";
 import Homepage from "../pages/public-old/homepage";
 import NotFoundPage from "../components/404/404";
@@ -12,12 +11,14 @@ import Footer from "../components/features/public/footer/Footer";
 import AboutPage from "../pages/public/AboutPage";
 import ApplicationNotFound from "../pages/public/NoApplicationPage";
 import Navbar from "../components/features/public/navbar/Navbar";
+import Catalogue from "../pages/public/Catalogue";
 
 const PublicRoutes = () => {
   return (
     <div>
       <Routes>
         <Route index element={<LandingPage />} />
+        <Route path="/catalogue" element={<Catalogue />} />
         <Route path="/join" element={<JoinPage />} />
         <Route path="/join/applied" element={<AppliedPage />} />
         <Route path="/join/applied/404" element={<ApplicationNotFound />} />

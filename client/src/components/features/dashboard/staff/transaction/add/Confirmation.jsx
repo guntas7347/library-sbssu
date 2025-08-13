@@ -1,5 +1,5 @@
 // src/components/features/dashboard/staff/transactions/cards/Confirmation.jsx
-import React from "react";
+
 import ConfirmationModal from "../../../../../modals/confirmation-model";
 import { fromSnakeCase } from "../../../../../../utils/functions";
 

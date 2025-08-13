@@ -1,4 +1,3 @@
-import React from "react";
 import CardHeader from "../../../../../header/CardHeader";
 import { DollarSign, Minus, Plus } from "lucide-react";
 import CounterField from "../../../../../forms/counter/CounterField";
@@ -30,7 +29,7 @@ const FineCard = () => {
         {data.map((item) => (
           <CounterField
             key={item}
-            label={fromSnakeCase(item, true)}
+            label={fromSnakeCase(item, 1)}
             onChange={(count) => setFields({ [item]: count })}
             defaultValue={fineData?.[item]}
           />
