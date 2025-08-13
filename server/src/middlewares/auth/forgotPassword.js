@@ -14,7 +14,7 @@ export const handleForgotPassword = async (req, res) => {
 
     // 1. Find the user by their username.
     const user = await prisma.auth.findUnique({
-      where: { username: username.toLowerCase() },
+      where: { username },
       select: { id: true, email: true, username: true },
     });
 

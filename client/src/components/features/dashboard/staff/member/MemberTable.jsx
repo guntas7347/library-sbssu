@@ -118,7 +118,6 @@ const MemberTable = ({ data }) => {
           onView={() => {
             if (item.id) navigate(item.id);
           }}
-          onEdit={() => {}}
         >
           <button
             className="p-2 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-green-900/50 rounded-lg transition-all duration-200"

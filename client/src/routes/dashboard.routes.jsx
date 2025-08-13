@@ -4,8 +4,10 @@ import { Route, Routes } from "react-router-dom";
 import NotFoundPage from "../components/404/404";
 import ProtectedRoute from "./ProtectedRoute";
 import Spinner from "../components/feedback/spinner/Spinner";
+import { Loader2 } from "lucide-react";
 
 const StaffRoutes = lazy(() => import("./staff/staff.routes"));
+const MemberRoutes = lazy(() => import("./member/MemberRoutes"));
 
 const StaffDashboard = () => {
   return (
@@ -28,11 +30,34 @@ const StaffDashboard = () => {
   );
 };
 
+export const MemberDashboard = () => {
+  return (
+    <>
+      <Routes>
+        <Route
+          path="/dashboard/*"
+          element={
+            <ProtectedRoute userType="member">
+              <Suspense fallback={<CenteredSpinner />}>
+                <MemberRoutes />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </>
+  );
+};
+
 const CenteredSpinner = () => {
   return (
-    <div className="flex flex-row justify-center items-center h-screen">
-      <Spinner />
-    </div>
+    <Loader2
+      className={
+        "animate-spin min-h-screen text-blue-400 self-center w-32 mx-auto"
+      }
+    />
   );
 };
 

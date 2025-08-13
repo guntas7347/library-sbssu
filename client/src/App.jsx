@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import LoginRoutes from "./routes/login.routes";
 import PublicRoutes from "./routes/public.routes";
 import ResetPasswordPage from "./pages/login/reset-password";
-import StaffDashboard from "./routes/dashboard.routes";
+import StaffDashboard, { MemberDashboard } from "./routes/dashboard.routes";
 import ScrollToTop from "./components/blocks/scrollToTop/ScrollToTop";
 import Test from "./test";
 
@@ -22,6 +22,7 @@ const App = () => {
           <Route path="/login/*" element={<LoginRoutes />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/staff/*" element={<StaffDashboard />} />
+          <Route path="/member/*" element={<MemberDashboard />} />
         </Routes>
       </div>
       {/* <Footer /> */}

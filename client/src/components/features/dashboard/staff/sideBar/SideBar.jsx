@@ -15,13 +15,7 @@ import {
 
 import { Link } from "react-router-dom";
 
-const SideBar = ({
-  isMobileMenuOpen,
-  setIsMobileMenuOpen,
-  isSidebarCollapsed,
-  activeTab,
-  setActiveTab,
-}) => {
+const SideBar = ({ isMobileMenuOpen, isSidebarCollapsed, activeTab }) => {
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: BarChart3, to: " " },
     { id: "issue-books", label: "Issue Books", icon: BookOpen },
@@ -33,7 +27,6 @@ const SideBar = ({
     { id: "books", label: "Books", icon: Book },
     { id: "applications", label: "Applications", icon: FileText },
     { id: "staff", label: "Staff", icon: Shield },
-    { id: "sessions", label: "Sessions", icon: Activity },
     { id: "settings", label: "Settings", icon: Settings },
   ];
   return (
@@ -51,10 +44,6 @@ const SideBar = ({
               <Link
                 key={item.id}
                 to={`/staff/dashboard/${item.to || item.id}`}
-                onClick={() => {
-                  // setActiveTab(item.id);
-                  // setIsMobileMenuOpen(false);
-                }}
                 className={`w-full flex items-center ${
                   isSidebarCollapsed ? "justify-center" : "space-x-3"
                 } px-4 py-3 rounded-xl text-left transition-all duration-200 group relative ${

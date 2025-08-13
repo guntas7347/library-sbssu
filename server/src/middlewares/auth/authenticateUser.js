@@ -29,7 +29,7 @@ export const authenticateUser = async (req, res, next) => {
 
     // 1. Find the user in the database by username (case-insensitive)
     const authDoc = await prisma.auth.findUnique({
-      where: { username: username.toLowerCase() },
+      where: { username },
     });
 
     if (!authDoc)

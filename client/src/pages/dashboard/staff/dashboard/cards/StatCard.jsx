@@ -9,9 +9,9 @@ const StatCard = ({ stat = { change: 0 }, loading = true }) => {
             <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
               {stat.title}
             </p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
+            <div className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
               {loading ? <Spinner solo /> : stat.value}
-            </p>
+            </div>
             <p
               className={`text-sm mt-2 ${
                 stat.change.startsWith("+") ? "text-green-600" : "text-red-600"

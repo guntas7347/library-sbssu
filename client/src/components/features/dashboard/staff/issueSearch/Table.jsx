@@ -119,14 +119,7 @@ const IssueSearchTable = ({ data }) => {
       render: (item) =>
         // Ensure item.id exists before passing to setModal
         item?.id ? (
-          <Actions onView={() => navigate(item.id)}>
-            <button
-              className="p-2 text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/50 rounded-lg transition-all duration-200"
-              type="button"
-            >
-              <Mail className="w-4 h-4" />
-            </button>
-          </Actions>
+          <Actions onView={() => navigate(item.id)} />
         ) : (
           <span className="text-sm text-gray-500">No Actions (ID missing)</span>
         ),
