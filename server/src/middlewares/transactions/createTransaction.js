@@ -46,8 +46,8 @@ export const createTransactionHandler = async (req, res) => {
       const currentBalance = member.balance;
       const newBalance =
         transactionType === "DEBIT"
-          ? currentBalance + Number(amount) // Debit increases the amount owed
-          : currentBalance - Number(amount); // Credit decreases the amount owed
+          ? currentBalance - amount // Debit decreases balance
+          : currentBalance + amount; // Credit increases balance
 
       // c. Update the member's balance
       await tx.member.update({
@@ -61,7 +61,7 @@ export const createTransactionHandler = async (req, res) => {
           memberId,
           transactionType,
           category,
-          amount: Number(amount),
+          amount: amount,
           closingBalance: newBalance,
           paymentMethod,
           receiptNumber,
@@ -70,6 +70,16 @@ export const createTransactionHandler = async (req, res) => {
         },
       });
     });
+    const transactionEmail = {
+      email: transaction,
+      fullName: transaction.fullName,
+      transactionType: transaction.transactionType,
+      amount: transaction.amount / 100,
+      balance: transaction.closingBalance / 100,
+      category: transaction.category,
+      date: new Date(transaction.createdAt).toLocaleDateString(),
+    };
+    console.log(transaction);
 
     return res.status(201).json(crs.TRANSACTION_201_CREATED(transaction));
   } catch (error) {

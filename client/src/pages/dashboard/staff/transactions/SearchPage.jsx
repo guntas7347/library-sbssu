@@ -44,7 +44,10 @@ const TransactionSearchPage = () => {
         onSearch={handleFetch}
         loader={loader}
         menuOptions={[
+          { label: "Member", value: "member" },
           { label: "Issue Ref Number", value: "irn" },
+          { label: "Receipt", value: "receipt" },
+          { label: "Amount", value: "amount" },
           { label: "Overdue", value: "due" },
           { label: "Accession Number", value: "acc" },
           { label: "Card Number", value: "card" },

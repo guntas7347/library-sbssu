@@ -81,6 +81,7 @@ export const findApplicationsHandler = async (req, res) => {
     const response = {
       data: applications,
       totalPages,
+      totalCount,
     };
 
     return res.status(200).json(crs.APPLICATION_200_SEARCHED(response));

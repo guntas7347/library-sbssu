@@ -143,17 +143,8 @@ export const imagePathUrl = (photo) => {
     : "https://placehold.co/64x64/cccccc/333333?text=N/A";
 };
 
-export const memberTypeOptions = [
-  { label: "Student UG", value: "student_ug" },
-  { label: "Student PG", value: "student_pg" },
-  { label: "Teacher Regular", value: "teacher_regular" },
-  { label: "Teacher Adhoc", value: "teacher_adhoc" },
-  { label: "Non Teaching Staff", value: "non_teaching_staff" },
-  { label: "Special Member", value: "special_member" },
-];
-
 export const autofillTestData = (programs, specializations) => {
-  const roles = ["undergraduate", "postgraduate", "teacher"];
+  const roles = ["undergraduate", "postgraduate"];
 
   const categories = ["general", "scst", "other"];
 
@@ -246,7 +237,7 @@ export const autofillTestData = (programs, specializations) => {
     memberType: getRandomItem(roles),
     program: program,
     specialization: specialization,
-    batch: 2025,
+    batch: "2025",
     streetAddress: "Ajit Road",
     city: "Ludhiana",
     state: "Punjab",

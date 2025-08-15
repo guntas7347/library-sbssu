@@ -7,9 +7,9 @@ export const createStaffSchema = z.object({
     .string()
     .min(3, { message: "Username must be at least 3 characters." }),
   email: z.string().email({ message: "A valid email address is required." }),
-  idNumber: z.coerce
-    .number()
-    .int({ message: "A valid ID number is required." }),
+  idNumber: z
+    .string()
+    .regex(/^\d+$/, { message: "A valid ID number is required." }),
 
   // Optional fields
   rights: z.array(z.string()).optional(),

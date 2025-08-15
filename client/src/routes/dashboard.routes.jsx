@@ -55,7 +55,7 @@ const CenteredSpinner = () => {
   return (
     <Loader2
       className={
-        "animate-spin min-h-screen text-blue-400 self-center w-32 mx-auto"
+        "animate-spin min-h-screen text-blue-400 self-center w-10 mx-auto"
       }
     />
   );

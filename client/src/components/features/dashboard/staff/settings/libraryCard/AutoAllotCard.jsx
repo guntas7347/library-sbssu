@@ -63,16 +63,18 @@ const AutoAllotCard = () => {
       </div>
 
       <div className="grid md:grid-cols-3 gap-5">
-        {memberTypes.map((item) => (
-          <CounterField
-            key={item}
-            label={fromSnakeCase(item, 1)}
-            // Use the controlled 'value' prop
-            value={data?.limits?.[item] || 0}
-            maxValue={20}
-            onChange={(count) => handleLimitChange(item, count)}
-          />
-        ))}
+        {memberTypes.map((item) => {
+          return (
+            <CounterField
+              key={item}
+              label={fromSnakeCase(item, 1)}
+              value={data?.limits?.[item] || 0}
+              defaultValue={data?.limits?.[item] || 0}
+              maxValue={20}
+              onChange={(count) => handleLimitChange(item, count)}
+            />
+          );
+        })}
       </div>
 
       <SaveCancelButton

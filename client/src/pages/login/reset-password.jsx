@@ -55,17 +55,6 @@ const ResetPasswordPage = () => {
       return;
     }
 
-    const strongPasswordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-
-    if (!strongPasswordRegex.test(formFields.password)) {
-      setFeedback(
-        2,
-        "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character."
-      );
-      return;
-    }
-
     try {
       const res = await server.auth.resetPassword({
         ...formFields,

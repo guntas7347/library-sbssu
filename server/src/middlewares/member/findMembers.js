@@ -90,7 +90,7 @@ export const findMembersHandler = async (req, res) => {
     const formattedMembers = members.map((member) => ({
       ...member,
       booksIssued: member._count.libraryCards,
-      fineAmount: member.balance,
+      fineAmount: member.balance / 100,
     }));
 
     const totalPages = Math.ceil(totalCount / limit);
@@ -103,6 +103,7 @@ export const findMembersHandler = async (req, res) => {
     const response = {
       data: formattedMembers,
       totalPages,
+      totalCount,
     };
 
     return res.status(200).json(crs.MEMBER_200_ALL_FETCHED(response));

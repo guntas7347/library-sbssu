@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 export const fetchMemberForIssueSchema = z.object({
-  number: z.string().regex(/^\d{6}$/, {
-    message: "Membership ID must be a 6-digit number.",
-  }),
+  search: z
+    .string()
+    .max(20, { message: "Search value must be at most 20 characters." })
+    .nonempty({ message: "Search value is required." }),
 });

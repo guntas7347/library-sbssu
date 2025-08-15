@@ -53,12 +53,13 @@ export const findReturnedBooksHandler = async (req, res) => {
           returnDate: true,
           issueDate: true,
           dueDate: true,
-          returnRemark: true,
+
           fine: { select: { amount: true } },
           bookAccession: {
             select: {
               accessionNumber: true,
               book: { select: { title: true, author: true } },
+              condition: true,
             },
           },
           libraryCard: {
@@ -105,8 +106,8 @@ export const findReturnedBooksHandler = async (req, res) => {
         returnDate: returnDate.toLocaleDateString(),
         borrowDuration,
         isLate,
-        condition: item.returnRemark || "Unknown",
-        fine: item.fine?.amount || 0,
+        condition: item?.bookAccession?.condition || "Unknown",
+        fine: item.fine?.amount / 100 || 0,
       };
     });
 

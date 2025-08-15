@@ -20,11 +20,11 @@ model Member {
   membershipId       String?       @unique
   applicationId      String        @unique
   authId             String?
-  rollNumber         Int?
+  rollNumber         String?
   fullName           String
   fatherName         String
   photo              String
-  batch              Int
+  batch              String
   email              String
   phoneNumber        String
   cast               String        @default("general")
@@ -67,7 +67,7 @@ model LibraryCard {
 
 model Staff {
   id                   String         @id @default(uuid())
-  idNumber             Int            @unique
+  idNumber             String         @unique
   fullName             String
   authId               String?
   phoneNumber          String?
@@ -207,10 +207,10 @@ model Transaction {
   transactionType TransactionType
   category        String
   remark          String?
-  amount          Float
+  amount          Int
   receiptNumber   String?
   paymentMethod   String
-  closingBalance  Float
+  closingBalance  Int
   createdAt       DateTime        @default(now())
 }
 

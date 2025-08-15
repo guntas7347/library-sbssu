@@ -15,7 +15,7 @@ import server from "../../../../../../services/server.api";
  */
 
 const FormCard = ({ member = null }) => {
-  const { formFields, handleChange, resetFormFields } = useForm({
+  const { formFields, handleChange, resetFormFields, setFields } = useForm({
     transactionType: "",
     category: "",
     amount: "0",
@@ -29,18 +29,42 @@ const FormCard = ({ member = null }) => {
 
   if (!member) return null; // Don't render if no member is selected
 
+  const handleAmountChange = (e) => {
+    let value = e.target.value;
+
+    // Remove invalid characters (anything not digit or dot)
+    value = value.replace(/[^\d.]/g, "");
+
+    // Allow only a single dot
+    const parts = value.split(".");
+    if (parts.length > 2) {
+      value = parts[0] + "." + parts[1];
+    }
+
+    // Limit to two decimal digits
+    if (parts[1]?.length > 2) {
+      value = parts[0] + "." + parts[1].slice(0, 2);
+    }
+
+    // Convert to paisas (cents) for storage
+    const paisas = Math.round(parseFloat(value || "0") * 100);
+
+    // Update state
+    setFields({ amount: paisas });
+  };
+
   const closingBalance = () => {
     const amount = parseFloat(formFields.amount);
-    if (isNaN(amount)) return member.balance.toFixed(2);
+    if (isNaN(amount)) return (member.balance / 100).toFixed(2);
 
-    //  Use uppercase to match select options
     if (formFields.transactionType === "DEBIT") {
-      return (member.balance - amount).toFixed(2);
+      return ((member.balance - amount) / 100).toFixed(2);
     }
     if (formFields.transactionType === "CREDIT") {
-      return (member.balance + amount).toFixed(2);
+      return ((member.balance + amount) / 100).toFixed(2);
     }
-    return member.balance.toFixed(2); // Default to current balance if no type selected
+
+    return (member.balance / 100).toFixed(2); // Default to current balance if no type selected
   };
 
   const handleSubmit = async () => {
@@ -115,8 +139,8 @@ const FormCard = ({ member = null }) => {
             type="number"
             placeholder="0.00"
             SVG={IndianRupee}
-            onChange={handleChange}
-            value={formFields.amount}
+            onChange={handleAmountChange}
+            value={formFields.amount / 100}
             min="0.01"
             step="0.01"
             required

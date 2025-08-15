@@ -55,15 +55,6 @@ export const handleApplicationDecision = async (req, res) => {
 
       // Send the final success response
       return res.status(200).json(crs.APPLICATION_200_REJECTED());
-    } else {
-      // Handle invalid decision value (e.g., if Zod schema allows other strings)
-      return res
-        .status(400)
-        .json(
-          crs.ZOD_400_INVALID_INPUT(
-            "Invalid decision value. Must be 'approve' or 'reject'."
-          )
-        );
     }
   } catch (error) {
     // 4. Catch any errors during the process

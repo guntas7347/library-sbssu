@@ -18,6 +18,7 @@ const useTable = (defaultState = null) => {
   const tableData = {
     data: data?.data || [],
     totalPages: data?.totalPages || 1,
+    totalCount: data?.totalCount || 0,
     page: page,
     setPage: (e) => setPage(e),
   };

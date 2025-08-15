@@ -1,7 +1,7 @@
 import TablePagination from "../pagination/tablePagination";
 
 const Table = ({
-  data = { data: [], totalPages: 1, page: 1, setPage: () => {} },
+  data = { data: [], totalPages: 1, totalCount: 0, page: 1, setPage: () => {} },
   architecture = [],
 }) => {
   return (
@@ -51,6 +51,7 @@ const Table = ({
             totalPages={data.totalPages}
             currentPage={data.page}
             setPage={data.setPage}
+            totalCount={data.totalCount}
           />
         </div>
       </div>

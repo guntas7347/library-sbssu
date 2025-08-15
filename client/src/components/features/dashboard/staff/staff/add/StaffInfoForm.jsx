@@ -68,7 +68,6 @@ const StaffInfoForm = ({ handleChange, formFields }) => {
             <Input
               label="ID Number"
               name="idNumber"
-              type="number"
               value={formFields.idNumber}
               onChange={handleChange}
               required

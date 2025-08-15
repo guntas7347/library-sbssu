@@ -64,7 +64,7 @@ export const findTransactionsHandler = async (req, res) => {
         if (value) {
           const amountNum = parseFloat(value);
           if (!isNaN(amountNum)) {
-            where.amount = { equals: amountNum };
+            where.amount = { equals: amountNum * 100 };
           }
         }
         break;
@@ -116,11 +116,12 @@ export const findTransactionsHandler = async (req, res) => {
 
     // 5. Format the data for the frontend
     const formattedData = transactions.map((t) => {
-      const closingBalance = t.closingBalance;
+      const amount = t.amount / 100;
+      const closingBalance = t.closingBalance / 100;
       const previousBalance =
         t.transactionType === "DEBIT"
-          ? closingBalance - t.amount
-          : closingBalance + t.amount;
+          ? closingBalance - amount
+          : closingBalance + amount;
 
       return {
         id: t.id,
@@ -128,7 +129,7 @@ export const findTransactionsHandler = async (req, res) => {
         memberPhoto: t.member?.photo,
         membershipId: t.member?.membershipId,
         memberGender: t.member?.gender,
-        amount: t.amount,
+        amount,
         transactionType: t.transactionType,
         transactionDate: t.createdAt.toISOString(),
         receiptNumber: t.receiptNumber,

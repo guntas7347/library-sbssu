@@ -1,4 +1,5 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
+import * as faceapi from "face-api.js";
 
 const useCropper = () => {
   const inputRef = useRef();
@@ -8,16 +9,24 @@ const useCropper = () => {
   const [dialog, setDialog] = useState(false);
   const imageRef = useRef(null);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImgSrc(reader.result);
-        setDialog(true);
-      };
-      reader.readAsDataURL(file);
+
+    if (!file) return;
+
+    const isValid = await detectFace(file);
+    console.log(isValid);
+    if (!isValid) {
+      alert("No face detected in image.");
+      return;
     }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImgSrc(reader.result);
+      setDialog(true);
+    };
+    reader.readAsDataURL(file);
   };
 
   const onCrop = (crop) => {
@@ -77,3 +86,18 @@ const useCropper = () => {
 };
 
 export default useCropper;
+
+let tinyModelLoaded = false;
+async function detectFace(file) {
+  if (!tinyModelLoaded) {
+    await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+    tinyModelLoaded = true;
+  }
+  const img = await faceapi.bufferToImage(file);
+  const detections = await faceapi.detectAllFaces(
+    img,
+    new faceapi.TinyFaceDetectorOptions()
+  );
+
+  return detections.length > 0;
+}

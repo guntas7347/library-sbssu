@@ -100,7 +100,7 @@ export const fetchReturnBookDetailsHandler = async (req, res) => {
       },
       fine: {
         id: returnedBook.fine?.id ?? null,
-        amount: returnedBook.fine?.amount ?? 0,
+        amount: returnedBook.fine?.amount / 100 || 0,
         paidOn: returnedBook.fine?.createdAt?.toISOString() ?? null,
         paymentMethod: returnedBook.fine?.paymentMethod ?? "N/A",
       },

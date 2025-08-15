@@ -23,6 +23,20 @@ export const findBooksHandler = async (req, res) => {
         totalCount = await prisma.book.count({ where });
         break;
 
+      case "category":
+        where = {
+          accessions: {
+            some: {
+              category: {
+                contains: filterValue,
+                mode: "insensitive",
+              },
+            },
+          },
+        };
+        totalCount = await prisma.book.count({ where });
+        break;
+
       case "accession":
         where = {
           accessions: {
@@ -54,6 +68,10 @@ export const findBooksHandler = async (req, res) => {
       },
     });
 
+    const totalAccessions = await prisma.accession.count({
+      where: { book: where },
+    });
+
     const booksWithDerivedFields = books.map((book) => {
       const totalCopies = book.accessions.length;
       const availableCopies = book.accessions.filter(
@@ -79,9 +97,15 @@ export const findBooksHandler = async (req, res) => {
 
     const totalPages = Math.ceil(totalCount / pageSize);
 
+    if (totalPages === 0)
+      return res
+        .status(404)
+        .json(crs("No Books found matching your criteria."));
+
     const data = {
       data: booksWithDerivedFields,
       totalPages,
+      totalCount: `${totalCount} Books and their ${totalAccessions} accessions`,
     };
 
     return res.status(200).json(crs.BOOK_200_ALL_FETCHED(data));

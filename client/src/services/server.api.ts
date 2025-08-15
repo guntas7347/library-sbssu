@@ -75,7 +75,7 @@ const server = {
   issue: {
     member: (e) =>
       restCall<MemberData>(
-        `staff/issue/member?number=${e}`,
+        `staff/issue/member?search=${e}`,
         null,
         "ISSUE_200_MEMBER_FETCHED"
       ),

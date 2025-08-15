@@ -25,7 +25,7 @@ export const returnBookHandler = async (req, res) => {
     }
 
     // --- 2. PROCESS RETURN IN A SINGLE TRANSACTION ---
-    const { emailPayload, transactionPayload } = await prisma.$transaction(
+    const { emailPayload, transactionEmail } = await prisma.$transaction(
       async (tx) => {
         const issuedBook = await tx.issuedBook.findUnique({
           where: { id: issuedBookId },
@@ -49,7 +49,7 @@ export const returnBookHandler = async (req, res) => {
           0,
           Math.floor((returnDate - issuedBook.dueDate) / (1000 * 60 * 60 * 24))
         );
-        const fineAmount = daysOverdue * FINE_PER_DAY;
+        const fineAmount = daysOverdue * FINE_PER_DAY * 100; // multiplied by 100 because amount is stored n paisa (cents)
 
         // b. Create ReturnedBook record
         const returnedBook = await tx.returnedBook.create({
@@ -68,10 +68,10 @@ export const returnBookHandler = async (req, res) => {
         });
 
         // c. Create Transaction if there is a fine
-        let transactionPayload = null;
+        let transactionEmail = null;
         if (fineAmount > 0) {
           const memberBalance = issuedBook.libraryCard.member.balance;
-          const newBalance = memberBalance + fineAmount;
+          const newBalance = memberBalance - fineAmount;
 
           const transaction = await tx.transaction.create({
             data: {
@@ -80,7 +80,7 @@ export const returnBookHandler = async (req, res) => {
               transactionType: "DEBIT",
               category: "book_overdue",
               amount: fineAmount,
-              paymentMethod: "auto-debit",
+              paymentMethod: "auto_debit",
               issuedById: staff.id,
               closingBalance: newBalance,
             },
@@ -94,12 +94,12 @@ export const returnBookHandler = async (req, res) => {
             data: { fineId: transaction.id },
           });
 
-          transactionPayload = {
+          transactionEmail = {
             email: issuedBook.libraryCard.member.email,
             fullName: issuedBook.libraryCard.member.fullName,
             transactionType: transaction.transactionType,
-            amount: transaction.amount,
-            balance: transaction.closingBalance,
+            amount: transaction.amount / 100,
+            balance: transaction.closingBalance / 100,
             category: transaction.category,
             date: new Date(transaction.createdAt).toLocaleDateString(),
           };
@@ -124,11 +124,11 @@ export const returnBookHandler = async (req, res) => {
           author: issuedBook.bookAccession.book.author,
           returnDate: returnDate.toLocaleDateString(),
           issueDate: new Date(issuedBook.issueDate).toLocaleDateString(),
-          fine: `₹${fineAmount.toFixed(2)}`,
+          fine: `₹${fineAmount / 100}`,
           cardNumber: issuedBook.libraryCard.cardNumber,
         };
 
-        return { emailPayload, transactionPayload };
+        return { emailPayload, transactionEmail };
       }
     );
 
@@ -137,8 +137,8 @@ export const returnBookHandler = async (req, res) => {
       const { email, ...details } = emailPayload;
       emailService.sendReturnConfirmationEmail(email, details);
     }
-    if (transactionPayload) {
-      const { email, ...details } = transactionPayload;
+    if (transactionEmail) {
+      const { email, ...details } = transactionEmail;
       emailService.sendTransactionConfirmationEmail(email, details);
     }
 

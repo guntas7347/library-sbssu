@@ -18,7 +18,7 @@ import { findStaffSchema } from "../../../schema/staff/findStaffSchema.js";
 
 export async function createStaffInternal() {
   const sampleStaffData = {
-    idNumber: 12345,
+    idNumber: "12345",
     fullName: "Guntas Singh",
     email: "guntas7347@gmail.com",
     userName: "guntas7347",

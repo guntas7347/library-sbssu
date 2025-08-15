@@ -16,8 +16,8 @@ const Confirmation = ({
   isSubmitting = false,
 }) => {
   const isDebit = data.transactionType === "DEBIT";
-  const amount = parseFloat(data.amount) || 0;
-  const previousBalance = member.balance || 0;
+  const amount = data.amount / 100 || 0;
+  const previousBalance = member.balance / 100 || 0;
   const newBalance = isDebit
     ? previousBalance - amount
     : previousBalance + amount;

@@ -8,11 +8,6 @@ const validate = (schemas) => async (req, res, next) => {
 
     next();
   } catch (error) {
-    error.errors?.forEach((e) => {
-      console.error(`- ${e.path.join(".")}: ${e.message}`);
-    });
-
-    console.log(error);
     const firstErrorMessage = error.errors?.[0]?.message || "Invalid input";
 
     // Manually construct the response object to include the custom message.

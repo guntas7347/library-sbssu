@@ -16,7 +16,7 @@ const FinancialSummary = ({ data }) => {
         <div className="flex justify-between">
           <span className="text-gray-600 dark:text-gray-400">Total Debits</span>
           <span className="font-semibold text-gray-900 dark:text-white">
-            ₹{totalDebits}
+            ₹{typeof totalDebits === "number" ? totalDebits.toFixed(2) : "N/A"}
           </span>
         </div>
         <div className="flex justify-between">
@@ -24,13 +24,14 @@ const FinancialSummary = ({ data }) => {
             Total Credits
           </span>
           <span className="font-semibold text-green-600 dark:text-green-400">
-            ₹{totalCredits}
+            ₹
+            {typeof totalCredits === "number" ? totalCredits.toFixed(2) : "N/A"}
           </span>
         </div>
         <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-3">
           <span className="text-gray-600 dark:text-gray-400">Outstanding</span>
           <span className="font-semibold text-red-600 dark:text-red-400">
-            ₹{outstanding}
+            ₹{typeof outstanding === "number" ? outstanding.toFixed(2) : "N/A"}
           </span>
         </div>
       </div>

@@ -4,6 +4,7 @@ import useInput from "../../hooks/useInput";
 const TablePagination = ({
   totalPages = 1,
   currentPage = 1,
+  totalCount = 0,
   setPage = () => {},
 }) => {
   const { formField, handleChange: hc } = useInput({ currentPage });
@@ -45,11 +46,11 @@ const TablePagination = ({
         <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
           Showing{" "}
           <span className="font-semibold text-gray-900 dark:text-white">
-            {currentPage}
+            {currentPage || "N/A"}
           </span>{" "}
           of{" "}
           <span className="font-semibold text-gray-900 dark:text-white">
-            {totalPages}
+            {totalPages || "N/A"} (Total Results: {totalCount || "N/A"})
           </span>
         </span>
         <ul className="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">

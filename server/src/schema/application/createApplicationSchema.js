@@ -1,7 +1,13 @@
 import z from "zod";
 
 export const createApplicationSchema = z.object({
-  rollNumber: z.coerce.number().optional(),
+  rollNumber: z
+    .string()
+    .trim()
+    .regex(/^\d+$/, {
+      message: "Roll number must be numeric",
+    })
+    .optional(),
   fullName: z.string().trim().min(1, "Full name is required"),
   fatherName: z.string().trim().min(1, "Father's name is required"),
   photo: z.string().min(1, "Photo is required"),
@@ -10,7 +16,9 @@ export const createApplicationSchema = z.object({
   dob: z.coerce.date({ required_error: "Date of birth is required" }),
   program: z.string().min(1, "Program is required"),
   specialization: z.string().min(1, "Specialization is required"),
-  batch: z.coerce.number({ required_error: "Batch is required" }),
+  batch: z.string().trim().regex(/^\d+$/, {
+    message: "Batch is required",
+  }),
   email: z
     .string()
     .trim()

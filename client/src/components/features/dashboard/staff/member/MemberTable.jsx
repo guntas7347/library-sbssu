@@ -80,7 +80,7 @@ const MemberTable = ({ data }) => {
                   : "text-green-600 dark:text-green-400"
               }`}
             >
-              ₹{fineAmount}
+              ₹{fineAmount.toFixed(2)}
             </div>
           </div>
         );

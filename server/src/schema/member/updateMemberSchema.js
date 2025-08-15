@@ -18,11 +18,23 @@ export const updateMemberSchema = z.object({
   cast: z.string().optional(),
 
   // Academic Info
-  rollNumber: z.coerce.number().int().optional().nullable(),
+  rollNumber: z
+    .string()
+    .trim()
+    .regex(/^\d+$/, {
+      message: "Roll number must be numeric",
+    })
+    .optional(),
   memberType: z.string().optional(),
   program: optionalNullableTrimmedString,
   specialization: optionalNullableTrimmedString,
-  batch: z.coerce.number().int().optional().nullable(),
+  batch: z
+    .string()
+    .trim()
+    .regex(/^\d+$/, {
+      message: "Batch must be numeric",
+    })
+    .optional(),
 
   // Address Info
   city: optionalNullableTrimmedString,

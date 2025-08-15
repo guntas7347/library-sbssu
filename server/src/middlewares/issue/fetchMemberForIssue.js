@@ -8,15 +8,28 @@ import { createLog } from "../../utils/log.js";
 export const fetchMemberForIssueHandler = async (req, res) => {
   try {
     // Data is validated by the Zod middleware
-    const { number } = req.validatedQuery;
+    const { search } = req.validatedQuery;
 
-    const formattedNumber = `${number.slice(0, 2)}-${number.slice(2)}`;
+    function formatMembershipId(input) {
+      if (/^\d+$/.test(input)) {
+        const prefix = input.slice(0, input.length - 4);
+        const suffix = input.slice(-4);
+        return `MEM-${prefix}-${suffix}`;
+      }
+      return input;
+    }
 
-    // Construct the full membershipId
-    const membershipId = `MEM-${formattedNumber}`;
+    const formattedId = formatMembershipId(search);
 
     const member = await prisma.member.findFirst({
-      where: { membershipId },
+      where: {
+        OR: [
+          { membershipId: formattedId }, // if stored as int
+          { fullName: { contains: search, mode: "insensitive" } }, // only string field
+          { phoneNumber: { contains: search, mode: "insensitive" } },
+          { rollNumber: { contains: search, mode: "insensitive" } },
+        ],
+      },
       select: {
         id: true,
         fullName: true,

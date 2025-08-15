@@ -47,6 +47,7 @@ const BookPage = () => {
         menuOptions={[
           { label: "Accession Number", value: "accession" },
           { label: "Title", value: "title" },
+          { label: "Category", value: "category" },
         ]}
       />
 

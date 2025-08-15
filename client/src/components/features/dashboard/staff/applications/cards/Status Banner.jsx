@@ -11,10 +11,10 @@ const StatusBanner = ({ data }) => {
             </div>
             <div>
               <h2 className="text-xl font-bold text-yellow-800 dark:text-yellow-200">
-                {data.status.toUpperCase()}
+                {data.status.toUpperCase() || "N/A"}
               </h2>
               <p className="text-yellow-700 dark:text-yellow-300">
-                Submitted on {new Date(data.createdAt).toDateString()}
+                Submitted on {new Date(data.createdAt).toDateString() || "N/A"}
               </p>
             </div>
           </div>

@@ -51,8 +51,13 @@ export const issueBookHandler = async (req, res) => {
       // a. Update statuses and book condition
       await tx.accession.update({
         where: { id: accession.id },
-        data: { status: "issued", condition: issueCondition },
+        data: {
+          status: "issued",
+          condition: issueCondition,
+          timesIssued: { increment: 1 },
+        },
       });
+
       await tx.libraryCard.update({
         where: { id: card.id },
         data: { status: "issued" },

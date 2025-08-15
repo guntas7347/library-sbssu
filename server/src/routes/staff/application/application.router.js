@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authorisationLevel } from "../../../middlewares/auth/auth.middlewares.js";
 import { findApplicationsHandler } from "../../../middlewares/application/findApplications.js";
 import validateRequest from "../../../middlewares/validateRequest.js";
-import { decisionSchema } from "../../../schema/application.schema.js";
+import { decisionSchema } from "../../../schema/application/decisionSchema.js";
 import { handleApplicationDecision } from "../../../middlewares/application/handleDecision.js";
 import { fetchApplicationHandler } from "../../../middlewares/application/fetchApplicationDetails.js";
 import validate from "../../../middlewares/validateRequest.js";

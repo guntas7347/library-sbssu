@@ -38,6 +38,7 @@ export const fetchApplicationHandler = async (req, res) => {
         memberType: true,
         batch: true,
         status: true,
+        createdAt: true,
       },
     });
 

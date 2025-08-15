@@ -23,7 +23,7 @@ import ProfilePhotoUploader from "../../components/features/public/join/ProfileP
 import Header from "../../components/features/public/join/Header";
 import TermsOfService from "../../components/features/public/join/TermsOfService";
 import PageHeader from "../../components/header/PageHeader";
-import { URL_PATH } from "../../utils/keys";
+import { IS_DEV, URL_PATH } from "../../utils/keys";
 
 // Step 1: Personal Information Component
 const PersonalInfoStep = ({ formFields, handleChange, setFields }) => (
@@ -312,13 +312,15 @@ const JoinPage = () => {
           svg={FormInput}
           colorClass="bg-blue-700"
         />
+        {IS_DEV && (
+          <button
+            className="p-2 bg-blue-400 m-5 flex hover:bg-blue-700 rounded-lg text-white"
+            onClick={testSubmit}
+          >
+            <Rocket /> Test Submit
+          </button>
+        )}
 
-        <button
-          className="p-2 bg-blue-400 m-5 flex hover:bg-blue-700 rounded-lg text-white"
-          onClick={testSubmit}
-        >
-          <Rocket /> Test Submit
-        </button>
         <div className="mt-8 bg-white dark:bg-gray-800 rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="p-6 sm:p-8 lg:p-10">
             {/* Progress Bar */}

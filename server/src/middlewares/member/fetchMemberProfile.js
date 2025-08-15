@@ -63,18 +63,18 @@ export const fetchMemberProfileHandler = async (req, res) => {
     }
 
     // 2. Calculate financial summary
-    const totalDebits = member.transactions
+    const totalDebitsCents = member.transactions
       .filter((t) => t.transactionType === "DEBIT")
       .reduce((sum, t) => sum + t.amount, 0);
 
-    const totalCredits = member.transactions
+    const totalCreditsCents = member.transactions
       .filter((t) => t.transactionType === "CREDIT")
       .reduce((sum, t) => sum + t.amount, 0);
 
     const financialSummary = {
-      totalDebits,
-      totalCredits,
-      outstanding: totalDebits - totalCredits,
+      totalDebits: totalDebitsCents / 100,
+      totalCredits: totalCreditsCents / 100,
+      outstanding: (totalDebitsCents - totalCreditsCents) / 100,
     };
 
     // 3. Currently issued books
@@ -110,7 +110,7 @@ export const fetchMemberProfileHandler = async (req, res) => {
         id: t.id,
         type: "payment",
         action: "Paid Fine/Fee",
-        item: `₹${t.amount}`,
+        item: `₹${t.amount / 100}`,
         date: new Date(t.createdAt).toLocaleDateString(),
       }));
 
