@@ -10,15 +10,19 @@ export const findReturnedBooksHandler = async (req, res) => {
     const now = new Date();
 
     // 2. Build the 'where' clause for the Prisma query
-    let where = {};
+    // CHANGE: The base condition is now that a `returnDate` must exist.
+    let where = {
+      returnDate: { not: null },
+    };
+
     switch (filter) {
-      case "irn": // <-- Added
+      case "irn":
         if (value) {
           where.issueRefNumber = { contains: value, mode: "insensitive" };
         }
         break;
-      case "due": // <-- Added
-        // This finds returned books whose due date was before the current time.
+      case "due":
+        // This finds returned books that were returned late.
         where.dueDate = { lt: now };
         break;
       case "acc":
@@ -42,9 +46,10 @@ export const findReturnedBooksHandler = async (req, res) => {
     }
 
     // 3. Fetch count and data in a single transaction
-    const [totalCount, returnedBooks] = await prisma.$transaction([
-      prisma.returnedBook.count({ where }),
-      prisma.returnedBook.findMany({
+    // CHANGE: Switched from `returnedBook` to `circulation` model.
+    const [totalCount, circulations] = await prisma.$transaction([
+      prisma.circulation.count({ where }),
+      prisma.circulation.findMany({
         where,
         take: limit,
         skip,
@@ -53,8 +58,7 @@ export const findReturnedBooksHandler = async (req, res) => {
           returnDate: true,
           issueDate: true,
           dueDate: true,
-
-          fine: { select: { amount: true } },
+          fine: { select: { amount: true } }, // Fine is now directly on circulation
           bookAccession: {
             select: {
               accessionNumber: true,
@@ -86,7 +90,8 @@ export const findReturnedBooksHandler = async (req, res) => {
     }
 
     // 5. Enhance data with calculated fields
-    const enhancedData = returnedBooks.map((item) => {
+    // CHANGE: Mapped over `circulations` instead of `returnedBooks`
+    const enhancedData = circulations.map((item) => {
       const returnDate = new Date(item.returnDate);
       const issueDate = new Date(item.issueDate);
       const dueDate = new Date(item.dueDate);

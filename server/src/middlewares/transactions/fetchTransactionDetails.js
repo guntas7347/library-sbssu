@@ -8,16 +8,15 @@ import { createLog } from "../../utils/log.js";
 export const fetchTransactionDetailsHandler = async (req, res) => {
   try {
     // 1. Get the validated transaction ID from the query
-    const { id: transactionId } = req.query;
+    const { id: transactionId } = req.validatedQuery;
 
-    // 2. Fetch the transaction and all its related data in a single, optimized query.
+    // 2. Fetch the transaction and all its related data.
     const transaction = await prisma.transaction.findUnique({
       where: { id: transactionId },
       include: {
-        member: true, // Include the full member object
+        member: true,
         issuedBy: { select: { fullName: true } },
-        // Include the related returned book and its nested relations
-        returnedBook: {
+        circulation: {
           include: {
             bookAccession: {
               include: {
@@ -33,7 +32,31 @@ export const fetchTransactionDetailsHandler = async (req, res) => {
       return res.status(404).json(crs("Transaction not found."));
     }
 
-    // 3. Fetch the member's transaction history separately.
+    // 3. Calculate the closing balance AT THE TIME of this transaction.
+    const balanceHistory = await prisma.transaction.groupBy({
+      by: ["transactionType"],
+      _sum: {
+        amount: true,
+      },
+      where: {
+        memberId: transaction.memberId,
+        createdAt: {
+          lte: transaction.createdAt, // Include all transactions up to this one
+        },
+      },
+    });
+
+    const totalDebits =
+      balanceHistory.find((t) => t.transactionType === "DEBIT")?._sum.amount ||
+      0;
+    const totalCredits =
+      balanceHistory.find((t) => t.transactionType === "CREDIT")?._sum.amount ||
+      0;
+
+    // CORRECTED: The balance is credits minus debits, consistent with your business logic.
+    const closingBalanceAtTime = totalCredits - totalDebits;
+
+    // 4. Fetch the member's recent transaction history for context.
     const history = await prisma.transaction.findMany({
       where: { memberId: transaction.memberId },
       select: {
@@ -41,13 +64,14 @@ export const fetchTransactionDetailsHandler = async (req, res) => {
         transactionType: true,
         category: true,
         createdAt: true,
+        amount: true,
         issuedBy: { select: { fullName: true } },
       },
       orderBy: { createdAt: "desc" },
       take: 20,
     });
 
-    // 4. Format the final data structure for the frontend.
+    // 5. Format the final data structure for the frontend.
     const formattedData = {
       transaction: {
         id: transaction.id,
@@ -57,8 +81,9 @@ export const fetchTransactionDetailsHandler = async (req, res) => {
         paymentMethod: transaction.paymentMethod,
         createdAt: transaction.createdAt.toISOString(),
         amount: transaction.amount / 100,
-        closingBalance: transaction.closingBalance / 100,
+        closingBalance: closingBalanceAtTime / 100,
         issuedBy: transaction.issuedBy?.fullName ?? "System",
+        currentBalance: transaction.member.balance / 100,
         remark: transaction.remark,
       },
       member: {
@@ -67,20 +92,22 @@ export const fetchTransactionDetailsHandler = async (req, res) => {
         photo: transaction.member.photo,
         membershipId: transaction.member.membershipId,
         program: transaction.member.program,
+        currentBalance: transaction.member.balance / 100,
       },
-      book: transaction.returnedBook
+      book: transaction.circulation
         ? {
-            id: transaction.returnedBook.id,
-            title: transaction.returnedBook.bookAccession.book.title,
-            author: transaction.returnedBook.bookAccession.book.author,
+            id: transaction.circulation.id,
+            title: transaction.circulation.bookAccession.book.title,
+            author: transaction.circulation.bookAccession.book.author,
             accessionNumber:
-              transaction.returnedBook.bookAccession.accessionNumber,
+              transaction.circulation.bookAccession.accessionNumber,
           }
         : null,
       history: history.map((h) => ({
         id: h.id,
         transactionType: h.transactionType,
         category: h.category,
+        amount: h.amount / 100,
         createdAt: h.createdAt.toISOString(),
         staff: h.issuedBy?.fullName ?? "System",
       })),

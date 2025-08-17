@@ -4,10 +4,10 @@ import { createLog } from "../../utils/log.js";
 
 /**
  * Fetches a complete profile for a single member, including academic details,
- * financial summary, issued books, and recent activities.
+ * financial summary, issued books, and recent activities, using the new schema.
  *
  * @async
- * @function fetchMemberProfile
+ * @function fetchMemberProfileHandler
  * @param {import("express").Request} req - Express request (expects `validatedQuery.id`)
  * @param {import("express").Response} res - Express response
  * @returns {Promise<void>}
@@ -16,13 +16,14 @@ export const fetchMemberProfileHandler = async (req, res) => {
   try {
     const { id } = req.validatedQuery;
 
-    // 1. Fetch member with all relevant relations
+    // 1. Fetch member with all relevant relations using the new 'circulations' model
     const member = await prisma.member.findUnique({
       where: { id },
       include: {
         libraryCards: {
           include: {
-            issuedBooks: {
+            // CHANGE: Replaced issuedBooks and returnedBooks with 'circulations'
+            circulations: {
               include: {
                 bookAccession: {
                   include: {
@@ -30,18 +31,7 @@ export const fetchMemberProfileHandler = async (req, res) => {
                   },
                 },
               },
-            },
-            returnedBooks: {
-              select: {
-                id: true,
-                returnDate: true,
-                bookAccession: {
-                  include: {
-                    book: { select: { title: true } },
-                  },
-                },
-              },
-              orderBy: { returnDate: "desc" },
+              orderBy: { issueDate: "desc" }, // Order by most recent issues first
             },
           },
         },
@@ -62,7 +52,12 @@ export const fetchMemberProfileHandler = async (req, res) => {
       return res.status(404).json(crs("Member not found"));
     }
 
-    // 2. Calculate financial summary
+    // Consolidate all circulations from all library cards into a single array
+    const allCirculations = member.libraryCards.flatMap(
+      (card) => card.circulations
+    );
+
+    // 2. Calculate financial summary (No changes needed here)
     const totalDebitsCents = member.transactions
       .filter((t) => t.transactionType === "DEBIT")
       .reduce((sum, t) => sum + t.amount, 0);
@@ -78,23 +73,25 @@ export const fetchMemberProfileHandler = async (req, res) => {
     };
 
     // 3. Currently issued books
-    const currentBooks = member.libraryCards
-      .flatMap((card) => card.issuedBooks)
-      .map((issue) => {
-        const due = new Date(issue.dueDate);
+    // CHANGE: Filter circulations where returnDate is null
+    const currentBooks = allCirculations
+      .filter((circ) => circ.returnDate === null)
+      .map((circ) => {
+        const due = new Date(circ.dueDate);
         return {
-          id: issue.id,
-          title: issue.bookAccession.book.title,
-          author: issue.bookAccession.book.author,
+          id: circ.id,
+          title: circ.bookAccession.book.title,
+          author: circ.bookAccession.book.author,
           dueDate: due.toLocaleDateString(),
           status: due < new Date() ? "Overdue" : "Issued",
         };
       });
 
     // 4. Recent activities (returns + payments)
-    const returns = member.libraryCards
-      .flatMap((card) => card.returnedBooks)
-      .slice(0, 3)
+    // CHANGE: Filter circulations where returnDate is NOT null for returns
+    const returns = allCirculations
+      .filter((circ) => circ.returnDate !== null)
+      .slice(0, 3) // Takes the 3 most recently issued-and-returned books
       .map((r) => ({
         id: r.id,
         type: "return",
@@ -115,10 +112,10 @@ export const fetchMemberProfileHandler = async (req, res) => {
       }));
 
     const recentActivities = [...returns, ...payments].sort(
-      (a, b) => new Date(b.date) - new Date(a.date)
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
-    // 5. Farthest card expiry
+    // 5. Farthest card expiry (No changes needed here)
     const farthestExpiry =
       member.libraryCards.length > 0
         ? new Date(
@@ -155,10 +152,10 @@ export const fetchMemberProfileHandler = async (req, res) => {
 
       stats: {
         currentBooks: currentBooks.length,
-        booksReturned: member.libraryCards.reduce(
-          (sum, card) => sum + card.returnedBooks.length,
-          0
-        ),
+        // CHANGE: Calculate returned books from the filtered circulations
+        booksReturned: allCirculations.filter(
+          (circ) => circ.returnDate !== null
+        ).length,
         cardCount: member.libraryCards.length,
       },
 

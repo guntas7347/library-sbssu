@@ -2,10 +2,14 @@ import prisma from "../../services/prisma.js";
 import crs from "../../utils/crs/crs.js";
 import { createLog } from "../../utils/log.js";
 
+/**
+ * Fetches the details of a specific, completed circulation (a returned book).
+ */
 export const fetchReturnBookDetailsHandler = async (req, res) => {
   try {
-    // 1. Fetch the complete ReturnedBook record and its relations using the ID from the query.
-    const returnedBook = await prisma.returnedBook.findUnique({
+    // 1. Fetch the complete Circulation record and its relations using the ID from the query.
+    // CHANGE: Switched from `returnedBook` to `circulation` model.
+    const circulation = await prisma.circulation.findUnique({
       where: { id: req.query.id },
       select: {
         id: true,
@@ -63,46 +67,47 @@ export const fetchReturnBookDetailsHandler = async (req, res) => {
       },
     });
 
-    // 2. If no record is found, return a 404 response.
-    if (!returnedBook) {
+    // 2. If no record is found or if the book hasn't been returned yet, return a 404.
+    if (!circulation || !circulation.returnDate) {
       return res
         .status(404)
         .json(crs.ERR_404_NOT_FOUND("Return record not found."));
     }
 
     // 3. Transform the nested data into a clean object for the frontend.
+    // CHANGE: Mapped from `circulation` object instead of `returnedBook`.
     const returnDetails = {
-      id: returnedBook.id,
-      issueRefNumber: returnedBook.issueRefNumber,
-      issueDate: returnedBook.issueDate.toISOString(),
-      dueDate: returnedBook.dueDate.toISOString(),
-      returnDate: returnedBook.returnDate.toISOString(),
-      issuedBy: returnedBook.issuedBy?.fullName ?? "N/A",
-      returnedBy: returnedBook.returnedBy?.fullName ?? "N/A",
+      id: circulation.id,
+      issueRefNumber: circulation.issueRefNumber,
+      issueDate: circulation.issueDate.toISOString(),
+      dueDate: circulation.dueDate.toISOString(),
+      returnDate: circulation.returnDate.toISOString(),
+      issuedBy: circulation.issuedBy?.fullName ?? "N/A",
+      returnedBy: circulation.returnedBy?.fullName ?? "N/A",
       remarks: {
-        issue: returnedBook.issueRemark,
-        return: returnedBook.returnRemark,
+        issue: circulation.issueRemark,
+        return: circulation.returnRemark,
       },
       book: {
-        id: returnedBook.bookAccession?.book?.id,
-        title: returnedBook.bookAccession?.book?.title,
-        author: returnedBook.bookAccession?.book?.author,
-        category: returnedBook.bookAccession?.category,
-        accessionNumber: returnedBook.bookAccession?.accessionNumber,
-        timesIssued: returnedBook.bookAccession?.timesIssued,
+        id: circulation.bookAccession?.book?.id,
+        title: circulation.bookAccession?.book?.title,
+        author: circulation.bookAccession?.book?.author,
+        category: circulation.bookAccession?.category,
+        accessionNumber: circulation.bookAccession?.accessionNumber,
+        timesIssued: circulation.bookAccession?.timesIssued,
       },
       member: {
-        id: returnedBook.libraryCard?.member?.id,
-        fullName: returnedBook.libraryCard?.member?.fullName,
-        photo: returnedBook.libraryCard?.member?.photo,
-        program: returnedBook.libraryCard?.member?.program,
-        cardNumber: returnedBook.libraryCard?.cardNumber,
+        id: circulation.libraryCard?.member?.id,
+        fullName: circulation.libraryCard?.member?.fullName,
+        photo: circulation.libraryCard?.member?.photo,
+        program: circulation.libraryCard?.member?.program,
+        cardNumber: circulation.libraryCard?.cardNumber,
       },
       fine: {
-        id: returnedBook.fine?.id ?? null,
-        amount: returnedBook.fine?.amount / 100 || 0,
-        paidOn: returnedBook.fine?.createdAt?.toISOString() ?? null,
-        paymentMethod: returnedBook.fine?.paymentMethod ?? "N/A",
+        id: circulation.fine?.id ?? null,
+        amount: circulation.fine?.amount / 100 || 0,
+        paidOn: circulation.fine?.createdAt?.toISOString() ?? null,
+        paymentMethod: circulation.fine?.paymentMethod ?? "N/A",
       },
     };
 

@@ -9,6 +9,8 @@ import { returnBookHandler } from "../../../middlewares/return/returnBook.js";
 import { fetchReturnBookDetailsHandler } from "../../../middlewares/return/fetchReturnBookDetails.js";
 import idSchema from "../../../schema/common/idSchema.js";
 import { returnBookSchema } from "../../../schema/return/returnBookSchema.js";
+import { reportBookLostHandler } from "../../../middlewares/return/reportBookLost.js";
+import { reportLostReturnSchema } from "../../../schema/return/reportLostReturnSchema.js";
 
 const returnRouter = Router();
 
@@ -24,6 +26,13 @@ returnRouter.post(
   authorisationLevel(["return_books"]),
   validate(returnBookSchema),
   returnBookHandler
+);
+
+returnRouter.post(
+  "/report-lost",
+  authorisationLevel(["return_books"]),
+  validate(reportLostReturnSchema),
+  reportBookLostHandler
 );
 
 returnRouter.get(

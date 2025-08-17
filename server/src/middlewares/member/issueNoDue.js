@@ -12,13 +12,19 @@ export const issueNoDueHandler = async (req, res) => {
 
     // --- 1. PRE-CHECKS: Verify eligibility ---
 
-    const issuedBooksCount = await prisma.issuedBook.count({
-      where: { libraryCard: { memberId: memberId } },
+    // CHANGE: Check for active circulations (unreturned books) instead of issuedBooks.
+    const activeCirculationsCount = await prisma.circulation.count({
+      where: {
+        libraryCard: { memberId: memberId },
+        returnDate: null, // This is the key condition for an active loan
+      },
     });
-    if (issuedBooksCount > 0) {
+    if (activeCirculationsCount > 0) {
       return res
         .status(409)
-        .json(crs(`Member has ${issuedBooksCount} book(s) currently issued.`));
+        .json(
+          crs(`Member has ${activeCirculationsCount} book(s) currently issued.`)
+        );
     }
 
     const member = await prisma.member.findUnique({
@@ -40,10 +46,14 @@ export const issueNoDueHandler = async (req, res) => {
         .status(409)
         .json(crs(`Member is not active. Current status: ${member.status}.`));
     }
-    if (member.balance !== 0) {
+    // In the new system, a positive balance is a DEBIT (money owed).
+    // A member must have a balance of 0 to have no dues.
+    if (member.balance > 0) {
       return res
         .status(409)
-        .json(crs(`Member has an outstanding balance of ₹${member.balance}.`));
+        .json(
+          crs(`Member has an outstanding balance of ₹${member.balance / 100}.`)
+        );
     }
 
     // --- 2. ATOMIC TRANSACTION: Update database ---

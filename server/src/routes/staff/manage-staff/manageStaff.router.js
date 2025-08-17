@@ -91,7 +91,7 @@ export async function createStaffInternal() {
   }
 } /// for making staff via code (dev only)
 
-// createStaffInternal();
+// createStaffInternal(); // (must be commented)
 
 const manageStaffRouter = Router();
 

@@ -31,9 +31,10 @@ export const findTransactionsHandler = async (req, res) => {
           where.receiptNumber = { contains: value, mode: "insensitive" };
         }
         break;
+      // CHANGE: All filters below now point to the `circulation` relation
       case "irn":
         if (value) {
-          where.returnedBook = {
+          where.circulation = {
             issueRefNumber: { contains: value, mode: "insensitive" },
           };
         }
@@ -45,7 +46,7 @@ export const findTransactionsHandler = async (req, res) => {
         if (value) {
           const accessionNum = parseInt(value, 10);
           if (!isNaN(accessionNum)) {
-            where.returnedBook = {
+            where.circulation = {
               bookAccession: { accessionNumber: accessionNum },
             };
           }
@@ -53,7 +54,7 @@ export const findTransactionsHandler = async (req, res) => {
         break;
       case "card":
         if (value) {
-          where.returnedBook = {
+          where.circulation = {
             libraryCard: {
               cardNumber: { contains: value, mode: "insensitive" },
             },
@@ -87,7 +88,7 @@ export const findTransactionsHandler = async (req, res) => {
           amount: true,
           transactionType: true,
           category: true,
-          closingBalance: true,
+          // CHANGE: Removed `closingBalance` as it's no longer stored
           member: {
             select: {
               fullName: true,
@@ -97,7 +98,8 @@ export const findTransactionsHandler = async (req, res) => {
             },
           },
           issuedBy: { select: { fullName: true } },
-          returnedBook: {
+          // CHANGE: Switched to `circulation` relation
+          circulation: {
             select: {
               bookAccession: { select: { book: { select: { title: true } } } },
             },
@@ -116,27 +118,19 @@ export const findTransactionsHandler = async (req, res) => {
 
     // 5. Format the data for the frontend
     const formattedData = transactions.map((t) => {
-      const amount = t.amount / 100;
-      const closingBalance = t.closingBalance / 100;
-      const previousBalance =
-        t.transactionType === "DEBIT"
-          ? closingBalance - amount
-          : closingBalance + amount;
-
       return {
         id: t.id,
         memberName: t.member?.fullName,
         memberPhoto: t.member?.photo,
         membershipId: t.member?.membershipId,
         memberGender: t.member?.gender,
-        amount,
+        amount: t.amount / 100,
         transactionType: t.transactionType,
         transactionDate: t.createdAt.toISOString(),
         receiptNumber: t.receiptNumber,
         category: t.category,
-        bookTitle: t.returnedBook?.bookAccession?.book?.title,
-        closingBalance,
-        previousBalance,
+        bookTitle: t.circulation?.bookAccession?.book?.title,
+        // CHANGE: `closingBalance` and `previousBalance` are removed.
         processedBy: t.issuedBy?.fullName,
       };
     });

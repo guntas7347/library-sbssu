@@ -11,7 +11,7 @@ const CRS_CODES = {
   AUTH_200_PING_SUCCESS: "Ping successful",
   AUTH_401_PING_UNAUTHORIZED: "Ping unauthorized",
   AUTH_401_INVALID_FINGERPRINT: "Invalid fingerprint",
-  AUTH_401_INVALID_JWT: "Session expired",
+  AUTH_401_INVALID_JWT: "Session expired, Refresh Page",
   AUTH_500_JWT_SERVER_ERROR: "JWT processing failed on server",
   AUTH_401_INSUFFICIENT_ROLE: "Insufficient role permissions for JWT",
   AUTH_200_SIGNOUT_SUCCESS: "Sign-out successful",
@@ -54,7 +54,8 @@ const CRS_CODES = {
   ISSUE_200_ALL_FETCHED: "Books fetched successfully",
 
   RETURN_200_FETCHED: "Book fetched successfully",
-  RETURN_201_BOOK_ISSUED: "Book returned successfully",
+  RETURN_200_SUCCESS: "Book returned successfully",
+  RETURN_200_LOST_SUCCESS: "Book marked as lost",
 
   TRANSACTION_200_ALL_FETCHED: "Transactions returned successfully",
   TRANSACTION_201_CREATED: "Transaction created successfully",

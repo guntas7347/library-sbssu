@@ -19,12 +19,11 @@ export async function getLibraryStats() {
   const lastMonthStart = startOfMonth(subMonths(today, 1));
   const lastMonthEnd = endOfMonth(subMonths(today, 1));
 
-  // Total Members
+  // --- Member Statistics (No changes needed here) ---
   const totalMembers = await prisma.member.count({
     where: { status: "active" },
   });
 
-  // New members in the last month
   const newMembersLastMonth = await prisma.member.count({
     where: {
       createdAt: {
@@ -35,7 +34,6 @@ export async function getLibraryStats() {
     },
   });
 
-  // New members this month (to compute % change)
   const newMembersThisMonth = await prisma.member.count({
     where: {
       createdAt: {
@@ -46,8 +44,11 @@ export async function getLibraryStats() {
     },
   });
 
+  // --- Circulation Statistics (Updated for new schema) ---
+
   // Books issued today
-  const booksIssuedToday = await prisma.issuedBook.count({
+  // CHANGE: Switched from `issuedBook` to the new `circulation` model.
+  const booksIssuedToday = await prisma.circulation.count({
     where: {
       issueDate: {
         gte: todayStart,
@@ -56,11 +57,11 @@ export async function getLibraryStats() {
     },
   });
 
-  // Books issued on the same day last month
+  // Books issued on the same day last month for comparison
   const sameDayLastMonthStart = startOfDay(subMonths(today, 1));
   const sameDayLastMonthEnd = endOfDay(subMonths(today, 1));
-
-  const booksIssuedLastMonthSameDay = await prisma.issuedBook.count({
+  // CHANGE: Switched from `issuedBook` to `circulation`.
+  const booksIssuedLastMonthSameDay = await prisma.circulation.count({
     where: {
       issueDate: {
         gte: sameDayLastMonthStart,
@@ -69,34 +70,44 @@ export async function getLibraryStats() {
     },
   });
 
-  // Overdue books (due date has passed and not returned)
-  const overdueBooks = await prisma.issuedBook.count({
+  // Overdue books
+  // CHANGE: Logic updated for accuracy. An overdue book is one where the
+  // due date has passed AND the `returnDate` is null.
+  const overdueBooks = await prisma.circulation.count({
     where: {
       dueDate: {
         lt: today,
       },
+      returnDate: null, // This is the crucial new condition
     },
   });
 
-  // Overdue books last month
-  const overdueBooksLastMonth = await prisma.issuedBook.count({
+  // Overdue books from last month for comparison
+  // NOTE: This counts books that BECAME due last month and are still not returned.
+  // CHANGE: Updated to use `circulation` and check for `returnDate: null`.
+  const overdueBooksLastMonth = await prisma.circulation.count({
     where: {
       dueDate: {
         gte: lastMonthStart,
         lte: lastMonthEnd,
       },
+      returnDate: null,
     },
   });
 
-  // Pending returns (books not yet returned)
-  const pendingReturns = await prisma.issuedBook.count({
+  // Pending returns (total books currently on loan)
+  // CHANGE: Logic updated to be more meaningful. This now counts ALL books
+  // that have not yet been returned, regardless of due date.
+  const pendingReturns = await prisma.circulation.count({
     where: {
-      dueDate: { lt: today },
+      returnDate: null,
     },
   });
 
-  // Pending returns last month
-  const pendingReturnsLastMonth = await prisma.issuedBook.count({
+  // Books issued last month (used for pending returns comparison)
+  // CHANGE: Switched from `issuedBook` to `circulation`. The logic remains
+  // the same as your original code for a consistent comparison metric.
+  const pendingReturnsLastMonth = await prisma.circulation.count({
     where: {
       issueDate: {
         gte: lastMonthStart,
@@ -105,7 +116,7 @@ export async function getLibraryStats() {
     },
   });
 
-  // Helper to calculate percentage change
+  // Helper function to calculate percentage change
   const percentChange = (current, previous) => {
     if (previous === 0) return current === 0 ? 0 : 100;
     return ((current - previous) / previous) * 100;

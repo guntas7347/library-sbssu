@@ -11,7 +11,11 @@ export const findIssuedBooksHandler = async (req, res) => {
     const now = new Date();
 
     // Build the 'where' clause for the Prisma query using a switch statement
-    let where = {};
+    // CHANGE: The base condition is that a `returnDate` must be null.
+    let where = {
+      returnDate: null,
+    };
+
     switch (filter) {
       case "irn":
         if (value) {
@@ -42,9 +46,10 @@ export const findIssuedBooksHandler = async (req, res) => {
     }
 
     // Fetch the total count and the paginated data in a single transaction
-    const [totalCount, issuedBooks] = await prisma.$transaction([
-      prisma.issuedBook.count({ where }),
-      prisma.issuedBook.findMany({
+    // CHANGE: Switched from `issuedBook` to `circulation` model.
+    const [totalCount, circulations] = await prisma.$transaction([
+      prisma.circulation.count({ where }),
+      prisma.circulation.findMany({
         where,
         take: limit,
         skip,
@@ -89,7 +94,8 @@ export const findIssuedBooksHandler = async (req, res) => {
     const fineRates = fineSettings?.value || {};
 
     // Enhance the data with calculated fields like fines and overdue status
-    const enhancedData = issuedBooks.map((item) => {
+    // CHANGE: Mapped over `circulations` instead of `issuedBooks`.
+    const enhancedData = circulations.map((item) => {
       const isOverdue = item.dueDate < now;
       const daysOverdue = isOverdue
         ? Math.floor((now - item.dueDate) / (1000 * 60 * 60 * 24))

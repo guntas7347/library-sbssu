@@ -1,22 +1,18 @@
-import { BookMarked } from "lucide-react";
+import { BookMarked, BookX } from "lucide-react";
 import React, { useState } from "react";
 import server from "../../../../../services/server.api";
 import useFeedback from "../../../../../hooks/useFeedback";
 import Confirmation from "./Confirmation";
 import useAlert from "../../../../../hooks/useAlert";
+import LostBookReport from "./LostBookReport";
 
 const Summary = ({ data }) => {
   const setFeedback = useFeedback();
   const [btn, setBtn] = useState(true);
   const { showAlert, closeAlert, openAlert } = useAlert();
+  const [showLost, setShowLost] = useState(false);
 
   const handleReturnBook = async () => {
-    // If essential data is missing, do nothing.
-    if (!data?.issue?.id) {
-      setFeedback(2, "Cannot process return: Missing issue ID.");
-      return;
-    }
-
     try {
       setBtn(false);
       const res = await server.return.return({
@@ -74,14 +70,24 @@ const Summary = ({ data }) => {
           </div>
         </div>
       </div>
-      <button
-        onClick={openAlert}
-        disabled={!btn}
-        className="w-full mt-5 px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white rounded-2xl hover:from-blue-700 hover:to-blue-800 dark:hover:from-blue-600 dark:hover:to-blue-700 transition-all duration-300 font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-      >
-        <BookMarked className="w-6 h-6" />
-        <span>Return Book</span>
-      </button>
+      <div className="flex gap-2 items-center mt-5">
+        <button
+          onClick={openAlert}
+          disabled={!btn || showLost}
+          className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 text-white rounded-2xl hover:from-blue-700 hover:to-blue-800 dark:hover:from-blue-600 dark:hover:to-blue-700 transition-all duration-300 font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+        >
+          <BookMarked className="w-6 h-6" />
+          <span>Return Book</span>
+        </button>
+
+        <button
+          onClick={() => setShowLost(!showLost)}
+          className="px-6 py-4 bg-gradient-to-r from-red-600 to-red-700 dark:from-red-500 dark:to-red-600 text-white rounded-2xl hover:from-red-700 hover:to-red-800 dark:hover:from-red-600 dark:hover:to-red-700 transition-all duration-300 font-semibold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+        >
+          <BookX className="size-6" />
+        </button>
+      </div>
+      {showLost && <LostBookReport data={data} />}
       <Confirmation
         show={showAlert}
         onYes={handleReturnBook}

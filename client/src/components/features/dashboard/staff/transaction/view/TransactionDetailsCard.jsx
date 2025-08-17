@@ -59,9 +59,10 @@ const TransactionDetailsCard = ({ data }) => {
             label="Closing Balance"
             value={`₹${data?.closingBalance?.toFixed(2) ?? "0.00"}`}
           />
-        </div>
-
-        <div className="mt-6">
+          <InfoField
+            label="Current Balance"
+            value={`₹${data?.currentBalance?.toFixed(2) ?? "0.00"}`}
+          />
           <InfoField label="Staff" value={data?.issuedBy ?? "N/A"} />
         </div>
 

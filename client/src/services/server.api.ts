@@ -93,7 +93,9 @@ const server = {
   return: {
     fetch: (e) =>
       restCall(`staff/return/fetch?number=${e}`, null, "RETURN_200_FETCHED"),
-    return: (e) => restCall("staff/return/return", e, "RETURN_201_BOOK_ISSUED"),
+    return: (e) => restCall("staff/return/return", e, "RETURN_200_SUCCESS"),
+    reportLost: (e) =>
+      restCall("staff/return/report-lost", e, "RETURN_200_LOST_SUCCESS"),
     search: (e) =>
       restCall(`staff/return/all?${e}`, null, "RETURN_200_FETCHED"),
     fetchReturn: (e) =>

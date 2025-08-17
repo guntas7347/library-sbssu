@@ -6,21 +6,23 @@ import { createLog } from "../../utils/log.js";
  * Fetches a complete profile for a single book, including its publication details,
  * copy statuses, and a list of current issues.
  *
- * @param {string} bookId - The ID of the book to fetch.
- * @returns {Promise<object|false>} The formatted book profile object, or false if not found.
+ * @param {import("express").Request} req - The Express request object.
+ * @param {import("express").Response} res - The Express response object.
+ * @returns {Promise<void>}
  */
-
 export const fetchBookProfileHandler = async (req, res) => {
   try {
-    // 1. Fetch the book and all its related copies (accessions) in one query.
-    // For each accession, include details about its current issue, if it has one.
+    // 1. Fetch the book and its related accessions. For each accession,
+    //    include its currently active circulation record (if one exists).
     const book = await prisma.book.findUnique({
       where: { id: req.validatedQuery.id },
       include: {
         accessions: {
           include: {
-            // We need to get the currently active issue for each accession copy
-            issuedBooks: {
+            // CHANGE: Replaced `issuedBooks` with `circulations`.
+            // ADDED: A `where` clause to only fetch circulations that are active (not returned).
+            circulations: {
+              where: { returnDate: null },
               include: {
                 libraryCard: {
                   select: {
@@ -45,7 +47,7 @@ export const fetchBookProfileHandler = async (req, res) => {
 
     // 2. Process the raw data to create the structure needed by the frontend.
 
-    // A. Calculate copy statistics
+    // A. Calculate copy statistics (this logic remains the same)
     const totalCopies = book.accessions.length;
     const availableCopies = book.accessions.filter(
       (acc) => acc.status === "available"
@@ -53,20 +55,21 @@ export const fetchBookProfileHandler = async (req, res) => {
     const issuedCopies = totalCopies - availableCopies;
 
     // B. Format the list of current issues
+    // CHANGE: Logic now checks for active circulations instead of issuedBooks.
     const currentIssues = book.accessions
-      // Filter for accessions that are actually issued and have a corresponding record
-      .filter((acc) => acc.status === "issued" && acc.issuedBooks.length > 0)
+      // Filter for accessions that are issued and have an active circulation record.
+      .filter((acc) => acc.status === "issued" && acc.circulations.length > 0)
       .map((acc) => {
-        // An accession can only have one active issue at a time
-        const issue = acc.issuedBooks[0];
-        const isOverdue = new Date(issue.dueDate) < new Date();
+        // An accession can only have one active circulation at a time.
+        const circulation = acc.circulations[0];
+        const isOverdue = new Date(circulation.dueDate) < new Date();
 
         return {
-          id: issue.id,
-          memberId: issue.libraryCard.member.membershipId,
-          memberName: issue.libraryCard.member.fullName,
-          issueDate: new Date(issue.issueDate).toDateString(),
-          dueDate: new Date(issue.dueDate).toDateString(),
+          id: circulation.id,
+          memberId: circulation.libraryCard.member.membershipId,
+          memberName: circulation.libraryCard.member.fullName,
+          issueDate: new Date(circulation.issueDate).toDateString(),
+          dueDate: new Date(circulation.dueDate).toDateString(),
           status: isOverdue ? "Overdue" : "Issued",
         };
       });
@@ -90,7 +93,6 @@ export const fetchBookProfileHandler = async (req, res) => {
       source: book.source,
       cost: book.cost,
       description: book.description,
-      // Pass the accessions to get the total count on the frontend
       accessions: book.accessions,
 
       // For CurrentIssues

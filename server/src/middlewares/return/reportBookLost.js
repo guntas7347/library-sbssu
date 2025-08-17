@@ -2,18 +2,16 @@ import prisma from "../../services/prisma.js";
 import crs from "../../utils/crs/crs.js";
 import { createLog } from "../../utils/log.js";
 import { emailService } from "../../services/emailService.js";
-import { fetchSettings } from "../../controllers/settings.controller.js";
 
 /**
- * A self-contained handler for the entire book return process,
- * updated to use the unified 'Circulation' model.
+ * A self-contained handler to process a lost book report.
+ * This closes the original loan and creates a separate fine for the lost item.
  */
-export const returnBookHandler = async (req, res) => {
+export const reportBookLostHandler = async (req, res) => {
   try {
-    const { id: circulationId, returnRemark } = req.body;
-
+    const { id: circulationId, returnRemark, fine } = req.body;
     const authId = req.user.uid;
-    const returnDate = new Date();
+    const lostDate = new Date();
 
     // --- 1. PRE-CHECKS ---
     const staff = await prisma.staff.findFirst({
@@ -26,7 +24,7 @@ export const returnBookHandler = async (req, res) => {
         .json(crs("Authenticated user is not a valid staff member."));
     }
 
-    // --- 2. PROCESS RETURN IN A SINGLE TRANSACTION ---
+    // --- 2. PROCESS LOST BOOK IN A SINGLE TRANSACTION ---
     const { emailPayload, transactionEmail } = await prisma.$transaction(
       async (tx) => {
         // a. Find the active circulation record
@@ -43,33 +41,24 @@ export const returnBookHandler = async (req, res) => {
           throw new Error("P2025"); // Prisma's "Record not found" error code
         }
 
-        // b. Calculate Fine
-        const fineSettings = await fetchSettings("FINE-PER-DAY", tx);
-        const fineRates = fineSettings?.value || {};
-        const memberType = circulation.libraryCard.member.memberType;
-        const FINE_PER_DAY = fineRates[memberType] || 0;
-        const daysOverdue = Math.max(
-          0,
-          Math.floor((returnDate - circulation.dueDate) / (1000 * 60 * 60 * 24))
-        );
-        const fineAmount = daysOverdue * FINE_PER_DAY * 100;
-
-        // c. Create Transaction if there is a fine
+        // b. Create a separate DEBIT transaction for the lost book fine
+        const lostBookFee = fine * 100; // Convert to cents
         let transactionEmailData = null;
-        if (fineAmount > 0) {
+
+        if (lostBookFee > 0) {
           const memberBalance = circulation.libraryCard.member.balance;
-          // CORRECTED: Restored original logic where a fine DECREASES the balance.
-          const newBalance = memberBalance - fineAmount;
+          const newBalance = memberBalance - lostBookFee; // Debit decreases balance
 
           const transaction = await tx.transaction.create({
             data: {
               memberId: circulation.libraryCard.memberId,
-              circulationId: circulation.id, // Link fine to the circulation
+              circulationId: circulation.id, // Link the fine to the original loan
               transactionType: "DEBIT",
-              category: "book_overdue",
-              amount: fineAmount,
-              paymentMethod: "auto_debited",
+              category: "book_lost_fee",
+              amount: lostBookFee,
+              paymentMethod: "auto_debit",
               issuedById: staff.id,
+              remark: "Fee for lost book",
             },
           });
 
@@ -82,43 +71,42 @@ export const returnBookHandler = async (req, res) => {
             email: circulation.libraryCard.member.email,
             fullName: circulation.libraryCard.member.fullName,
             transactionType: transaction.transactionType,
-            amount: transaction.amount / 100, // Convert back for display
+            amount: transaction.amount / 100,
             balance: newBalance / 100,
             category: transaction.category,
             date: new Date(transaction.createdAt).toLocaleDateString(),
           };
         }
 
-        // d. Update the Circulation record with return details
+        // c. "Return" the book to close the circulation record
         await tx.circulation.update({
           where: { id: circulationId },
           data: {
-            returnDate,
+            returnDate: lostDate,
             returnedById: staff.id,
-            returnRemark,
+            returnRemark: `Book reported as lost. ${returnRemark || ""}`.trim(),
           },
         });
 
-        // e. Update statuses
+        // d. Update statuses: Mark the physical book as 'lost'
         await tx.libraryCard.update({
           where: { id: circulation.libraryCard.id },
-          data: { status: "available" },
+          data: { status: "available" }, // Card is now free
         });
         await tx.accession.update({
           where: { id: circulation.bookAccessionId },
-          data: { status: "available" },
+          data: { status: "lost" }, // This copy is now out of circulation
         });
 
-        // f. Prepare return confirmation email payload
+        // e. Prepare a confirmation email payload for the 'return' action
         const returnEmailPayload = {
           name: circulation.libraryCard.member.fullName,
           email: circulation.libraryCard.member.email,
           accessionNumber: circulation.bookAccession.accessionNumber,
           title: circulation.bookAccession.book.title,
-          author: circulation.bookAccession.book.author,
-          returnDate: returnDate.toLocaleDateString(),
+          returnDate: lostDate.toLocaleDateString(),
           issueDate: new Date(circulation.issueDate).toLocaleDateString(),
-          fine: `₹${fineAmount / 100}`,
+          fine: "N/A (See Lost Book Fee)",
           cardNumber: circulation.libraryCard.cardNumber,
         };
 
@@ -132,23 +120,25 @@ export const returnBookHandler = async (req, res) => {
     // --- 3. SEND NOTIFICATIONS (Non-blocking) ---
     if (emailPayload) {
       const { email, ...details } = emailPayload;
-      emailService.sendReturnConfirmationEmail(email, details);
+      emailService.sendReturnConfirmationEmail(email, {
+        ...details,
+        isLost: true,
+      });
     }
     if (transactionEmail) {
       const { email, ...details } = transactionEmail;
       emailService.sendTransactionConfirmationEmail(email, details);
     }
 
-    return res.status(200).json(crs.RETURN_200_SUCCESS());
+    return res.status(200).json(crs.RETURN_200_LOST_SUCCESS());
   } catch (error) {
     createLog(error);
-    // Handle specific error for record not found within transaction
     if (error.message === "P2025") {
       return res
         .status(404)
         .json(
           crs(
-            "Return failed: The book issue record was not found or has already been processed."
+            "Action failed: The book issue record was not found or has already been processed."
           )
         );
     }

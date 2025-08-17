@@ -4,22 +4,26 @@ import crs from "../../utils/crs/crs.js";
 import { createLog } from "../../utils/log.js";
 
 /**
- * A self-contained handler to fetch all details needed for a book return.
+ * For searching issued book for returning purpose.
  */
 export const fetchReturnDetailsHandler = async (req, res) => {
   try {
     // 1. Get the validated accession number from the query
     const { number: accessionNumber } = req.validatedQuery;
 
-    // 2. Find the unique issued book record
-    const issuedBook = await prisma.issuedBook.findFirst({
-      where: { bookAccession: { accessionNumber } },
+    // 2. Find the unique active circulation record for the given accession number
+    // CHANGE: Switched from `issuedBook.findFirst` to `circulation.findFirst`
+    // ADDED: A condition to only find records where `returnDate` is null.
+    const activeCirculation = await prisma.circulation.findFirst({
+      where: {
+        bookAccession: { accessionNumber },
+        returnDate: null, // This ensures we only get currently issued books
+      },
       select: {
         id: true,
         issueRefNumber: true,
         issueDate: true,
         dueDate: true,
-
         issueRemark: true,
         issuedBy: { select: { fullName: true } },
         bookAccession: {
@@ -56,8 +60,8 @@ export const fetchReturnDetailsHandler = async (req, res) => {
       },
     });
 
-    // 3. If no issued book is found, return a 404
-    if (!issuedBook) {
+    // 3. If no active circulation is found, return a 404
+    if (!activeCirculation) {
       return res.status(404).json(crs("This book is not currently issued."));
     }
 
@@ -65,43 +69,44 @@ export const fetchReturnDetailsHandler = async (req, res) => {
     const now = new Date();
     const fineSettings = await fetchSettings("FINE-PER-DAY");
     const fineRates = fineSettings?.value || {};
-    const memberType = issuedBook.libraryCard.member.memberType;
+    const memberType = activeCirculation.libraryCard.member.memberType;
     const FINE_PER_DAY = fineRates[memberType] || 0;
 
-    const isOverdue = issuedBook.dueDate < now;
+    const isOverdue = activeCirculation.dueDate < now;
     const daysOverdue = isOverdue
-      ? Math.floor((now - issuedBook.dueDate) / (1000 * 60 * 60 * 24))
+      ? Math.floor((now - activeCirculation.dueDate) / (1000 * 60 * 60 * 24))
       : 0;
     const fineAmount = daysOverdue * FINE_PER_DAY;
 
     // 5. Format the data for the frontend
+    // CHANGE: Renamed `issuedBook` to `activeCirculation` throughout this section
     const returnDetails = {
       issue: {
-        id: issuedBook.id,
-        issueRefNumber: issuedBook.issueRefNumber,
-        issueDate: issuedBook.issueDate.toISOString(),
-        dueDate: issuedBook.dueDate.toISOString(),
-        issueCondition: issuedBook.bookAccession.condition,
-        issueRemark: issuedBook.issueRemark || "None",
-        issuedBy: issuedBook.issuedBy?.fullName ?? "N/A",
+        id: activeCirculation.id,
+        issueRefNumber: activeCirculation.issueRefNumber,
+        issueDate: activeCirculation.issueDate.toISOString(),
+        dueDate: activeCirculation.dueDate.toISOString(),
+        issueCondition: activeCirculation.bookAccession.condition,
+        issueRemark: activeCirculation.issueRemark || "None",
+        issuedBy: activeCirculation.issuedBy?.fullName ?? "N/A",
         daysOverdue,
       },
       book: {
-        id: issuedBook.bookAccession.book.id,
-        title: issuedBook.bookAccession.book.title,
-        author: issuedBook.bookAccession.book.author,
-        accessionNumber: issuedBook.bookAccession.accessionNumber,
-        isbn: issuedBook.bookAccession.book.isbn,
-        category: issuedBook.bookAccession.category,
-        location: issuedBook.bookAccession.book.location,
+        id: activeCirculation.bookAccession.book.id,
+        title: activeCirculation.bookAccession.book.title,
+        author: activeCirculation.bookAccession.book.author,
+        accessionNumber: activeCirculation.bookAccession.accessionNumber,
+        isbn: activeCirculation.bookAccession.book.isbn,
+        category: activeCirculation.bookAccession.category,
+        location: activeCirculation.bookAccession.book.location,
       },
       member: {
-        id: issuedBook.libraryCard.member.id,
-        fullName: issuedBook.libraryCard.member.fullName,
-        photo: issuedBook.libraryCard.member.photo,
-        program: issuedBook.libraryCard.member.program,
-        membershipId: issuedBook.libraryCard.member.membershipId,
-        cardNumber: issuedBook.libraryCard.cardNumber,
+        id: activeCirculation.libraryCard.member.id,
+        fullName: activeCirculation.libraryCard.member.fullName,
+        photo: activeCirculation.libraryCard.member.photo,
+        program: activeCirculation.libraryCard.member.program,
+        membershipId: activeCirculation.libraryCard.member.membershipId,
+        cardNumber: activeCirculation.libraryCard.cardNumber,
       },
       fine: fineAmount,
     };

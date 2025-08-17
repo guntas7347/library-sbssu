@@ -1,6 +1,7 @@
 import prisma from "../../services/prisma.js";
 import crs from "../../utils/crs/crs.js";
 import { createLog } from "../../utils/log.js";
+import { emailService } from "../../services/emailService.js";
 
 /**
  * A self-contained handler for creating a new transaction and updating a member's balance.
@@ -31,55 +32,70 @@ export const createTransactionHandler = async (req, res) => {
     }
 
     // 2. Perform the balance update and transaction creation atomically
-    const transaction = await prisma.$transaction(async (tx) => {
-      // a. Fetch the member's current balance, locking the row for this transaction
-      const member = await tx.member.findUnique({
-        where: { id: memberId },
-        select: { balance: true },
-      });
+    const { transaction, memberDetails } = await prisma.$transaction(
+      async (tx) => {
+        // a. Fetch the member's current balance and details, locking the row
+        const member = await tx.member.findUnique({
+          where: { id: memberId },
+          select: { balance: true, email: true, fullName: true },
+        });
 
-      if (!member) {
-        throw new Error("MemberNotFound"); // Custom error to be caught below
+        if (!member) {
+          throw new Error("MemberNotFound"); // Custom error to be caught below
+        }
+
+        // b. Calculate the new balance
+        // CORRECTED: Restored original logic.
+        // DEBIT (fine/charge) decreases the balance.
+        // CREDIT (payment) increases the balance.
+        const currentBalance = member.balance;
+        const newBalance =
+          transactionType === "DEBIT"
+            ? currentBalance - amount
+            : currentBalance + amount;
+
+        // c. Update the member's balance
+        await tx.member.update({
+          where: { id: memberId },
+          data: { balance: newBalance },
+        });
+
+        // d. Create the transaction record (without closingBalance)
+        const newTransaction = await tx.transaction.create({
+          data: {
+            memberId,
+            transactionType,
+            category,
+            amount: amount,
+            paymentMethod,
+            receiptNumber,
+            issuedById: staff.id,
+            remark,
+          },
+        });
+
+        return {
+          transaction: newTransaction,
+          memberDetails: { ...member, newBalance },
+        };
       }
+    );
 
-      // b. Calculate the new balance
-      const currentBalance = member.balance;
-      const newBalance =
-        transactionType === "DEBIT"
-          ? currentBalance - amount // Debit decreases balance
-          : currentBalance + amount; // Credit increases balance
-
-      // c. Update the member's balance
-      await tx.member.update({
-        where: { id: memberId },
-        data: { balance: newBalance },
-      });
-
-      // d. Create the transaction record with the correct closing balance
-      return tx.transaction.create({
-        data: {
-          memberId,
-          transactionType,
-          category,
-          amount: amount,
-          closingBalance: newBalance,
-          paymentMethod,
-          receiptNumber,
-          issuedById: staff.id,
-          remark,
-        },
-      });
-    });
+    // 3. Send transaction confirmation email (non-blocking)
     const transactionEmail = {
-      email: transaction,
-      fullName: transaction.fullName,
+      email: memberDetails.email,
+      fullName: memberDetails.fullName,
       transactionType: transaction.transactionType,
-      amount: transaction.amount / 100,
-      balance: transaction.closingBalance / 100,
+      amount: transaction.amount / 100, // Convert from cents for display
+      balance: memberDetails.newBalance / 100, // Use the calculated new balance
       category: transaction.category,
       date: new Date(transaction.createdAt).toLocaleDateString(),
     };
-    console.log(transaction);
+
+    emailService.sendTransactionConfirmationEmail(
+      transactionEmail.email,
+      transactionEmail
+    );
 
     return res.status(201).json(crs.TRANSACTION_201_CREATED(transaction));
   } catch (error) {

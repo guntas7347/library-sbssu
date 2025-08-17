@@ -1,9 +1,7 @@
-import { lazy } from "react";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 import NotFoundPage from "../components/404/404";
 import ProtectedRoute from "./ProtectedRoute";
-import Spinner from "../components/feedback/spinner/Spinner";
 import { Loader2 } from "lucide-react";
 
 const StaffRoutes = lazy(() => import("./staff/staff.routes"));

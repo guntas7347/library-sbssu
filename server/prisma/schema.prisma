@@ -15,6 +15,11 @@ enum Gender {
   other
 }
 
+enum TransactionType {
+  CREDIT
+  DEBIT
+}
+
 model Member {
   id                 String        @id @default(uuid())
   membershipId       String?       @unique
@@ -48,26 +53,25 @@ model Member {
 }
 
 model LibraryCard {
-  id            String         @id @default(uuid())
-  member        Member         @relation(fields: [memberId], references: [id])
-  memberId      String
-  cardNumber    String         @unique
-  status        String         @default("available")
-  type          String
-  expiry        DateTime
-  remark        String?
-  createdBy     String
-  autoAlloted   Boolean        @default(false)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  staff         Staff?         @relation("StaffLibraryCards", fields: [createdBy], references: [id])
-  issuedBooks   IssuedBook[]
-  returnedBooks ReturnedBook[]
+  id           String        @id @default(uuid())
+  member       Member        @relation(fields: [memberId], references: [id])
+  memberId     String
+  cardNumber   String        @unique
+  status       String        @default("available")
+  type         String
+  expiry       DateTime
+  remark       String?
+  createdBy    String
+  autoAlloted  Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  staff        Staff?        @relation("StaffLibraryCards", fields: [createdBy], references: [id])
+  circulations Circulation[]
 }
 
 model Staff {
-  id                   String         @id @default(uuid())
-  idNumber             String         @unique
+  id                   String        @id @default(uuid())
+  idNumber             String        @unique
   fullName             String
   authId               String?
   phoneNumber          String?
@@ -81,13 +85,12 @@ model Staff {
   joiningDate          DateTime?
   employmentStatus     String?
   photo                String?
-  createdAt            DateTime       @default(now())
-  libraryCards         LibraryCard[]  @relation("StaffLibraryCards")
+  createdAt            DateTime      @default(now())
+  libraryCards         LibraryCard[] @relation("StaffLibraryCards")
   auth                 Auth?
-  issuedBooks          IssuedBook[]   @relation("IssuedByStaff")
-  returnedBooks        ReturnedBook[] @relation("ReturnedByStaff")
-  returnsOfIssuedBooks ReturnedBook[] @relation("IssuedByStaffReturned")
-  transactions         Transaction[]
+  issuedCirculations   Circulation[] @relation("IssuedByStaff")
+  receivedCirculations Circulation[] @relation("ReturnedByStaff")
+  issuedTransactions   Transaction[]
 }
 
 model Auth {
@@ -145,72 +148,57 @@ model Book {
 }
 
 model Accession {
-  id              String         @id @default(uuid())
-  book            Book           @relation(fields: [bookId], references: [id])
+  id              String        @id @default(uuid())
+  book            Book          @relation(fields: [bookId], references: [id])
   bookId          String
-  condition       String?        @default("unknown")
-  accessionNumber Int            @unique
-  status          String         @default("available")
+  condition       String?       @default("unknown")
+  accessionNumber Int           @unique
+  status          String        @default("available")
   category        String?
-  timesIssued     Int            @default(0)
-  issuedBooks     IssuedBook[]
-  returnedBooks   ReturnedBook[]
+  timesIssued     Int           @default(0)
+  circulations    Circulation[]
 }
 
-model IssuedBook {
+model Circulation {
   id              String      @id @default(uuid())
-  issueRefNumber  String      @unique
+  issueRefNumber  String      @unique // Unique reference for the entire loan transaction
   bookAccession   Accession   @relation(fields: [bookAccessionId], references: [id])
   bookAccessionId String
   libraryCard     LibraryCard @relation(fields: [libraryCardId], references: [id])
   libraryCardId   String
-  issueDate       DateTime
-  dueDate         DateTime
-  issuedBy        Staff       @relation("IssuedByStaff", fields: [issuedById], references: [id])
-  issuedById      String
-  issueRemark     String?
-}
 
-model ReturnedBook {
-  id              String       @id @default(uuid())
-  issueRefNumber  String       @unique
-  bookAccession   Accession    @relation(fields: [bookAccessionId], references: [id])
-  bookAccessionId String
-  libraryCard     LibraryCard  @relation(fields: [libraryCardId], references: [id])
-  libraryCardId   String
-  issueDate       DateTime
-  dueDate         DateTime
-  returnDate      DateTime
-  fine            Transaction? @relation("ReturnFine")
-  fineId          String?      @unique
-  issuedBy        Staff        @relation("IssuedByStaffReturned", fields: [issuedById], references: [id])
-  issuedById      String
-  returnedBy      Staff        @relation("ReturnedByStaff", fields: [returnedById], references: [id])
-  returnedById    String
-  issueRemark     String?
-  returnRemark    String?
-}
+  // --- Issue Details ---
+  issueDate   DateTime
+  dueDate     DateTime
+  issuedBy    Staff    @relation("IssuedByStaff", fields: [issuedById], references: [id])
+  issuedById  String
+  issueRemark String?
 
-enum TransactionType {
-  CREDIT
-  DEBIT
+  // --- Return Details (nullable, filled upon return) ---
+  returnDate   DateTime?
+  returnedBy   Staff?    @relation("ReturnedByStaff", fields: [returnedById], references: [id])
+  returnedById String?
+  returnRemark String?
+
+  // --- Fine Relationship ---
+  // A loan can have one associated fine transaction.
+  fine Transaction? @relation("CirculationFine")
 }
 
 model Transaction {
   id              String          @id @default(uuid())
   member          Member          @relation(fields: [memberId], references: [id])
   memberId        String
-  returnedBook    ReturnedBook?   @relation("ReturnFine", fields: [returnedBookId], references: [id])
-  returnedBookId  String?         @unique
+  circulation     Circulation?    @relation("CirculationFine", fields: [circulationId], references: [id])
+  circulationId   String?         @unique
   issuedBy        Staff?          @relation(fields: [issuedById], references: [id])
   issuedById      String?
   transactionType TransactionType
-  category        String
+  category        String // e.g., "Fine", "Membership Fee", "Security Deposit"
   remark          String?
-  amount          Int
+  amount          Int // The value of the transaction
   receiptNumber   String?
   paymentMethod   String
-  closingBalance  Int
   createdAt       DateTime        @default(now())
 }
 

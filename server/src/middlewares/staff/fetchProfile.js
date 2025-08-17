@@ -17,16 +17,16 @@ export const fetchProfileHandler = async (req, res) => {
     }
 
     // 1. Fetch the core staff profile and their direct relations.
+    // CHANGE: Updated _count to use `issuedCirculations` instead of `issuedBooks`.
     const staff = await prisma.staff.findFirst({
       where: { authId: req.user.uid },
       include: {
         auth: {
           select: { email: true }, // Get email from the related Auth record
         },
-        // Get counts for stats
         _count: {
           select: {
-            issuedBooks: true,
+            issuedCirculations: true, // This is the new relation name
             libraryCards: true, // Counts cards created, a proxy for members approved
           },
         },
@@ -34,15 +34,15 @@ export const fetchProfileHandler = async (req, res) => {
     });
 
     if (!staff) {
-      // This case should ideally not be hit if the first check passes, but it's a good safeguard.
       return res
         .status(404)
         .json(crs("Staff profile data could not be loaded."));
     }
 
     // 2. Fetch recent activities separately for a combined timeline.
-    const recentIssues = await prisma.issuedBook.findMany({
-      where: { issuedById: staffId.id }, // CORRECTED: Pass the ID directly
+    // CHANGE: Switched from `issuedBook` to `circulation` model.
+    const recentCirculations = await prisma.circulation.findMany({
+      where: { issuedById: staffId.id },
       orderBy: { issueDate: "desc" },
       take: 5,
       select: {
@@ -53,11 +53,12 @@ export const fetchProfileHandler = async (req, res) => {
     });
 
     // 3. Format the data into a clean structure for the frontend.
-    const issueActivities = recentIssues.map((i) => ({
-      id: i.id,
+    // CHANGE: Mapped over `recentCirculations`.
+    const issueActivities = recentCirculations.map((c) => ({
+      id: c.id,
       type: "book_issue",
-      description: `Issued book: ${i.bookAccession.book.title}`,
-      date: i.issueDate,
+      description: `Issued book: ${c.bookAccession.book.title}`,
+      date: c.issueDate,
     }));
 
     // Combine and sort all activities by date
@@ -86,9 +87,10 @@ export const fetchProfileHandler = async (req, res) => {
       employmentStatus: staff.employmentStatus,
 
       // Stats
+      // CHANGE: Updated the count to use the new relation name.
       stats: {
-        booksIssued: staff._count.issuedBooks,
-        membersApproved: staff._count.libraryCards, // Using card creation as a proxy
+        booksIssued: staff._count.issuedCirculations,
+        membersApproved: staff._count.libraryCards,
       },
 
       // History
